@@ -1,268 +1,369 @@
-# miniERP - Modular ERP System
+# miniERP - Monorepo
 
-A modern, modular ERP system built with NestJS, PostgreSQL, Prisma, and Redis.
+A modern, full-stack ERP system built with **NestJS + Angular** in a monorepo architecture.
 
-## Features
+## 📁 Project Structure
 
-- 🔐 **Authentication & Authorization**: JWT-based auth with refresh tokens, RBAC with role guards
-- 👥 **User Management**: Support for Employees, Client Users, and Supplier Users
-- 🏢 **Client & Supplier Management**: Complete CRUD operations
-- 📦 **Product Catalog**: Product management with supplier relationships
-- 💰 **Dynamic Pricing**: Hierarchical pricing with client/supplier overrides
-- 🧾 **Invoice System**: Draft→Issued→Paid workflow with immutable totals
-- 📊 **Audit Trail**: Track critical changes across the system
-- 🔒 **Resource Locking**: Redis-based edit locks (coming soon)
-- 📡 **Real-time Updates**: WebSocket support (coming soon)
-- 📝 **OpenAPI Documentation**: Auto-generated Swagger docs
-
-## Tech Stack
-
-- **Backend**: NestJS (Node.js + TypeScript)
-- **Database**: PostgreSQL 16
-- **ORM**: Prisma 6
-- **Cache/Queue**: Redis 7
-- **Auth**: Passport JWT
-- **Validation**: class-validator
-- **API Docs**: Swagger/OpenAPI
-- **Testing**: Jest
-
-## Prerequisites
-
-- Node.js 20+
-- Docker & Docker Compose
-- npm or yarn
-
-## Quick Start
-
-### 1. Clone and Install
-
-```bash
-cd /Users/emirsalihagic/git/miniERP
-npm install
+```
+miniERP/
+├── apps/
+│   ├── api/                    # NestJS Backend (REST API)
+│   │   ├── src/
+│   │   ├── prisma/
+│   │   └── package.json
+│   └── ui/                     # Angular Frontend (Ant Design)
+│       ├── src/
+│       └── package.json
+├── libs/
+│   └── shared/
+│       ├── types/              # Shared TypeScript types
+│       └── utils/              # Shared utilities
+├── tools/
+│   └── scripts/               # Build & deployment scripts
+├── docker-compose.yml         # PostgreSQL + Redis
+├── package.json               # Root package.json
+└── README.md
 ```
 
-### 2. Start Services (Database & Redis)
+## 🚀 Quick Start
+
+### 1. Install Dependencies
 
 ```bash
-make docker-up
-# or
+# Install root dependencies
+npm install
+
+# Install all app dependencies
+cd apps/api && npm install --legacy-peer-deps
+cd ../ui && npm install --legacy-peer-deps
+cd ../..
+```
+
+### 2. Start Services
+
+```bash
+# Start PostgreSQL & Redis
 docker-compose up -d
 ```
 
-### 3. Run Migrations
+### 3. Setup Database
 
 ```bash
-make migrate
-# or
+# Run migrations
+cd apps/api
 npm run migrate
-```
 
-### 4. Seed Database
-
-```bash
-make seed
-# or
+# Seed data
 npm run seed
+
+cd ../..
 ```
 
-This creates:
-- Admin user: `admin@minierp.com` / `password123`
-- 2 Suppliers
-- 3 Products with base pricing
-- 2 Clients
-- 1 Client-specific pricing override
+### 4. Start Development Servers
 
-### 5. Start Development Server
-
+**Terminal 1 - API:**
 ```bash
-make dev
-# or
-npm run start:dev
+npm run api:dev
+# or: cd apps/api && npm run start:dev
 ```
 
-The API will be available at:
+**Terminal 2 - UI:**
+```bash
+npm run ui:dev
+# or: cd apps/ui && ng serve
+```
+
+### 5. Access Applications
+
 - **API**: http://localhost:3000
 - **Swagger Docs**: http://localhost:3000/api-docs
-- **Health Check**: http://localhost:3000/health
+- **Frontend UI**: http://localhost:4200
 
-## Environment Variables
+---
 
-Copy `.env.example` to `.env` and configure:
+## 📦 Tech Stack
 
+### Backend (apps/api)
+- **Framework**: NestJS 11
+- **Database**: PostgreSQL 16
+- **ORM**: Prisma 6
+- **Auth**: Passport JWT
+- **Validation**: class-validator
+- **Documentation**: Swagger/OpenAPI
+
+### Frontend (apps/ui)
+- **Framework**: Angular 18
+- **UI Library**: Ant Design (ng-zorro-antd)
+- **State Management**: RxJS / Signals
+- **HTTP Client**: HttpClient
+- **Routing**: Angular Router
+
+### Shared (libs/shared)
+- **Types**: TypeScript interfaces/enums
+- **Utils**: Common utilities
+
+---
+
+## 🛠️ Development Commands
+
+### Root Level
+```bash
+npm run dev              # Start both API + UI
+npm run api:dev          # Start API only
+npm run ui:dev           # Start UI only
+npm run docker:up        # Start PostgreSQL + Redis
+npm run docker:down      # Stop services
+npm run install:all      # Install all dependencies
+```
+
+### API (apps/api)
+```bash
+cd apps/api
+npm run start:dev        # Development server
+npm run build            # Build for production
+npm run migrate          # Run database migrations
+npm run seed             # Seed database
+npm run prisma:studio    # Visual database browser
+npm run test             # Run tests
+```
+
+### UI (apps/ui)
+```bash
+cd apps/ui
+ng serve                 # Development server
+ng build                 # Build for production
+ng test                  # Run tests
+ng generate component    # Generate component
+```
+
+---
+
+## 🔐 Default Credentials
+
+After seeding the database:
+
+```
+Email: admin@minierp.com
+Password: password123
+```
+
+---
+
+## 📊 Features
+
+### ✅ Implemented
+- **Authentication**: JWT with refresh tokens
+- **Authorization**: Role-based access control (EMPLOYEE, CLIENT_USER, SUPPLIER_USER)
+- **User Management**: CRUD operations with role assignments
+- **Client Management**: Client companies and relationships
+- **Supplier Management**: Supplier companies and products
+- **Product Catalog**: Products with SKU, categories, soft-delete
+- **Pricing Engine**: Hierarchical pricing (client > supplier > base)
+- **Invoice System**: Complete invoice lifecycle (DRAFT → ISSUED → PAID)
+- **Audit Trail**: Track critical changes
+- **Health Checks**: Database connectivity monitoring
+
+### 🚧 Coming Soon
+- Angular UI components for all features
+- API client auto-generation from OpenAPI
+- Real-time updates (WebSocket)
+- PDF generation for invoices
+- Advanced reporting
+- File uploads
+
+---
+
+## 🎯 Monorepo Benefits
+
+1. **Shared Types**: Backend and frontend use the same TypeScript interfaces
+2. **Atomic Changes**: Update API + UI in a single commit
+3. **Code Reuse**: Share utilities, constants, validation logic
+4. **Simplified Setup**: One clone, one command to run everything
+5. **Type Safety**: End-to-end type checking
+
+---
+
+## 📝 Project Files
+
+### Shared Types (`libs/shared/types/index.ts`)
+
+All entities have shared TypeScript interfaces:
+- `User`, `UserRole`
+- `Client`, `Supplier`
+- `Product`, `Pricing`
+- `Invoice`, `InvoiceItem`, `InvoiceStatus`
+
+**Example:**
+```typescript
+import { Invoice, InvoiceStatus } from '@miniERP/shared-types';
+
+// Both API and UI use the same types!
+```
+
+### API Routes
+
+All routes are versioned `/api/v1/`:
+
+- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/register` - Register
+- `GET /api/v1/invoices` - List invoices
+- `POST /api/v1/invoices` - Create invoice
+- `POST /api/v1/invoices/:id/items` - Add invoice items
+- `POST /api/v1/invoices/:id/issue` - Issue invoice
+
+Full documentation: http://localhost:3000/api-docs
+
+---
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**API (.env in apps/api):**
 ```env
 NODE_ENV=development
 PORT=3000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/erp_db?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/erp_db"
 JWT_SECRET=your-secret-key
 JWT_REFRESH_SECRET=your-refresh-secret
 REDIS_HOST=localhost
 REDIS_PORT=6379
 ```
 
-## Project Structure
-
-```
-src/
-├── common/           # Shared utilities (guards, decorators, DTOs)
-├── config/           # Configuration files
-├── database/         # Prisma service
-├── modules/
-│   ├── auth/        # Authentication & JWT
-│   ├── users/       # User management
-│   ├── clients/     # Client management
-│   ├── suppliers/   # Supplier management
-│   ├── products/    # Product catalog
-│   ├── pricing/     # Pricing resolution engine
-│   ├── invoices/    # Invoice management
-│   └── health/      # Health checks
-├── app.module.ts
-└── main.ts
+**UI (environment.ts in apps/ui):**
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000'
+};
 ```
 
-## API Endpoints
+---
 
-### Authentication
-- `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `POST /api/v1/auth/logout` - Logout
+## 🐳 Docker
 
-### Invoices
-- `POST /api/v1/invoices` - Create draft invoice
-- `GET /api/v1/invoices` - List invoices
-- `GET /api/v1/invoices/:id` - Get invoice details
-- `POST /api/v1/invoices/:id/items` - Add item to invoice
-- `POST /api/v1/invoices/:id/issue` - Issue invoice
-
-## Example Workflow
-
-### 1. Register & Login
-
+Start all services:
 ```bash
-# Register
-curl -X POST http://localhost:3000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "employee@example.com",
-    "password": "password123",
-    "firstName": "John",
-    "lastName": "Doe",
-    "role": "EMPLOYEE"
-  }'
-
-# Login
-curl -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@minierp.com",
-    "password": "password123"
-  }'
-
-# Save the accessToken
-export TOKEN="<your_access_token>"
+docker-compose up -d
 ```
 
-### 2. Create Invoice
+Services running:
+- PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
 
+---
+
+## 🧪 Testing
+
+### API Tests
 ```bash
-# Create draft invoice
-curl -X POST http://localhost:3000/api/v1/invoices \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "clientId": "<client_id>",
-    "dueDate": "2025-12-31"
-  }'
-
-# Add items (pricing is auto-resolved)
-curl -X POST http://localhost:3000/api/v1/invoices/<invoice_id>/items \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "productId": "<product_id>",
-    "quantity": 10
-  }'
-
-# Issue invoice (makes totals immutable)
-curl -X POST http://localhost:3000/api/v1/invoices/<invoice_id>/issue \
-  -H "Authorization: Bearer $TOKEN"
+cd apps/api
+npm run test         # Unit tests
+npm run test:e2e     # E2E tests
+npm run test:cov     # Coverage
 ```
 
-## Available Commands
-
+### UI Tests
 ```bash
-make help           # Show all available commands
-make install        # Install dependencies
-make dev            # Run development server
-make build          # Build for production
-make test           # Run tests
-make lint           # Run linter
-make migrate        # Run database migrations
-make seed           # Seed database
-make prisma-studio  # Open Prisma Studio
-make docker-up      # Start Docker services
-make docker-down    # Stop Docker services
+cd apps/ui
+ng test              # Unit tests
+ng e2e               # E2E tests
 ```
 
-## Testing
+---
 
-```bash
-# Unit tests
-npm run test
+## 📚 Next Steps
 
-# E2E tests
-npm run test:e2e
+### For Frontend Development:
 
-# Test coverage
-npm run test:cov
-```
+1. **Create Login Component**
+   ```bash
+   cd apps/ui
+   ng generate component features/auth/login
+   ```
 
-## Prisma Studio
+2. **Add API Service**
+   ```bash
+   ng generate service core/api/api
+   ```
 
-Explore your database with Prisma Studio:
+3. **Install Ant Design Components**
+   Already installed! Import modules in `app.config.ts`
 
-```bash
-make prisma-studio
-# or
-npm run prisma:studio
-```
+4. **Create Dashboard**
+   ```bash
+   ng generate component features/dashboard
+   ```
 
-Open http://localhost:5555
+### For Backend Development:
 
-## Pricing Resolution Logic
+1. **Add New Module**
+   ```bash
+   cd apps/api
+   nest g resource feature-name
+   ```
 
-The pricing system uses a hierarchical resolution order:
+2. **Create Migration**
+   ```bash
+   npm run migrate
+   ```
 
-1. **Client-specific override** (highest priority)
-2. **Supplier-specific override**
-3. **Base product price** (fallback)
+3. **Update Shared Types**
+   Edit `libs/shared/types/index.ts`
 
-All pricing respects `effectiveFrom` and `effectiveTo` date windows.
+---
 
-## Production Deployment
+## 🤝 Contributing
 
-```bash
-# Build
-npm run build
+1. Create feature branch: `git checkout -b feature/my-feature`
+2. Make changes in `apps/api` or `apps/ui`
+3. Update shared types in `libs/shared/types` if needed
+4. Test both API and UI
+5. Commit: `git commit -m "feat: add feature"`
+6. Push and create PR
 
-# Run migrations
-npm run migrate:deploy
+---
 
-# Start production server
-npm run start:prod
-```
-
-Or use Docker:
-
-```bash
-docker build -t minierp .
-docker run -p 3000:3000 --env-file .env minierp
-```
-
-## License
+## 📄 License
 
 UNLICENSED - Private Project
 
-## Support
+---
 
-For questions or issues, contact the development team.
+## 💡 Tips
+
+- Use **Prisma Studio** to visually browse the database: `npm run api:migrate && cd apps/api && npx prisma studio`
+- Use **Swagger UI** to test APIs: http://localhost:3000/api-docs
+- Shared types are in `libs/shared/types` - update once, use everywhere
+- Both apps have hot-reload enabled for fast development
+
+---
+
+## 🆘 Troubleshooting
+
+### Port already in use
+```bash
+# Kill process on port 3000
+lsof -ti :3000 | xargs kill -9
+
+# Kill process on port 4200
+lsof -ti :4200 | xargs kill -9
+```
+
+### Database connection error
+```bash
+# Restart PostgreSQL
+docker-compose restart postgres
+
+# Check if running
+docker ps
+```
+
+### Cannot find shared types
+```bash
+# Rebuild TypeScript paths
+cd apps/ui
+npx ng build
+```
+
+**Happy Coding! 🚀**
