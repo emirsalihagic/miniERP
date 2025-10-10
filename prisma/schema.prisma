@@ -1,0 +1,234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  EMPLOYEE
+  CLIENT_USER
+  SUPPLIER_USER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  SENT
+  PAID
+  VOID
+}
+
+model User {
+  id                String    @id @default(uuid()) @db.Uuid
+  email             String    @unique
+  password          String
+  firstName         String    @map("first_name")
+  lastName          String    @map("last_name")
+  role              UserRole
+  isEmailVerified   Boolean   @default(false) @map("is_email_verified")
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  refreshToken      String?   @map("refresh_token")
+  
+  // Discriminator approach - only ONE should be set
+  clientId          String?   @unique @map("client_id") @db.Uuid
+  supplierId        String?   @unique @map("supplier_id") @db.Uuid
+  
+  client            Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+  @@index([email])
+  @@index([role])
+}
+
+model Client {
+  id                String    @id @default(uuid()) @db.Uuid
+  name              String
+  taxId             String?   @unique @map("tax_id")
+  email             String?
+  phone             String?
+  address           String?
+  city              String?
+  country           String?
+  isActive          Boolean   @default(true) @map("is_active")
+  
+  users             User[]
+  invoices          Invoice[]
+  pricingOverrides  Pricing[]
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("clients")
+  @@index([name])
+  @@index([isActive])
+}
+
+model Supplier {
+  id                String    @id @default(uuid()) @db.Uuid
+  name              String
+  taxId             String?   @unique @map("tax_id")
+  email             String?
+  phone             String?
+  address           String?
+  city              String?
+  country           String?
+  isActive          Boolean   @default(true) @map("is_active")
+  
+  users             User[]
+  products          Product[]
+  pricingOverrides  Pricing[]
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("suppliers")
+  @@index([name])
+  @@index([isActive])
+}
+
+model Product {
+  id                String    @id @default(uuid()) @db.Uuid
+  sku               String    @unique
+  name              String
+  description       String?
+  category          String?
+  unit              String    @default("pcs") // pcs, kg, liter, etc.
+  supplierId        String    @map("supplier_id") @db.Uuid
+  isActive          Boolean   @default(true) @map("is_active")
+  deletedAt         DateTime? @map("deleted_at") // soft delete
+  
+  supplier          Supplier       @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  pricing           Pricing[]
+  invoiceItems      InvoiceItem[]
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("products")
+  @@index([supplierId])
+  @@index([sku])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model Pricing {
+  id                String    @id @default(uuid()) @db.Uuid
+  productId         String    @map("product_id") @db.Uuid
+  
+  // Override scope - ALL null = base price
+  clientId          String?   @map("client_id") @db.Uuid
+  supplierId        String?   @map("supplier_id") @db.Uuid
+  
+  price             Decimal   @db.Decimal(10, 2)
+  currency          String    @default("USD")
+  taxRate           Decimal   @default(0) @map("tax_rate") @db.Decimal(5, 2) // percentage
+  discountPercent   Decimal   @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  
+  effectiveFrom     DateTime  @default(now()) @map("effective_from")
+  effectiveTo       DateTime? @map("effective_to")
+  
+  product           Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  client            Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("pricing")
+  @@index([productId])
+  @@index([clientId])
+  @@index([supplierId])
+  @@index([effectiveFrom, effectiveTo])
+  @@unique([productId, clientId, supplierId, effectiveFrom]) // prevent duplicate overrides
+}
+
+model Invoice {
+  id                String         @id @default(uuid()) @db.Uuid
+  invoiceNumber     String         @unique @map("invoice_number")
+  clientId          String         @map("client_id") @db.Uuid
+  status            InvoiceStatus  @default(DRAFT)
+  
+  // Computed totals (immutable after ISSUED)
+  subtotal          Decimal        @default(0) @db.Decimal(12, 2)
+  taxTotal          Decimal        @default(0) @map("tax_total") @db.Decimal(12, 2)
+  discountTotal     Decimal        @default(0) @map("discount_total") @db.Decimal(12, 2)
+  grandTotal        Decimal        @default(0) @map("grand_total") @db.Decimal(12, 2)
+  currency          String         @default("USD")
+  
+  issuedAt          DateTime?      @map("issued_at")
+  sentAt            DateTime?      @map("sent_at")
+  paidAt            DateTime?      @map("paid_at")
+  voidedAt          DateTime?      @map("voided_at")
+  dueDate           DateTime?      @map("due_date")
+  
+  notes             String?
+  
+  client            Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  items             InvoiceItem[]
+  auditTrail        AuditLog[]
+  
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@map("invoices")
+  @@index([clientId])
+  @@index([status])
+  @@index([issuedAt])
+  @@index([invoiceNumber])
+}
+
+model InvoiceItem {
+  id                String    @id @default(uuid()) @db.Uuid
+  invoiceId         String    @map("invoice_id") @db.Uuid
+  productId         String    @map("product_id") @db.Uuid
+  
+  // Snapshot at creation (immutable)
+  sku               String
+  productName       String    @map("product_name")
+  quantity          Decimal   @db.Decimal(10, 3)
+  unitPrice         Decimal   @map("unit_price") @db.Decimal(10, 2)
+  taxRate           Decimal   @map("tax_rate") @db.Decimal(5, 2)
+  discountPercent   Decimal   @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  
+  // Computed line totals
+  lineSubtotal      Decimal   @map("line_subtotal") @db.Decimal(12, 2)
+  lineTax           Decimal   @map("line_tax") @db.Decimal(12, 2)
+  lineDiscount      Decimal   @map("line_discount") @db.Decimal(12, 2)
+  lineTotal         Decimal   @map("line_total") @db.Decimal(12, 2)
+  
+  invoice           Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product           Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("invoice_items")
+  @@index([invoiceId])
+  @@index([productId])
+}
+
+model AuditLog {
+  id                String    @id @default(uuid()) @db.Uuid
+  entityType        String    @map("entity_type") // Invoice, Pricing, etc.
+  entityId          String    @map("entity_id") @db.Uuid
+  action            String    // CREATED, UPDATED, STATUS_CHANGED, etc.
+  userId            String?   @map("user_id") @db.Uuid
+  changes           Json?     // old/new values
+  metadata          Json?
+  
+  invoice           Invoice?  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
