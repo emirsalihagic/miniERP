@@ -112,11 +112,15 @@
   .ant-input-affix-wrapper {
     padding: 8px 11px;
     height: 44px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .ant-input {
     height: 44px;
     border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .ant-form-item-label {
@@ -128,16 +132,23 @@
   .ant-form-item-control {
     line-height: 1.5;
     width: 100%;
+    max-width: 100%;
   }
 
   .ant-form-item {
     display: block;
     margin-bottom: 24px;
+    width: 100%;
   }
 
   .ant-form-item-label > label {
     height: auto;
     line-height: 1.5;
+  }
+
+  .ant-form-item-control-input {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
