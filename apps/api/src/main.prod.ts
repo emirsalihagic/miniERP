@@ -32,18 +32,16 @@ async function bootstrap() {
     const apiPrefix = process.env.API_PREFIX || 'api/v1';
     app.setGlobalPrefix(apiPrefix);
 
-    // Swagger documentation (only in development)
-    if (process.env.NODE_ENV !== 'production') {
-      const config = new DocumentBuilder()
-        .setTitle('Mini ERP API')
-        .setDescription('Mini ERP Backend API Documentation')
-        .setVersion(process.env.API_VERSION || '1.0.0')
-        .addBearerAuth()
-        .build();
-      
-      const document = SwaggerModule.createDocument(app, config);
-      SwaggerModule.setup('api/docs', app, document);
-    }
+    // Swagger documentation
+    const config = new DocumentBuilder()
+      .setTitle('Mini ERP API')
+      .setDescription('Mini ERP Backend API Documentation')
+      .setVersion(process.env.API_VERSION || '1.0.0')
+      .addBearerAuth()
+      .build();
+    
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
 
     await app.init();
   }
