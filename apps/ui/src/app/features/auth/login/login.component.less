@@ -33,8 +33,14 @@
 }
 
 .login-form {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  
   .form-field {
     margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
     
     .field-label {
       display: block;
@@ -46,6 +52,7 @@
     
     .field-input {
       width: 100%;
+      max-width: 100%;
     }
   }
 
@@ -111,34 +118,39 @@
 :host ::ng-deep {
   .ant-input-affix-wrapper {
     padding: 8px 11px;
-    height: 44px;
-    width: 100%;
-    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden;
   }
 
   .ant-input {
-    height: 44px;
     border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .ant-form-item-label {
     padding-bottom: 0;
     text-align: left;
     width: 100%;
+    max-width: 100%;
   }
 
   .ant-form-item-control {
     line-height: 1.5;
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
   }
 
   .ant-form-item {
     display: block;
     margin-bottom: 24px;
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .ant-form-item-label > label {
@@ -147,8 +159,15 @@
   }
 
   .ant-form-item-control-input {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+
+  .ant-form-item-control-input-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
   }
 }
 
