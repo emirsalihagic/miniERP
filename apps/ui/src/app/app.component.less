@@ -1,0 +1,274 @@
+.app-layout {
+  min-height: 100vh;
+
+  &.no-sidebar {
+    .inner-content {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+}
+
+.menu-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  height: 100vh !important;
+  
+  // Override Ant Design sider styles
+  .ant-layout-sider {
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+
+.sidebar-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #001529;
+  border-bottom: 1px solid #1f1f1f;
+  flex-shrink: 0;
+
+  h1 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    transition: all 0.3s;
+  }
+}
+
+.menu-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+  
+  // Firefox scrollbar styling
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+  
+  // Enhanced menu item styling
+  .ant-menu {
+    border-right: none;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    
+    .ant-menu-item {
+      margin: 0;
+      height: 48px;
+      line-height: 48px;
+      display: flex;
+      align-items: center;
+      
+      .anticon {
+        margin-right: 12px;
+        font-size: 16px;
+        transition: all 0.3s;
+      }
+      
+      span:not(.anticon) {
+        transition: all 0.3s;
+      }
+      
+      &:hover {
+        .anticon {
+          transform: scale(1.1);
+        }
+      }
+      
+      &.ant-menu-item-selected {
+        .anticon {
+          color: #1890ff;
+        }
+      }
+    }
+    
+    .ant-menu-submenu {
+      .ant-menu-submenu-title {
+        height: 48px;
+        line-height: 48px;
+        display: flex;
+        align-items: center;
+        
+        .anticon {
+          margin-right: 12px;
+          font-size: 16px;
+          transition: all 0.3s;
+        }
+        
+        &:hover .anticon {
+          transform: scale(1.1);
+        }
+      }
+      
+      .ant-menu {
+        .ant-menu-item {
+          padding-left: 56px !important;
+          height: 40px;
+          line-height: 40px;
+          
+          .anticon {
+            margin-right: 8px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Override Ant Design header padding
+.ant-layout-header {
+  padding: 0 !important;
+}
+
+// Additional overrides for proper scrolling
+.ant-layout-sider {
+  height: 100vh !important;
+  overflow: hidden !important;
+  
+  .ant-layout-sider-children {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+
+.app-header {
+  background: #fff;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 999;
+  height: 64px;
+  border-bottom: 1px solid #f0f0f0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .header-trigger {
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s;
+    color: #666;
+    padding: 8px;
+    border-radius: 4px;
+
+    &:hover {
+      color: #1890ff;
+      background: #f5f5f5;
+    }
+  }
+
+  .page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #262626;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+
+  .right-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+    max-width: 200px;
+
+        .user-avatar {
+          cursor: pointer;
+          transition: all 0.3s;
+          background-color: #1890ff;
+          color: #fff;
+          font-weight: 600;
+          font-size: 16px;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          margin-right: 50px;
+
+          &:hover {
+            transform: scale(1.05);
+            background-color: #40a9ff;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+          }
+        }
+  }
+}
+
+.inner-content {
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px);
+  margin-left: 256px; // Default margin for sidebar
+  transition: margin-left 0.3s;
+
+  &.full-width {
+    min-height: 100vh;
+    padding: 0;
+    background: #fff;
+    margin-left: 0;
+  }
+}
+
+// Handle collapsed sidebar
+.app-layout.collapsed .inner-content {
+  margin-left: 80px;
+}
+
+// Handle no sidebar
+.app-layout.no-sidebar .inner-content {
+  margin-left: 0;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .menu-sidebar {
+    position: fixed;
+    z-index: 1001;
+  }
+  
+  .inner-content {
+    padding: 16px;
+  }
+}
+

@@ -1,0 +1,85 @@
+<div class="login-container">
+  <nz-card class="login-card" [nzBordered]="true">
+    <div class="login-header">
+      <h1>miniERP</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email Field -->
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true">Email</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a valid email address">
+          <nz-input-group nzPrefixIcon="user">
+            <input
+              type="email"
+              nz-input
+              formControlName="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+            />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Password Field -->
+      <nz-form-item>
+        <nz-form-label [nzRequired]="true">Password</nz-form-label>
+        <nz-form-control nzErrorTip="Password must be at least 6 characters">
+          <nz-input-group [nzSuffix]="suffixTemplate" nzPrefixIcon="lock">
+            <input
+              [type]="passwordVisible ? 'text' : 'password'"
+              nz-input
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+          </nz-input-group>
+          <ng-template #suffixTemplate>
+            <span
+              nz-icon
+              [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+              (click)="togglePasswordVisibility()"
+              class="password-toggle"
+            ></span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Remember Me & Forgot Password -->
+      <nz-form-item class="login-options">
+        <nz-form-control>
+          <label nz-checkbox formControlName="remember">
+            <span>Remember me</span>
+          </label>
+          <a class="login-form-forgot" routerLink="/auth/forgot-password">
+            Forgot password?
+          </a>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Submit Button -->
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            nzType="primary"
+            nzBlock
+            [nzLoading]="isLoading"
+            [disabled]="!loginForm.valid"
+            type="submit"
+          >
+            Sign In
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Register Link -->
+      <div class="register-link">
+        Don't have an account?
+        <a routerLink="/auth/register">Sign up</a>
+      </div>
+    </form>
+  </nz-card>
+</div>
+

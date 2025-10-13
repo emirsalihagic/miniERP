@@ -1,0 +1,166 @@
+<div class="user-form-container">
+  <div class="page-header">
+    <h1>{{ getTitle() }}</h1>
+    <button nz-button (click)="onCancel()">
+      <span nz-icon nzType="arrow-left"></span>
+      Back to Users
+    </button>
+  </div>
+
+  <nz-card>
+    <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>First Name</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please enter first name">
+              <input nz-input formControlName="firstName" placeholder="Enter first name" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Last Name</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please enter last name">
+              <input nz-input formControlName="lastName" placeholder="Enter last name" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Email</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please enter a valid email">
+              <input 
+                nz-input 
+                formControlName="email" 
+                placeholder="Enter email address"
+                [disabled]="isEditMode"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Role</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please select a role">
+              <nz-select formControlName="role" placeholder="Select role">
+                <nz-option 
+                  *ngFor="let option of roleOptions" 
+                  [nzValue]="option.value" 
+                  [nzLabel]="option.label"
+                ></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <!-- Client/Supplier Selection Fields -->
+      <div nz-row [nzGutter]="16" *ngIf="form.get('role')?.value === userRole.CLIENT_USER">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Client</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please select a client">
+              <nz-select formControlName="clientId" placeholder="Select client">
+                <nz-option 
+                  *ngFor="let client of clients" 
+                  [nzValue]="client.id" 
+                  [nzLabel]="client.name"
+                ></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16" *ngIf="form.get('role')?.value === userRole.SUPPLIER_USER">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Supplier</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Please select a supplier">
+              <nz-select formControlName="supplierId" placeholder="Select supplier">
+                <nz-option 
+                  *ngFor="let supplier of suppliers" 
+                  [nzValue]="supplier.id" 
+                  [nzLabel]="supplier.name"
+                ></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16" *ngIf="!isEditMode">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6" nzRequired>Password</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Password must be at least 6 characters">
+              <input 
+                nz-input 
+                type="password" 
+                formControlName="password" 
+                placeholder="Enter password"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6">Email Verified</nz-form-label>
+            <nz-form-control [nzSpan]="18">
+              <label nz-checkbox formControlName="isEmailVerified">
+                Mark email as verified
+              </label>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16" *ngIf="isEditMode">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6">New Password</nz-form-label>
+            <nz-form-control [nzSpan]="18" nzErrorTip="Password must be at least 6 characters">
+              <input 
+                nz-input 
+                type="password" 
+                formControlName="password" 
+                placeholder="Enter new password (leave blank to keep current)"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="6">Email Verified</nz-form-label>
+            <nz-form-control [nzSpan]="18">
+              <label nz-checkbox formControlName="isEmailVerified">
+                Mark email as verified
+              </label>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-control [nzOffset]="6" [nzSpan]="18">
+          <button 
+            nz-button 
+            nzType="primary" 
+            type="submit"
+            [nzLoading]="loading"
+            [disabled]="form.invalid"
+          >
+            {{ isEditMode ? 'Update User' : 'Create User' }}
+          </button>
+          <button nz-button nzType="default" type="button" (click)="onCancel()" style="margin-left: 8px;">
+            Cancel
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-card>
+</div>

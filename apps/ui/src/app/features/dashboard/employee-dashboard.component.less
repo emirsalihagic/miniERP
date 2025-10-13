@@ -1,0 +1,90 @@
+.employee-dashboard {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  h1 {
+    color: #1890ff;
+    margin-bottom: 8px;
+    font-size: 2.5rem;
+  }
+  
+  p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 4px 0;
+  }
+}
+
+.stats-section {
+  margin-bottom: 32px;
+}
+
+.quick-actions {
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    button {
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+  }
+}
+
+.recent-activity {
+  p {
+    margin: 8px 0;
+    padding: 8px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid #1890ff;
+  }
+}
+
+.system-status {
+  p {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      
+      &.green {
+        background: #52c41a;
+      }
+      
+      &.yellow {
+        background: #faad14;
+      }
+      
+      &.red {
+        background: #ff4d4f;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-dashboard {
+    padding: 16px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 2rem;
+  }
+}

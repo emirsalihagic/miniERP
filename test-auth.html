@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <div id="status">Loading...</div>
+    <button onclick="testAuth()">Test Authentication</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    <button onclick="refreshPage()">Refresh Page</button>
+    
+    <script>
+        function testAuth() {
+            const accessToken = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+            const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
+            
+            document.getElementById('status').innerHTML = `
+                <p>Access Token: ${accessToken ? 'EXISTS' : 'MISSING'}</p>
+                <p>Refresh Token: ${refreshToken ? 'EXISTS' : 'MISSING'}</p>
+                <p>Access Token (first 50 chars): ${accessToken ? accessToken.substring(0, 50) + '...' : 'N/A'}</p>
+            `;
+            
+            if (accessToken) {
+                try {
+                    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+                    const currentTime = Math.floor(Date.now() / 1000);
+                    const isExpired = payload.exp <= currentTime;
+                    
+                    document.getElementById('status').innerHTML += `
+                        <p>Token Expires: ${new Date(payload.exp * 1000).toLocaleString()}</p>
+                        <p>Current Time: ${new Date().toLocaleString()}</p>
+                        <p>Is Expired: ${isExpired}</p>
+                    `;
+                } catch (e) {
+                    document.getElementById('status').innerHTML += `<p>Error parsing token: ${e.message}</p>`;
+                }
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById('status').innerHTML = 'Storage cleared!';
+        }
+        
+        function refreshPage() {
+            window.location.reload();
+        }
+        
+        // Auto-test on load
+        window.onload = testAuth;
+    </script>
+</body>
+</html>

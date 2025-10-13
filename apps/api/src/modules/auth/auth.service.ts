@@ -15,7 +15,7 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async register(dto: RegisterDto): Promise<{ accessToken: string; refreshToken: string; user: { id: string; email: string; name: string; role: string; clientId?: string; supplierId?: string } }> {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -38,10 +38,22 @@ export class AuthService {
 
     // TODO: Trigger email verification job here
     
-    return this.generateTokens(user.id, user.email, user.role);
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        role: user.role,
+        clientId: user.clientId ?? undefined,
+        supplierId: user.supplierId ?? undefined,
+      },
+    };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string; user: { id: string; email: string; name: string; role: string; clientId?: string; supplierId?: string } }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -65,7 +77,17 @@ export class AuthService {
       data: { refreshToken: hashedRefreshToken },
     });
 
-    return tokens;
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        role: user.role,
+        clientId: user.clientId ?? undefined,
+        supplierId: user.supplierId ?? undefined,
+      },
+    };
   }
 
   async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {

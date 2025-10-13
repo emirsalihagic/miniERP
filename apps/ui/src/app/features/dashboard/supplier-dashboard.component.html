@@ -1,0 +1,119 @@
+<div class="supplier-dashboard">
+  <div class="welcome-section">
+    <h1>Supplier Portal 🏪</h1>
+    <p>Welcome, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
+    <p>Manage your products and track your business performance.</p>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="stats-section">
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="My Products"
+          [nzValue]="stats.myProducts"
+          nzPrefix="📦"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Active Orders"
+          [nzValue]="stats.activeOrders"
+          nzPrefix="📋"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Total Revenue"
+          [nzValue]="stats.totalRevenue"
+          nzPrefix="$"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Pending Deliveries"
+          [nzValue]="stats.pendingDeliveries"
+          nzPrefix="🚚"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="supplier-actions">
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Quick Actions" nzSize="small">
+        <div class="action-buttons">
+          <button nz-button nzType="primary" nzSize="large" routerLink="/products/new">
+            <span nz-icon nzType="plus"></span>
+            Add Product
+          </button>
+          <button nz-button nzSize="large" routerLink="/products">
+            <span nz-icon nzType="shopping"></span>
+            Manage Products
+          </button>
+          <button nz-button nzSize="large" routerLink="/suppliers">
+            <span nz-icon nzType="shop"></span>
+            View Profile
+          </button>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Recent Orders" nzSize="small">
+        <div class="recent-orders">
+          <div class="order-item">
+            <span class="order-id">#ORD-001</span>
+            <span class="order-status urgent">Urgent</span>
+            <span class="order-amount">$2,500</span>
+          </div>
+          <div class="order-item">
+            <span class="order-id">#ORD-002</span>
+            <span class="order-status normal">Normal</span>
+            <span class="order-amount">$1,800</span>
+          </div>
+          <div class="order-item">
+            <span class="order-id">#ORD-003</span>
+            <span class="order-status completed">Completed</span>
+            <span class="order-amount">$3,200</span>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Performance Metrics" nzSize="small">
+        <div class="performance-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Order Fulfillment Rate</span>
+            <span class="metric-value excellent">98.5%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Average Delivery Time</span>
+            <span class="metric-value good">2.3 days</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Customer Rating</span>
+            <span class="metric-value excellent">4.8/5</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Monthly Growth</span>
+            <span class="metric-value good">+12.5%</span>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+</div>

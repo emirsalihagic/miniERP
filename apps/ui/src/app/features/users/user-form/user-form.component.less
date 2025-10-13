@@ -1,0 +1,49 @@
+.user-form-container {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      margin: 0;
+      color: #262626;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+
+  nz-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    nz-form {
+      .ant-form-item {
+        margin-bottom: 24px;
+      }
+
+      .ant-form-item-label {
+        font-weight: 500;
+      }
+
+      .ant-input,
+      .ant-select-selector {
+        border-radius: 6px;
+      }
+
+      .ant-btn {
+        border-radius: 6px;
+        height: 40px;
+        font-weight: 500;
+      }
+    }
+  }
+}

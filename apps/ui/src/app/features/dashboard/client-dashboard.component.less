@@ -1,0 +1,155 @@
+.client-dashboard {
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  h1 {
+    color: white;
+    margin-bottom: 8px;
+    font-size: 2.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin: 4px 0;
+  }
+}
+
+.stats-section {
+  margin-bottom: 32px;
+  
+  nz-card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+}
+
+.client-actions {
+  nz-card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  button {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+}
+
+.recent-invoices {
+  .invoice-item {
+    padding: 12px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #1890ff;
+    
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      
+      .invoice-number {
+        font-weight: 600;
+        color: #1890ff;
+      }
+    }
+    
+    .invoice-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .invoice-amount {
+        font-weight: 600;
+        color: #28a745;
+      }
+      
+      .invoice-date {
+        font-size: 0.9rem;
+        color: #666;
+      }
+    }
+  }
+  
+  .no-invoices {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+  }
+}
+
+.loading-placeholder {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.no-info {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.account-info {
+  p {
+    margin: 12px 0;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    
+    .status-active {
+      color: #28a745;
+      font-weight: 600;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .client-dashboard {
+    padding: 16px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 2rem;
+  }
+  
+  .recent-invoices .invoice-item {
+    .invoice-header {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+    
+    .invoice-details {
+      flex-direction: column;
+      gap: 4px;
+      text-align: center;
+    }
+  }
+}

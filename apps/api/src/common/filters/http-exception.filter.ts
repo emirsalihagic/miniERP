@@ -29,6 +29,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         typeof exceptionResponse === 'object' && 'error' in exceptionResponse
           ? exceptionResponse.error
           : HttpStatus[status],
+      ...(typeof exceptionResponse === 'object' && 'errors' in exceptionResponse
+        ? { errors: exceptionResponse.errors }
+        : {}),
     };
 
     response.status(status).json(errorResponse);

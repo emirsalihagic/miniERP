@@ -1,0 +1,161 @@
+.supplier-dashboard {
+  padding: 24px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  h1 {
+    color: white;
+    margin-bottom: 8px;
+    font-size: 2.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin: 4px 0;
+  }
+}
+
+.stats-section {
+  margin-bottom: 32px;
+  
+  nz-card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+}
+
+.supplier-actions {
+  nz-card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  button {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+}
+
+.recent-orders {
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #f5576c;
+    
+    .order-id {
+      font-weight: 600;
+      color: #f5576c;
+    }
+    
+    .order-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      
+      &.urgent {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      
+      &.normal {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      
+      &.completed {
+        background: #d4edda;
+        color: #155724;
+      }
+    }
+    
+    .order-amount {
+      font-weight: 600;
+      color: #28a745;
+    }
+  }
+}
+
+.performance-metrics {
+  .metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 6px;
+    
+    .metric-label {
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .metric-value {
+      font-weight: 600;
+      font-size: 1.1rem;
+      
+      &.excellent {
+        color: #28a745;
+      }
+      
+      &.good {
+        color: #17a2b8;
+      }
+      
+      &.warning {
+        color: #ffc107;
+      }
+      
+      &.danger {
+        color: #dc3545;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .supplier-dashboard {
+    padding: 16px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 2rem;
+  }
+  
+  .recent-orders .order-item,
+  .performance-metrics .metric-item {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}

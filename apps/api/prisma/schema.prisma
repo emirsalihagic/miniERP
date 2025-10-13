@@ -21,6 +21,154 @@ enum InvoiceStatus {
   VOID
 }
 
+enum OrderStatus {
+  PENDING        // Order submitted, waiting for invoice
+  INVOICE_CREATED // Draft invoice created
+  INVOICE_ISSUED  // Invoice issued by employee
+  SHIPPED        // Order shipped
+  DELIVERED      // Order delivered to client
+  COMPLETED      // Invoice paid + delivered
+  CANCELLED      // Order cancelled
+}
+
+enum ClientType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+}
+
+enum PaymentTerms {
+  ON_RECEIPT
+  D7
+  D15
+  D30
+  D45
+  D60
+}
+
+enum Currency {
+  BAM
+  EUR
+  USD
+}
+
+enum UnitGroup {
+  WEIGHT
+  VOLUME
+  LENGTH
+  COUNT
+}
+
+enum ProductStatus {
+  REGISTRATION
+  ACTIVE
+  INACTIVE
+}
+
+enum StorageType {
+  AMBIENT
+  CHILLED
+  FROZEN
+  HAZMAT
+  DRY
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  DECIMAL
+  BOOLEAN
+  DATE
+  LIST
+}
+
+model Unit {
+  id              String    @id @default(uuid()) @db.Uuid
+  code            String    @unique
+  name            String
+  group           UnitGroup
+  isBase          Boolean   @default(false) @map("is_base")
+  toBaseFactor    Decimal   @default(1) @map("to_base_factor") @db.Decimal(15, 6)
+  
+  products        Product[]
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("units")
+  @@index([group])
+  @@index([isBase])
+}
+
+model ProductGroup {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  code            String    @unique
+  description     String?
+  
+  products        Product[]
+  groupAttributes GroupAttribute[]
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("product_groups")
+}
+
+model Attribute {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  type            AttributeType
+  
+  options         AttributeOption[]
+  groupAttributes GroupAttribute[]
+  productAttributeValues ProductAttributeValue[]
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("attributes")
+}
+
+model AttributeOption {
+  id              String    @id @default(uuid()) @db.Uuid
+  attributeId     String    @map("attribute_id") @db.Uuid
+  option          String
+  sortOrder       Int       @default(0) @map("sort_order")
+  
+  attribute       Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("attribute_options")
+  @@unique([attributeId, option])
+}
+
+model GroupAttribute {
+  id              String    @id @default(uuid()) @db.Uuid
+  groupId         String    @map("group_id") @db.Uuid
+  attributeId     String    @map("attribute_id") @db.Uuid
+  required        Boolean   @default(false)
+  uniqueInGroup   Boolean   @default(false) @map("unique_in_group")
+  useInName       Boolean   @default(false) @map("use_in_name")
+  sortOrder       Int       @default(0) @map("sort_order")
+  
+  productGroup    ProductGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  attribute       Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("group_attributes")
+  @@unique([groupId, attributeId])
+}
+
 model User {
   id                String    @id @default(uuid()) @db.Uuid
   email             String    @unique
@@ -36,8 +184,9 @@ model User {
   clientId          String?   @unique @map("client_id") @db.Uuid
   supplierId        String?   @unique @map("supplier_id") @db.Uuid
   
-  client            Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client            Client?   @relation("ClientUsers", fields: [clientId], references: [id], onDelete: Cascade)
   supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  assignedClients   Client[]  @relation("ClientAssignedTo")
   
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
@@ -48,26 +197,50 @@ model User {
 }
 
 model Client {
-  id                String    @id @default(uuid()) @db.Uuid
-  name              String
-  taxId             String?   @unique @map("tax_id")
-  email             String?
-  phone             String?
-  address           String?
-  city              String?
-  country           String?
-  isActive          Boolean   @default(true) @map("is_active")
-  
-  users             User[]
-  invoices          Invoice[]
-  pricingOverrides  Pricing[]
-  
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                 String        @id @default(uuid()) @db.Uuid
+  name               String
+  type               ClientType    @default(COMPANY)
+  contactPerson      String?       @map("contact_person")
+  email              String        @db.VarChar(190)
+  phone              String?       @db.VarChar(40)
+  website            String?       @db.VarChar(190)
+
+  taxNumber          String?       @unique @map("tax_number") @db.VarChar(64)
+  billingStreet      String?       @map("billing_street")
+  billingCity        String?       @map("billing_city") @db.VarChar(120)
+  billingZip         String?       @map("billing_zip") @db.VarChar(20)
+  billingCountry     String?       @map("billing_country") @db.VarChar(120)
+
+  paymentTerms       PaymentTerms  @default(D30) @map("payment_terms")
+  preferredCurrency  Currency      @default(BAM) @map("preferred_currency")
+  creditLimit        Decimal       @default(0) @map("credit_limit") @db.Decimal(12, 2)
+  status             ClientStatus  @default(ACTIVE)
+
+  leadSource         String?       @map("lead_source") @db.VarChar(80)
+  lastContactedAt    DateTime?     @map("last_contacted_at")
+  nextFollowupAt     DateTime?     @map("next_followup_at")
+  tags               String[]      @db.Text     // Postgres text[]
+
+  clientCode         String?       @unique @map("client_code") @db.VarChar(40)
+  assignedToId       String?       @map("assigned_to_id") @db.Uuid // FK -> User.id
+
+  notes              String?
+
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  assignedTo         User?         @relation("ClientAssignedTo", fields: [assignedToId], references: [id])
+  users              User[]        @relation("ClientUsers")
+  invoices           Invoice[]
+  pricingOverrides   Pricing[]
+  carts              Cart[]
+  orders             Order[]
 
   @@map("clients")
-  @@index([name])
-  @@index([isActive])
+  @@index([status])
+  @@index([billingCity])
+  @@index([email])
+  @@index([taxNumber])
 }
 
 model Supplier {
@@ -83,6 +256,7 @@ model Supplier {
   
   users             User[]
   products          Product[]
+  preferredSuppliers ProductPreferredSupplier[]
   pricingOverrides  Pricing[]
   
   createdAt         DateTime  @default(now()) @map("created_at")
@@ -96,17 +270,32 @@ model Supplier {
 model Product {
   id                String    @id @default(uuid()) @db.Uuid
   sku               String    @unique
-  name              String
+  name              String?
   description       String?
   category          String?
-  unit              String    @default("pcs") // pcs, kg, liter, etc.
   supplierId        String    @map("supplier_id") @db.Uuid
   isActive          Boolean   @default(true) @map("is_active")
   deletedAt         DateTime? @map("deleted_at") // soft delete
   
+  // New fields for extended functionality
+  groupId           String?   @map("group_id") @db.Uuid
+  unitId            String?   @map("unit_id") @db.Uuid
+  status            ProductStatus @default(REGISTRATION)
+  storageType       StorageType @default(AMBIENT) @map("storage_type")
+  brand             String?
+  shelfLifeDays     Int?      @map("shelf_life_days")
+  weightPerItem     Decimal?  @map("weight_per_item") @db.Decimal(10, 6)
+  variationKey      String?   @map("variation_key")
+  
   supplier          Supplier       @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  productGroup      ProductGroup?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  unit              Unit?          @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  attributeValues   ProductAttributeValue[]
+  preferredSuppliers ProductPreferredSupplier[]
   pricing           Pricing[]
   invoiceItems      InvoiceItem[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
   
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
@@ -116,6 +305,46 @@ model Product {
   @@index([sku])
   @@index([isActive])
   @@index([deletedAt])
+  @@index([status])
+  @@index([groupId])
+  @@index([brand])
+  @@unique([groupId, variationKey])
+}
+
+model ProductAttributeValue {
+  id              String    @id @default(uuid()) @db.Uuid
+  productId       String    @map("product_id") @db.Uuid
+  attributeId     String    @map("attribute_id") @db.Uuid
+  value           Json
+  
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attribute       Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("product_attribute_values")
+  @@unique([productId, attributeId])
+}
+
+model ProductPreferredSupplier {
+  id              String    @id @default(uuid()) @db.Uuid
+  productId       String    @map("product_id") @db.Uuid
+  supplierId      String    @map("supplier_id") @db.Uuid
+  priority        Int       @default(1)
+  isPrimary       Boolean   @default(false) @map("is_primary")
+  supplierSku     String?   @map("supplier_sku")
+  price           Decimal?  @db.Decimal(10, 2)
+  currency        String?   @db.VarChar(3)
+  
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier        Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("product_preferred_suppliers")
+  @@unique([productId, supplierId])
 }
 
 model Pricing {
@@ -160,7 +389,11 @@ model Invoice {
   taxTotal          Decimal        @default(0) @map("tax_total") @db.Decimal(12, 2)
   discountTotal     Decimal        @default(0) @map("discount_total") @db.Decimal(12, 2)
   grandTotal        Decimal        @default(0) @map("grand_total") @db.Decimal(12, 2)
+  remainingAmount   Decimal        @default(0) @map("remaining_amount") @db.Decimal(12, 2)
   currency          String         @default("USD")
+  
+  // Invoice-level discount
+  discountPercent   Decimal        @default(0) @map("discount_percent") @db.Decimal(5, 2)
   
   issuedAt          DateTime?      @map("issued_at")
   sentAt            DateTime?      @map("sent_at")
@@ -173,6 +406,7 @@ model Invoice {
   client            Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
   items             InvoiceItem[]
   auditTrail        AuditLog[]
+  order             Order?
   
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
@@ -230,5 +464,89 @@ model AuditLog {
   @@map("audit_logs")
   @@index([entityType, entityId])
   @@index([createdAt])
+}
+
+model Cart {
+  id          String      @id @default(uuid()) @db.Uuid
+  clientId    String      @map("client_id") @db.Uuid
+  items       CartItem[]
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  
+  client      Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@map("carts")
+  @@unique([clientId])
+}
+
+model CartItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  cartId      String   @map("cart_id") @db.Uuid
+  productId   String   @map("product_id") @db.Uuid
+  quantity    Float
+  
+  cart        Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("cart_items")
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id              String       @id @default(uuid()) @db.Uuid
+  orderNumber     String       @unique @map("order_number")
+  clientId        String       @map("client_id") @db.Uuid
+  status          OrderStatus  @default(PENDING)
+  
+  invoiceId       String?      @unique @map("invoice_id") @db.Uuid
+  
+  subtotal        Decimal      @default(0) @db.Decimal(12, 2)
+  taxTotal        Decimal      @default(0) @map("tax_total") @db.Decimal(12, 2)
+  grandTotal      Decimal      @default(0) @map("grand_total") @db.Decimal(12, 2)
+  currency        String       @default("EUR")
+  
+  notes           String?
+  shippedAt       DateTime?    @map("shipped_at")
+  deliveredAt     DateTime?    @map("delivered_at")
+  cancelledAt     DateTime?    @map("cancelled_at")
+  
+  client          Client       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  invoice         Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  items           OrderItem[]
+  
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  
+  @@map("orders")
+  @@index([clientId])
+  @@index([status])
+}
+
+model OrderItem {
+  id              String   @id @default(uuid()) @db.Uuid
+  orderId         String   @map("order_id") @db.Uuid
+  productId       String   @map("product_id") @db.Uuid
+  
+  sku             String
+  productName     String   @map("product_name")
+  quantity        Decimal  @db.Decimal(10, 3)
+  unitPrice       Decimal  @map("unit_price") @db.Decimal(10, 2)
+  taxRate         Decimal  @map("tax_rate") @db.Decimal(5, 2)
+  
+  lineSubtotal    Decimal  @map("line_subtotal") @db.Decimal(12, 2)
+  lineTax         Decimal  @map("line_tax") @db.Decimal(12, 2)
+  lineTotal       Decimal  @map("line_total") @db.Decimal(12, 2)
+  
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  @@map("order_items")
+  @@index([orderId])
 }
 

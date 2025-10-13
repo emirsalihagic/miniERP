@@ -5,21 +5,40 @@ import { PrismaService } from '../../database/prisma.service';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isEmailVerified: true,
-        clientId: true,
-        supplierId: true,
-        createdAt: true,
+  async findAll(options?: { page?: number; limit?: number }) {
+    const page = options?.page || 1;
+    const limit = options?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isEmailVerified: true,
+          clientId: true,
+          supplierId: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.user.count(),
+    ]);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async findOne(id: string) {
@@ -49,6 +68,44 @@ export class UsersService {
     return user;
   }
 
+  async create(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    clientId?: string;
+    supplierId?: string;
+  }) {
+    const createData: any = {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
+    };
+
+    if (data.clientId) {
+      createData.clientId = data.clientId;
+    }
+    if (data.supplierId) {
+      createData.supplierId = data.supplierId;
+    }
+
+    return this.prisma.user.create({
+      data: createData,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isEmailVerified: true,
+        createdAt: true,
+      },
+    });
+  }
+
   async update(id: string, data: Partial<{
     firstName: string;
     lastName: string;
@@ -65,6 +122,19 @@ export class UsersService {
         role: true,
         isEmailVerified: true,
         createdAt: true,
+      },
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.user.delete({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
       },
     });
   }

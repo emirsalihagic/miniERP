@@ -1,0 +1,17 @@
+Add this to cart.controller.ts for testing:
+
+@Get('test-raw')
+async testRaw(@Request() req) {
+  const clientId = req.user.clientId;
+  const cart = await this.prisma.cart.findUnique({
+    where: { clientId },
+    include: { items: true }
+  });
+  return {
+    quantity: cart.items[0].quantity,
+    quantityType: typeof cart.items[0].quantity,
+    quantityToString: cart.items[0].quantity.toString(),
+    quantityNumber: Number(cart.items[0].quantity)
+  };
+}
+

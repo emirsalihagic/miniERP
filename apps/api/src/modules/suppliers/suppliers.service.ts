@@ -19,11 +19,30 @@ export class SuppliersService {
     });
   }
 
-  async findAll() {
-    return this.prisma.supplier.findMany({
-      where: { isActive: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(options?: { page?: number; limit?: number }) {
+    const page = options?.page || 1;
+    const limit = options?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [suppliers, total] = await Promise.all([
+      this.prisma.supplier.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.supplier.count({ where: { isActive: true } }),
+    ]);
+
+    return {
+      data: suppliers,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string) {
@@ -63,6 +82,40 @@ export class SuppliersService {
       where: { id },
       data: { isActive: false },
     });
+  }
+
+  async getProducts(supplierId: string, options?: { page?: number; limit?: number }) {
+    const page = options?.page || 1;
+    const limit = options?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { 
+          supplierId,
+          deletedAt: null, // Only active products
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.product.count({ 
+        where: { 
+          supplierId,
+          deletedAt: null,
+        },
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
 

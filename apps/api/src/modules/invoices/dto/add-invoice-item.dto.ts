@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsNumber, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsUUID, IsNumber, Min, IsOptional } from 'class-validator';
 
 export class AddInvoiceItemDto {
   @ApiProperty()
@@ -10,5 +10,11 @@ export class AddInvoiceItemDto {
   @IsNumber()
   @Min(0.001)
   quantity: number;
+
+  @ApiPropertyOptional({ description: 'Manual discount percentage for this item (0-100)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  discountPercent?: number;
 }
 

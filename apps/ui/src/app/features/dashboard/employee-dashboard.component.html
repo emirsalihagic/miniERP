@@ -1,0 +1,101 @@
+<div class="employee-dashboard">
+  <div class="welcome-section">
+    <h1>Employee Dashboard 👨‍💼</h1>
+    <p>Welcome back, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
+    <p>Manage your organization's operations efficiently.</p>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="stats-section">
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Total Products"
+          [nzValue]="stats.products"
+          nzPrefix="📦"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Active Clients"
+          [nzValue]="stats.clients"
+          nzPrefix="👥"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Suppliers"
+          [nzValue]="stats.suppliers"
+          nzPrefix="🏪"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Invoices"
+          [nzValue]="stats.invoices"
+          nzPrefix="📄"
+          [nzLoading]="loading">
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="quick-actions">
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Quick Actions" nzSize="small">
+        <div class="action-buttons">
+          <button nz-button nzType="primary" nzSize="large" routerLink="/products/new">
+            <span nz-icon nzType="plus"></span>
+            Add Product
+          </button>
+          <button nz-button nzSize="large" routerLink="/clients/new">
+            <span nz-icon nzType="user-add"></span>
+            Add Client
+          </button>
+          <button nz-button nzSize="large" routerLink="/suppliers/new">
+            <span nz-icon nzType="shop"></span>
+            Add Supplier
+          </button>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Recent Activity" nzSize="small">
+        <div class="recent-activity" *ngIf="!loadingActivity; else activityLoading">
+          <p *ngFor="let activity of recentActivity">
+            {{ activity.icon }} {{ activity.description }}
+          </p>
+          <p *ngIf="recentActivity.length === 0" class="no-data">No recent activity</p>
+        </div>
+        <ng-template #activityLoading>
+          <nz-spin nzSimple></nz-spin>
+        </ng-template>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="System Status" nzSize="small">
+        <div class="system-status" *ngIf="!loadingStatus; else statusLoading">
+          <p *ngFor="let status of systemStatus">
+            <span class="status-indicator" [ngClass]="status.status"></span> {{ status.description }}
+          </p>
+        </div>
+        <ng-template #statusLoading>
+          <nz-spin nzSimple></nz-spin>
+        </ng-template>
+      </nz-card>
+    </div>
+  </div>
+</div>

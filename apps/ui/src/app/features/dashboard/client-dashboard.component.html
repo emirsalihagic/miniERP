@@ -1,0 +1,133 @@
+<div class="client-dashboard">
+  <div class="welcome-section">
+    <h1>Client Portal 🛒</h1>
+    <p>Welcome, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
+    <p *ngIf="clientInfo">Account: <strong>{{ clientInfo.name }}</strong></p>
+    <p>Browse products and manage your orders.</p>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="stats-section">
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Available Products"
+          [nzValue]="stats.availableProducts"
+          [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="shopping" style="color: #1890ff;"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="My Invoices"
+          [nzValue]="stats.myInvoices"
+          [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="file-text" style="color: #52c41a;"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Pending Orders"
+          [nzValue]="stats.pendingOrders"
+          [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="clock-circle" style="color: #faad14;"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Unpaid Amount"
+          [nzValue]="stats.unpaidTotal"
+          nzPrefix="€"
+          [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="dollar" style="color: #f5222d;"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="[16, 16]" class="client-actions">
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Quick Actions" nzSize="small">
+        <div class="action-buttons">
+          <button nz-button nzType="primary" nzSize="large" routerLink="/products">
+            <span nz-icon nzType="shopping"></span>
+            Browse Products
+          </button>
+          <button nz-button nzSize="large" routerLink="/invoices">
+            <span nz-icon nzType="file-text"></span>
+            View Invoices
+          </button>
+          <button nz-button nzSize="large" routerLink="/invoices/new">
+            <span nz-icon nzType="plus-circle"></span>
+            Create Order
+          </button>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Recent Invoices" nzSize="small">
+        <div class="recent-invoices" *ngIf="!loading">
+          <div class="invoice-item" *ngFor="let invoice of recentInvoices">
+            <div class="invoice-header">
+              <span class="invoice-number">{{ invoice.invoiceNumber }}</span>
+              <nz-tag [nzColor]="getStatusColor(invoice.status)">
+                {{ invoice.status }}
+              </nz-tag>
+            </div>
+            <div class="invoice-details">
+              <span class="invoice-amount">€{{ invoice.grandTotal | number:'1.2-2' }}</span>
+              <span class="invoice-date">{{ invoice.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+          <div *ngIf="recentInvoices.length === 0" class="no-invoices">
+            <p>No recent invoices found.</p>
+          </div>
+        </div>
+        <div *ngIf="loading" class="loading-placeholder">
+          <p>Loading recent invoices...</p>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="8">
+      <nz-card nzTitle="Account Info" nzSize="small">
+        <div class="account-info" *ngIf="clientInfo">
+          <p><strong>Account Status:</strong> 
+            <nz-tag [nzColor]="clientInfo.status === 'ACTIVE' ? 'green' : 'red'">
+              {{ clientInfo.status }}
+            </nz-tag>
+          </p>
+          <p><strong>Credit Limit:</strong> €{{ clientInfo.creditLimit | number:'1.2-2' }}</p>
+          <p><strong>Payment Terms:</strong> {{ clientInfo.paymentTerms }}</p>
+          <p><strong>Currency:</strong> {{ clientInfo.preferredCurrency }}</p>
+          <p *ngIf="clientSummary?.lastInvoiceAt"><strong>Last Invoice:</strong> 
+            {{ clientSummary?.lastInvoiceAt | date:'short' }}
+          </p>
+        </div>
+        <div *ngIf="!clientInfo && !loading" class="no-info">
+          <p>Account information not available.</p>
+        </div>
+        <div *ngIf="loading" class="loading-placeholder">
+          <p>Loading account info...</p>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+</div>

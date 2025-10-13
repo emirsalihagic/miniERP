@@ -1,0 +1,104 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #8c8c8c;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.login-form {
+  .password-toggle {
+    cursor: pointer;
+    color: #8c8c8c;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #1890ff;
+    }
+  }
+
+  .login-options {
+    margin-bottom: 24px;
+
+    nz-form-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      label {
+        margin: 0;
+      }
+    }
+
+    .login-form-forgot {
+      color: #667eea;
+      text-decoration: none;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #764ba2;
+      }
+    }
+  }
+
+  button[nz-button] {
+    height: 44px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .register-link {
+    text-align: center;
+    margin-top: 16px;
+    color: #8c8c8c;
+
+    a {
+      color: #667eea;
+      font-weight: 500;
+      text-decoration: none;
+      margin-left: 4px;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #764ba2;
+      }
+    }
+  }
+}
+
+:host ::ng-deep {
+  .ant-input-affix-wrapper {
+    padding: 8px 11px;
+  }
+
+  .ant-input {
+    height: 44px;
+  }
+}
+

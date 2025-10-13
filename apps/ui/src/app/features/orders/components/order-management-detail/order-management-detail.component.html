@@ -1,0 +1,265 @@
+<div class="order-management-detail-container" *ngIf="order">
+  <div class="header-section">
+      <button nz-button nzType="default" (click)="goBack()">
+      <span nz-icon nzType="arrow-left"></span>
+      Back to Orders
+    </button>
+    <h1>Order Management: {{ order.orderNumber }}</h1>
+  </div>
+
+  <!-- Order Progress -->
+  <div class="progress-section" *ngIf="order.status !== 'CANCELLED'">
+    <nz-card nzTitle="Order Progress">
+      <nz-steps 
+        [nzCurrent]="getCurrentStep()" 
+        nzSize="small">
+        <nz-step nzTitle="Order Placed" nzDescription="Order submitted"></nz-step>
+        <nz-step nzTitle="Invoice Created" nzDescription="Draft invoice created"></nz-step>
+        <nz-step nzTitle="Invoice Issued" nzDescription="Invoice issued"></nz-step>
+        <nz-step nzTitle="Shipped" nzDescription="Order shipped"></nz-step>
+        <nz-step nzTitle="Delivered" nzDescription="Order delivered"></nz-step>
+        <nz-step nzTitle="Completed" nzDescription="Order completed"></nz-step>
+      </nz-steps>
+    </nz-card>
+  </div>
+
+  <!-- Order Timeline -->
+  <div class="timeline-section">
+    <nz-card nzTitle="Order Timeline">
+      <nz-timeline>
+        <nz-timeline-item 
+          *ngFor="let item of getTimelineItems()" 
+          [nzColor]="item.color">
+          <ng-template #nzDot>
+            <i nz-icon [nzType]="item.icon" nzTheme="fill"></i>
+          </ng-template>
+          <div class="timeline-content">
+            <div class="timeline-title">{{ item.title }}</div>
+            <div class="timeline-description">{{ item.description }}</div>
+            <div class="timeline-time">{{ item.time | date:'short' }}</div>
+          </div>
+        </nz-timeline-item>
+      </nz-timeline>
+    </nz-card>
+  </div>
+
+  <!-- Order Information -->
+  <div class="order-info-section">
+    <nz-card nzTitle="Order Information">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Order Number:</label>
+          <span>{{ order.orderNumber }}</span>
+        </div>
+        <div class="info-item">
+          <label>Client:</label>
+          <span>{{ order.client.name }}</span>
+        </div>
+        <div class="info-item">
+          <label>Status:</label>
+          <nz-tag [nzColor]="getStatusColor(order.status)">
+            {{ getStatusLabel(order.status) }}
+          </nz-tag>
+        </div>
+        <div class="info-item">
+          <label>Total:</label>
+          <span class="total-amount">{{ formatPrice(order.grandTotal) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Created:</label>
+          <span>{{ order.createdAt | date:'short' }}</span>
+        </div>
+        <div class="info-item" *ngIf="order.shippedAt">
+          <label>Shipped:</label>
+          <span>{{ order.shippedAt | date:'short' }}</span>
+        </div>
+        <div class="info-item" *ngIf="order.deliveredAt">
+          <label>Delivered:</label>
+          <span>{{ order.deliveredAt | date:'short' }}</span>
+        </div>
+        <div class="info-item" *ngIf="order.notes">
+          <label>Notes:</label>
+          <span>{{ order.notes }}</span>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+
+  <!-- Order Items -->
+  <div class="order-items-section">
+    <nz-card nzTitle="Order Items">
+      <nz-table #itemsTable [nzData]="order.items" [nzShowPagination]="false">
+        <thead>
+          <tr>
+            <th>
+              <span nz-icon nzType="shopping"></span>
+              Product
+            </th>
+            <th>
+              <span nz-icon nzType="barcode"></span>
+              SKU
+            </th>
+            <th>
+              <span nz-icon nzType="number"></span>
+              Quantity
+            </th>
+            <th>
+              <span nz-icon nzType="dollar"></span>
+              Unit Price
+            </th>
+            <th>
+              <span nz-icon nzType="percentage"></span>
+              Tax Rate
+            </th>
+            <th>
+              <span nz-icon nzType="calculator"></span>
+              Line Total
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of itemsTable.data">
+            <td>
+              <div class="product-info">
+                <div class="product-name">{{ item.productName }}</div>
+                <div class="product-supplier" *ngIf="item.product?.supplier?.name">
+                  <nz-tag nzColor="blue">{{ item.product.supplier?.name }}</nz-tag>
+                </div>
+              </div>
+            </td>
+            <td>{{ item.sku }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ formatPrice(item.unitPrice) }}</td>
+            <td>{{ item.taxRate }}%</td>
+            <td>{{ formatPrice(item.lineTotal) }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </div>
+
+  <!-- Invoice Information -->
+  <div class="invoice-section" *ngIf="order.invoice">
+    <nz-card nzTitle="Linked Invoice">
+      <div class="invoice-info">
+        <div class="invoice-details">
+          <div class="invoice-item">
+            <label>
+              <span nz-icon nzType="file-text"></span>
+              Invoice Number:
+            </label>
+            <a [routerLink]="['/invoices', order.invoice.id]">{{ order.invoice.invoiceNumber }}</a>
+          </div>
+          <div class="invoice-item">
+            <label>
+              <span nz-icon nzType="info-circle"></span>
+              Invoice Status:
+            </label>
+            <nz-tag [nzColor]="getStatusColor(order.invoice.status)">
+              {{ order.invoice.status }}
+            </nz-tag>
+          </div>
+          <div class="invoice-item">
+            <label>
+              <span nz-icon nzType="dollar"></span>
+              Invoice Total:
+            </label>
+            <span>{{ formatPrice(order.invoice.grandTotal) }}</span>
+          </div>
+        </div>
+        <div class="invoice-actions">
+          <button nz-button nzType="primary" [routerLink]="['/invoices', order.invoice.id]">
+            <span nz-icon nzType="file-text"></span>
+            View Invoice
+          </button>
+          
+          <button 
+            nz-button 
+            nzType="primary" 
+            nzDanger
+            *ngIf="canMarkAsPaid()"
+            (click)="markInvoiceAsPaid()"
+            [nzLoading]="updatingStatus">
+            <span nz-icon nzType="check-circle"></span>
+            Mark as Paid
+          </button>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-section">
+    <nz-card nzTitle="Order Actions">
+      <div class="action-buttons">
+        <button 
+          nz-button 
+          nzType="primary" 
+          *ngIf="canUpdateStatus()"
+          (click)="showStatusModal()"
+          [nzLoading]="updatingStatus">
+          <span nz-icon nzType="edit"></span>
+          Update Status
+        </button>
+        
+        <button 
+          nz-button 
+          nzType="primary" 
+          nzDanger
+          *ngIf="canCompleteOrder()"
+          (click)="completeOrder()"
+          [nzLoading]="updatingStatus">
+          <span nz-icon nzType="check-circle"></span>
+          Complete Order
+        </button>
+        
+        <button 
+          nz-button 
+          nzType="default"
+          [routerLink]="['/orders']">
+          <span nz-icon nzType="arrow-left"></span>
+          Back to Orders
+        </button>
+      </div>
+    </nz-card>
+  </div>
+
+  <!-- Status Update Modal -->
+  <nz-modal
+    [(nzVisible)]="isStatusModalVisible"
+    nzTitle="Update Order Status"
+    (nzOnCancel)="hideStatusModal()"
+    (nzOnOk)="updateOrderStatus()"
+    [nzOkLoading]="updatingStatus">
+    
+    <div class="status-form">
+      <div class="form-item">
+        <label>New Status:</label>
+        <nz-select
+          [(ngModel)]="newStatus"
+          nzPlaceHolder="Select status"
+          style="width: 100%;">
+          <nz-option
+            *ngFor="let option of statusOptions"
+            [nzValue]="option.value"
+            [nzLabel]="option.label">
+          </nz-option>
+        </nz-select>
+      </div>
+      
+      <div class="form-item" *ngIf="newStatus === 'SHIPPED'">
+        <label>Tracking Number:</label>
+        <input
+          nz-input
+          [(ngModel)]="trackingNumber"
+          placeholder="Enter tracking number"
+          style="width: 100%;">
+      </div>
+    </div>
+  </nz-modal>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <nz-spin nzSize="large"></nz-spin>
+</div>

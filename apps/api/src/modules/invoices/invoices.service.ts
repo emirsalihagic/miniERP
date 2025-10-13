@@ -22,6 +22,7 @@ export class InvoicesService {
         clientId: dto.clientId,
         dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
         notes: dto.notes,
+        discountPercent: dto.discountPercent ? new Decimal(dto.discountPercent) : new Decimal(0),
       },
       include: {
         client: true,
@@ -29,9 +30,27 @@ export class InvoicesService {
       },
     });
 
+    // Add items if provided
+    if (dto.items && dto.items.length > 0) {
+      for (const itemDto of dto.items) {
+        await this.addItem(invoice.id, itemDto, userId);
+      }
+    }
+
     await this.createAuditLog(invoice.id, 'CREATED', userId);
 
-    return invoice;
+    // Return invoice with updated items
+    return this.prisma.invoice.findUnique({
+      where: { id: invoice.id },
+      include: {
+        client: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
   }
 
   async addItem(invoiceId: string, dto: AddInvoiceItemDto, userId: string) {
@@ -64,7 +83,13 @@ export class InvoicesService {
 
     const quantity = new Decimal(dto.quantity);
     const lineSubtotal = this.pricingResolver.calculateLineSubtotal(quantity, resolvedPrice.price);
-    const lineDiscount = this.pricingResolver.calculateLineDiscount(lineSubtotal, resolvedPrice.discountPercent);
+    
+    // Use manual discount if provided, otherwise use pricing discount
+    const effectiveDiscountPercent = dto.discountPercent !== undefined 
+      ? new Decimal(dto.discountPercent) 
+      : resolvedPrice.discountPercent;
+    
+    const lineDiscount = this.pricingResolver.calculateLineDiscount(lineSubtotal, effectiveDiscountPercent);
     const lineTax = this.pricingResolver.calculateLineTax(lineSubtotal, lineDiscount, resolvedPrice.taxRate);
     const lineTotal = this.pricingResolver.calculateLineTotal(lineSubtotal, lineTax, lineDiscount);
 
@@ -73,11 +98,11 @@ export class InvoicesService {
         invoiceId,
         productId: dto.productId,
         sku: product.sku,
-        productName: product.name,
+        productName: product.name || 'Unknown Product',
         quantity,
         unitPrice: resolvedPrice.price,
         taxRate: resolvedPrice.taxRate,
-        discountPercent: resolvedPrice.discountPercent,
+        discountPercent: effectiveDiscountPercent,
         lineSubtotal,
         lineDiscount,
         lineTax,
@@ -89,6 +114,37 @@ export class InvoicesService {
     await this.recomputeTotals(invoiceId);
 
     return item;
+  }
+
+  async updateDiscount(invoiceId: string, discountPercent: number, userId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+    });
+
+    if (!invoice) {
+      throw new BadRequestException('Invoice not found');
+    }
+
+    if (invoice.status !== InvoiceStatus.DRAFT) {
+      throw new ForbiddenException('Cannot modify invoice after it has been issued');
+    }
+
+    const updatedInvoice = await this.prisma.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        discountPercent: new Decimal(discountPercent),
+      },
+    });
+
+    // Recompute totals to reflect the new discount
+    await this.recomputeTotals(invoiceId);
+
+    await this.createAuditLog(invoiceId, 'DISCOUNT_UPDATED', userId, {
+      oldDiscount: invoice.discountPercent,
+      newDiscount: discountPercent,
+    });
+
+    return updatedInvoice;
   }
 
   async issue(invoiceId: string, userId: string) {
@@ -121,6 +177,9 @@ export class InvoicesService {
       from: InvoiceStatus.DRAFT,
       to: InvoiceStatus.ISSUED,
     });
+
+    // Update linked order status if exists
+    await this.syncOrderStatus(invoiceId, 'INVOICE_ISSUED');
 
     // TODO: Queue PDF generation job here
 
@@ -163,14 +222,23 @@ export class InvoicesService {
   }
 
   private async recomputeTotals(invoiceId: string): Promise<void> {
-    const items = await this.prisma.invoiceItem.findMany({
-      where: { invoiceId },
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: { items: true },
     });
 
+    if (!invoice) return;
+
+    const items = invoice.items;
     const subtotal = items.reduce((sum, item) => sum.plus(item.lineSubtotal), new Decimal(0));
     const taxTotal = items.reduce((sum, item) => sum.plus(item.lineTax), new Decimal(0));
-    const discountTotal = items.reduce((sum, item) => sum.plus(item.lineDiscount), new Decimal(0));
-    const grandTotal = items.reduce((sum, item) => sum.plus(item.lineTotal), new Decimal(0));
+    const itemDiscountTotal = items.reduce((sum, item) => sum.plus(item.lineDiscount), new Decimal(0));
+    
+    // Apply invoice-level discount to subtotal (after item discounts)
+    const invoiceDiscountAmount = subtotal.minus(itemDiscountTotal).times(invoice.discountPercent).dividedBy(100);
+    const discountTotal = itemDiscountTotal.plus(invoiceDiscountAmount);
+    
+    const grandTotal = subtotal.plus(taxTotal).minus(discountTotal);
 
     await this.prisma.invoice.update({
       where: { id: invoiceId },
@@ -180,6 +248,13 @@ export class InvoicesService {
         discountTotal,
         grandTotal,
       },
+    });
+
+    // Sync totals to linked order
+    await this.syncOrderTotals(invoiceId, {
+      subtotal: subtotal.toNumber(),
+      taxTotal: taxTotal.toNumber(),
+      grandTotal: grandTotal.toNumber(),
     });
   }
 
@@ -218,6 +293,97 @@ export class InvoicesService {
         changes,
       },
     });
+  }
+
+  async markAsPaid(invoiceId: string, userId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+    });
+
+    if (!invoice) {
+      throw new BadRequestException('Invoice not found');
+    }
+
+    if (invoice.status !== InvoiceStatus.ISSUED) {
+      throw new BadRequestException('Only issued invoices can be marked as paid');
+    }
+
+    const updatedInvoice = await this.prisma.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        status: InvoiceStatus.PAID,
+        paidAt: new Date(),
+      },
+    });
+
+    await this.createAuditLog(invoiceId, 'STATUS_CHANGED', userId, {
+      from: InvoiceStatus.ISSUED,
+      to: InvoiceStatus.PAID,
+    });
+
+    // Check if linked order is delivered and auto-complete it
+    await this.checkAndCompleteOrder(invoiceId);
+
+    return updatedInvoice;
+  }
+
+  private async syncOrderStatus(invoiceId: string, orderStatus: string): Promise<void> {
+    try {
+      await this.prisma.order.updateMany({
+        where: { invoiceId },
+        data: { status: orderStatus as any },
+      });
+    } catch (error) {
+      console.error('Error syncing order status:', error);
+      // Don't throw error as this is not critical for invoice operations
+    }
+  }
+
+  private async checkAndCompleteOrder(invoiceId: string): Promise<void> {
+    try {
+      const order = await this.prisma.order.findFirst({
+        where: { 
+          invoiceId,
+          status: 'DELIVERED'
+        },
+      });
+
+      if (order) {
+        await this.prisma.order.update({
+          where: { id: order.id },
+          data: { status: 'COMPLETED' },
+        });
+      }
+    } catch (error) {
+      console.error('Error checking order completion:', error);
+      // Don't throw error as this is not critical for invoice operations
+    }
+  }
+
+  private async syncOrderTotals(invoiceId: string, totals: { subtotal: number; taxTotal: number; grandTotal: number }): Promise<void> {
+    try {
+      // Find the order linked to this invoice
+      const order = await this.prisma.order.findFirst({
+        where: { invoiceId },
+      });
+
+      if (order) {
+        // Update order totals to match invoice totals
+        await this.prisma.order.update({
+          where: { id: order.id },
+          data: {
+            subtotal: totals.subtotal,
+            taxTotal: totals.taxTotal,
+            grandTotal: totals.grandTotal,
+          },
+        });
+
+        console.log(`Synced order ${order.id} totals with invoice ${invoiceId}:`, totals);
+      }
+    } catch (error) {
+      console.error('Error syncing order totals:', error);
+      // Don't throw error as this is not critical for invoice operations
+    }
   }
 }
 

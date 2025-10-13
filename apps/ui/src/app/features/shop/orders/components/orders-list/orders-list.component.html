@@ -1,0 +1,138 @@
+<div class="orders-list">
+  <div class="orders-header">
+    <h1>My Orders</h1>
+    <p>Track and manage your orders</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <nz-card>
+      <div class="filter-controls">
+        <div class="filter-item">
+          <label>Status Filter:</label>
+          <nz-select 
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="onStatusFilterChange()"
+            nzPlaceHolder="Filter by status"
+            nzAllowClear
+            style="width: 200px;"
+          >
+            <nz-option 
+              *ngFor="let option of statusOptions" 
+              [nzValue]="option.value" 
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="orders-content">
+    <nz-card nzTitle="Orders">
+      <nz-spin [nzSpinning]="loading">
+        <nz-table 
+          #ordersTable 
+          [nzData]="orders" 
+          [nzPageSize]="pageSize"
+          [nzShowPagination]="false"
+          [nzLoading]="loading"
+        >
+          <thead>
+            <tr>
+              <th>Order Number</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Invoice</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of ordersTable.data">
+              <td>
+                <div class="order-number">
+                  <span class="number">{{ order.orderNumber }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+              </td>
+              <td>
+                <nz-tag [nzColor]="getStatusColor(order.status)">
+                  {{ getStatusLabel(order.status) }}
+                </nz-tag>
+              </td>
+              <td>
+                <span class="order-total">{{ formatPrice(order.grandTotal) }}</span>
+              </td>
+              <td>
+                <div class="invoice-info" *ngIf="order.invoice">
+                  <div class="invoice-number">{{ order.invoice.invoiceNumber }}</div>
+                  <nz-tag [nzColor]="getInvoiceStatusColor(order.invoice.status)">
+                    {{ order.invoice.status }}
+                  </nz-tag>
+                </div>
+                <span class="no-invoice" *ngIf="!order.invoice">No invoice yet</span>
+              </td>
+              <td>
+                <div class="order-actions">
+                  <button 
+                    nz-button 
+                    nzType="primary" 
+                    nzSize="small"
+                    routerLink="/shop/orders/{{ order.id }}"
+                  >
+                    <span nz-icon nzType="eye"></span>
+                    View
+                  </button>
+                  
+                  <button 
+                    nz-button 
+                    nzType="default" 
+                    nzSize="small"
+                    nzDanger
+                    *ngIf="canCancelOrder(order)"
+                    (click)="cancelOrder(order)"
+                  >
+                    <span nz-icon nzType="close"></span>
+                    Cancel
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && orders.length === 0" class="empty-orders">
+          <nz-empty 
+            nzNotFoundImage="simple"
+            nzNotFoundContent="No orders found"
+            nzNotFoundFooter="Start shopping to create your first order"
+          >
+            <ng-container nzExtra>
+              <button nz-button nzType="primary" routerLink="/shop">
+                <span nz-icon nzType="shopping"></span>
+                Browse Products
+              </button>
+            </ng-container>
+          </nz-empty>
+        </div>
+      </nz-spin>
+    </nz-card>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-section" *ngIf="total > pageSize">
+    <nz-pagination
+      [(nzPageIndex)]="page"
+      [nzTotal]="total"
+      [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="false"
+      [nzShowQuickJumper]="true"
+      (nzPageIndexChange)="onPageChange($event)"
+    ></nz-pagination>
+  </div>
+</div>

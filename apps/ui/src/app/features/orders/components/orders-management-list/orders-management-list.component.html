@@ -1,0 +1,130 @@
+<div class="orders-management-container">
+  <nz-card nzTitle="Order Management">
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-row">
+        <div class="filter-item">
+          <label>Status:</label>
+          <nz-select
+            [(ngModel)]="statusFilter"
+            (ngModelChange)="onStatusFilterChange()"
+            [nzOptions]="statusOptions"
+            nzPlaceHolder="Select status"
+            style="width: 200px;">
+          </nz-select>
+        </div>
+        
+        <div class="filter-item">
+          <label>Search:</label>
+          <input
+            nz-input
+            [(ngModel)]="searchTerm"
+            placeholder="Search by order number or client name"
+            style="width: 300px;"
+            (keyup.enter)="onSearch()">
+        </div>
+        
+        <div class="filter-item">
+          <button nz-button nzType="primary" (click)="onSearch()">
+            <span nz-icon nzType="search"></span>
+            Search
+          </button>
+        </div>
+        
+        <div class="filter-item">
+          <button nz-button (click)="clearFilters()">
+            <span nz-icon nzType="clear"></span>
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-section">
+      <nz-table
+        #ordersTable
+        [nzData]="orders"
+        [nzLoading]="loading"
+        [nzPageSize]="pageSize"
+        [nzTotal]="total"
+        [nzPageIndex]="page"
+        (nzPageIndexChange)="onPageChange($event)"
+        (nzPageSizeChange)="onPageSizeChange($event)"
+        nzShowSizeChanger
+        nzShowQuickJumper
+        [nzPageSizeOptions]="[10, 20, 50, 100]">
+        
+        <thead>
+          <tr>
+            <th>Order Number</th>
+            <th>Client</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Created</th>
+            <th>Invoice</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          <tr *ngFor="let order of ordersTable.data">
+            <td>
+              <a [routerLink]="['/orders', order.id]">{{ order.orderNumber }}</a>
+            </td>
+            <td>{{ order.client.name }}</td>
+            <td>
+              <nz-tag [nzColor]="getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </nz-tag>
+            </td>
+            <td>{{ formatPrice(order.grandTotal) }}</td>
+            <td>{{ order.createdAt | date:'short' }}</td>
+            <td>
+              <a *ngIf="order.invoice" [routerLink]="['/invoices', order.invoice.id]">
+                {{ order.invoice.invoiceNumber }}
+              </a>
+              <span *ngIf="!order.invoice" class="no-invoice">No invoice</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  nz-button
+                  nzType="primary"
+                  nzSize="small"
+                  *ngIf="canShipOrder(order)"
+                  (click)="shipOrder(order)">
+                  <span nz-icon nzType="car"></span>
+                  Ship
+                </button>
+                
+                <button
+                  nz-button
+                  nzType="default"
+                  nzSize="small"
+                  *ngIf="canMarkDelivered(order)"
+                  (click)="markDelivered(order)">
+                  <span nz-icon nzType="check"></span>
+                  Delivered
+                </button>
+                
+                <button
+                  nz-button
+                  nzSize="small"
+                  [routerLink]="['/orders', order.id]">
+                  <span nz-icon nzType="eye"></span>
+                  View
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && orders.length === 0" class="empty-state">
+      <nz-empty nzText="No orders found"></nz-empty>
+    </div>
+  </nz-card>
+</div>

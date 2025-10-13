@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,11 +25,12 @@ import { UserRole } from '@prisma/client';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { AddInvoiceItemDto } from './dto/add-invoice-item.dto';
+import { UpdateInvoiceDiscountDto } from './dto/update-invoice-discount.dto';
 
 @ApiTags('Invoices')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('api/v1/invoices')
+@Controller('invoices')
 export class InvoicesController {
   constructor(private readonly invoicesService: InvoicesService) {}
 
@@ -66,6 +68,19 @@ export class InvoicesController {
     return this.invoicesService.addItem(id, dto, user.id);
   }
 
+  @Patch(':id/discount')
+  @Roles(UserRole.EMPLOYEE, UserRole.CLIENT_USER)
+  @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
+  @ApiOperation({ summary: 'Update invoice discount' })
+  @ApiResponse({ status: 200, description: 'Discount updated successfully' })
+  updateDiscount(
+    @Param('id') id: string,
+    @Body() dto: UpdateInvoiceDiscountDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.invoicesService.updateDiscount(id, dto.discountPercent || 0, user.id);
+  }
+
   @Post(':id/issue')
   @Roles(UserRole.EMPLOYEE)
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
@@ -73,6 +88,17 @@ export class InvoicesController {
   @ApiResponse({ status: 200, description: 'Invoice issued successfully' })
   issue(@Param('id') id: string, @CurrentUser() user: any) {
     return this.invoicesService.issue(id, user.id);
+  }
+
+  @Post(':id/paid')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.EMPLOYEE)
+  @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
+  @ApiOperation({ summary: 'Mark invoice as paid' })
+  @ApiResponse({ status: 200, description: 'Invoice marked as paid successfully' })
+  markAsPaid(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.invoicesService.markAsPaid(id, user.id);
   }
 }
 

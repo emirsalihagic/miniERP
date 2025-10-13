@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "468983f4-49b4-497b-aa58-7e9f3834465e"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -32,6 +33,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ant-design/icons-angular/src/inline-svg",
+                "output": "assets/outline"
               }
             ],
             "styles": [
@@ -91,6 +97,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ant-design/icons-angular/src/inline-svg",
+                "output": "assets/outline"
               }
             ],
             "styles": [
