@@ -47,10 +47,10 @@ export class ClientsService {
     if (qp.q) {
       whereConditions.push({
         OR: [
-          { name: { contains: qp.q, mode: 'insensitive' } },
-          { email: { contains: qp.q, mode: 'insensitive' } },
-          { clientCode: { contains: qp.q, mode: 'insensitive' } },
-          { taxNumber: { contains: qp.q, mode: 'insensitive' } },
+          { name: { contains: qp.q, mode: 'insensitive' as any } },
+          { email: { contains: qp.q, mode: 'insensitive' as any } },
+          { clientCode: { contains: qp.q, mode: 'insensitive' as any } },
+          { taxNumber: { contains: qp.q, mode: 'insensitive' as any } },
         ],
       });
     }
