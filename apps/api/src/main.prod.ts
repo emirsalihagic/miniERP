@@ -41,7 +41,30 @@ async function bootstrap() {
       .build();
     
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        tryItOutEnabled: true,
+        requestInterceptor: (req) => {
+          // Add any custom request handling here
+          return req;
+        },
+      },
+      customCss: `
+        .swagger-ui .topbar { display: none }
+        .swagger-ui .info { margin: 20px 0 }
+      `,
+      customSiteTitle: 'Mini ERP API Documentation',
+      customfavIcon: '/favicon.ico',
+      customJs: [
+        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js',
+        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js',
+      ],
+      customCssUrl: [
+        'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css',
+      ],
+    });
 
     await app.init();
   }
