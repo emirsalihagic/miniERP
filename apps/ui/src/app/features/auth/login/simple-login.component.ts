@@ -82,12 +82,6 @@ import { environment } from '../../../environments/environment';
           >
             {{ isLoading ? 'Signing in...' : 'Sign In' }}
           </button>
-
-          <!-- Register Link -->
-          <div class="register-link">
-            Don't have an account?
-            <a routerLink="/auth/register">Sign up</a>
-          </div>
         </form>
       </div>
     </div>
@@ -221,23 +215,6 @@ import { environment } from '../../../environments/environment';
       background: #d9d9d9;
       cursor: not-allowed;
     }
-
-    .register-link {
-      text-align: center;
-      margin-top: 16px;
-      color: #8c8c8c;
-    }
-
-    .register-link a {
-      color: #667eea;
-      font-weight: 500;
-      text-decoration: none;
-      margin-left: 4px;
-    }
-
-    .register-link a:hover {
-      color: #764ba2;
-    }
   `]
 })
 export class SimpleLoginComponent {
@@ -253,7 +230,7 @@ export class SimpleLoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      remember: [true]
+      remember: [false]
     });
   }
 

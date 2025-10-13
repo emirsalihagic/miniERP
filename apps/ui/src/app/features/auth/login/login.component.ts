@@ -45,9 +45,9 @@ export class LoginComponent implements OnInit {
     private navigationService: NavigationService
   ) {
     this.loginForm = this.fb.group({
-      email: ['admin@minierp.com', [Validators.required, Validators.email]],
-      password: ['password123', [Validators.required, Validators.minLength(6)]],
-      remember: [true]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      remember: [false]
     });
   }
 
