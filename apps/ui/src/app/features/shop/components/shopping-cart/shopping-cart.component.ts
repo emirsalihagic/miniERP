@@ -118,14 +118,11 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   formatPrice(price: number): string {
-    // Convert USD to EUR (approximate rate: 1 USD = 0.85 EUR)
-    // In a real application, this would use a live exchange rate API
-    const eurPrice = price * 0.85;
-    
+    // Price is already in EUR, no conversion needed
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'EUR'
-    }).format(eurPrice);
+    }).format(price);
   }
 
   getProductImage(item: CartItem): string {

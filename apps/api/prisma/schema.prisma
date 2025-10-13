@@ -14,7 +14,7 @@ enum UserRole {
 }
 
 enum InvoiceStatus {
-  DRAFT
+  QUOTE
   ISSUED
   SENT
   PAID
@@ -181,7 +181,7 @@ model User {
   refreshToken      String?   @map("refresh_token")
   
   // Discriminator approach - only ONE should be set
-  clientId          String?   @unique @map("client_id") @db.Uuid
+  clientId          String?   @map("client_id") @db.Uuid
   supplierId        String?   @unique @map("supplier_id") @db.Uuid
   
   client            Client?   @relation("ClientUsers", fields: [clientId], references: [id], onDelete: Cascade)
@@ -382,7 +382,7 @@ model Invoice {
   id                String         @id @default(uuid()) @db.Uuid
   invoiceNumber     String         @unique @map("invoice_number")
   clientId          String         @map("client_id") @db.Uuid
-  status            InvoiceStatus  @default(DRAFT)
+  status            InvoiceStatus  @default(QUOTE)
   
   // Computed totals (immutable after ISSUED)
   subtotal          Decimal        @default(0) @db.Decimal(12, 2)

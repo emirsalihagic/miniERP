@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
@@ -20,8 +21,14 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
-  async getCart(@Request() req) {
-    const clientId = req.user.clientId;
+  async getCart(@Request() req, @Query('clientId') clientIdParam?: string) {
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in query parameter
+    if (!clientId && req.user.role === 'EMPLOYEE' && clientIdParam) {
+      clientId = clientIdParam;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }
@@ -30,7 +37,13 @@ export class CartController {
 
   @Post('items')
   async addItem(@Request() req, @Body() addCartItemDto: AddCartItemDto) {
-    const clientId = req.user.clientId;
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in request body
+    if (!clientId && req.user.role === 'EMPLOYEE' && addCartItemDto.clientId) {
+      clientId = addCartItemDto.clientId;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }
@@ -43,7 +56,13 @@ export class CartController {
     @Param('productId') productId: string,
     @Body() updateCartItemDto: UpdateCartItemDto,
   ) {
-    const clientId = req.user.clientId;
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in request body
+    if (!clientId && req.user.role === 'EMPLOYEE' && updateCartItemDto.clientId) {
+      clientId = updateCartItemDto.clientId;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }
@@ -51,8 +70,14 @@ export class CartController {
   }
 
   @Delete('items/:productId')
-  async removeItem(@Request() req, @Param('productId') productId: string) {
-    const clientId = req.user.clientId;
+  async removeItem(@Request() req, @Param('productId') productId: string, @Query('clientId') clientIdParam?: string) {
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in query parameter
+    if (!clientId && req.user.role === 'EMPLOYEE' && clientIdParam) {
+      clientId = clientIdParam;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }
@@ -60,8 +85,14 @@ export class CartController {
   }
 
   @Delete()
-  async clearCart(@Request() req) {
-    const clientId = req.user.clientId;
+  async clearCart(@Request() req, @Query('clientId') clientIdParam?: string) {
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in query parameter
+    if (!clientId && req.user.role === 'EMPLOYEE' && clientIdParam) {
+      clientId = clientIdParam;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }

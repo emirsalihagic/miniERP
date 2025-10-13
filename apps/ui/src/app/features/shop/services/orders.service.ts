@@ -65,6 +65,7 @@ export interface Order {
 
 export interface CreateOrderDto {
   notes?: string;
+  clientId?: string; // For EMPLOYEE users
 }
 
 export interface UpdateOrderStatusDto {
@@ -98,8 +99,8 @@ export class OrdersService {
 
   constructor(private http: HttpClient) {}
 
-  createOrder(notes?: string): Observable<Order> {
-    const dto: CreateOrderDto = { notes };
+  createOrder(notes?: string, clientId?: string): Observable<Order> {
+    const dto: CreateOrderDto = { notes, clientId };
     return this.http.post<Order>(this.apiUrl, dto);
   }
 

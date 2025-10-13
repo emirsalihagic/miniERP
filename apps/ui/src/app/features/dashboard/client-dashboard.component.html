@@ -1,30 +1,20 @@
 <div class="client-dashboard">
   <div class="welcome-section">
-    <h1>Client Portal 🛒</h1>
+    <h1>
+      <span nz-icon nzType="user" style="margin-right: 12px; color: #1890ff;"></span>
+      Client Dashboard
+    </h1>
     <p>Welcome, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
-    <p *ngIf="clientInfo">Account: <strong>{{ clientInfo.name }}</strong></p>
-    <p>Browse products and manage your orders.</p>
+    <p *ngIf="clientInfo">Client: <strong>{{ clientInfo.name }}</strong></p>
+    <p>View client information, invoices, and manage orders.</p>
   </div>
 
   <div nz-row [nzGutter]="[16, 16]" class="stats-section">
     <div nz-col nzXs="24" nzSm="12" nzMd="6">
       <nz-card>
         <nz-statistic
-          nzTitle="Available Products"
-          [nzValue]="stats.availableProducts"
-          [nzLoading]="loading">
-          <ng-template #nzPrefix>
-            <span nz-icon nzType="shopping" style="color: #1890ff;"></span>
-          </ng-template>
-        </nz-statistic>
-      </nz-card>
-    </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="My Invoices"
-          [nzValue]="stats.myInvoices"
+          nzTitle="All Invoices"
+          [nzValue]="stats.totalInvoices"
           [nzLoading]="loading">
           <ng-template #nzPrefix>
             <span nz-icon nzType="file-text" style="color: #52c41a;"></span>
@@ -36,7 +26,7 @@
     <div nz-col nzXs="24" nzSm="12" nzMd="6">
       <nz-card>
         <nz-statistic
-          nzTitle="Pending Orders"
+          nzTitle="Outstanding Orders"
           [nzValue]="stats.pendingOrders"
           [nzLoading]="loading">
           <ng-template #nzPrefix>
@@ -49,12 +39,26 @@
     <div nz-col nzXs="24" nzSm="12" nzMd="6">
       <nz-card>
         <nz-statistic
-          nzTitle="Unpaid Amount"
-          [nzValue]="stats.unpaidTotal"
-          nzPrefix="€"
+          nzTitle="Amount Due"
+          [nzValue]="stats.unpaidAmount"
+          nzSuffix="€"
           [nzLoading]="loading">
           <ng-template #nzPrefix>
-            <span nz-icon nzType="dollar" style="color: #f5222d;"></span>
+            <span nz-icon nzType="exclamation-circle" style="color: #f5222d;"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    
+    <div nz-col nzXs="24" nzSm="12" nzMd="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Total Paid"
+          [nzValue]="stats.totalSpent"
+          nzSuffix="€"
+          [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="dollar-circle" style="color: #13c2c2;"></span>
           </ng-template>
         </nz-statistic>
       </nz-card>
@@ -64,18 +68,23 @@
   <div nz-row [nzGutter]="[16, 16]" class="client-actions">
     <div nz-col nzXs="24" nzSm="12" nzMd="8">
       <nz-card nzTitle="Quick Actions" nzSize="small">
+        <ng-template #nzTitle>
+          <span nz-icon nzType="thunderbolt" style="margin-right: 8px;"></span>
+          Quick Actions
+        </ng-template>
         <div class="action-buttons">
-          <button nz-button nzType="primary" nzSize="large" routerLink="/products">
-            <span nz-icon nzType="shopping"></span>
-            Browse Products
-          </button>
-          <button nz-button nzSize="large" routerLink="/invoices">
-            <span nz-icon nzType="file-text"></span>
-            View Invoices
-          </button>
-          <button nz-button nzSize="large" routerLink="/invoices/new">
-            <span nz-icon nzType="plus-circle"></span>
+          <button nz-button nzType="primary" nzSize="large" routerLink="/shop">
+            <span nz-icon nzType="shopping-cart"></span>
             Create Order
+          </button>
+          <button nz-button nzSize="large" routerLink="/shop/orders">
+            <span nz-icon nzType="file-text"></span>
+            View Orders
+          </button>
+          <button nz-button nzSize="large" routerLink="/shop/cart">
+            <span nz-icon nzType="shopping-cart"></span>
+            Cart
+            <nz-badge [nzCount]="cartItemCount" [nzOffset]="[10, -5]" *ngIf="cartItemCount > 0"></nz-badge>
           </button>
         </div>
       </nz-card>
@@ -83,6 +92,10 @@
     
     <div nz-col nzXs="24" nzSm="12" nzMd="8">
       <nz-card nzTitle="Recent Invoices" nzSize="small">
+        <ng-template #nzTitle>
+          <span nz-icon nzType="file-text" style="margin-right: 8px;"></span>
+          Recent Invoices
+        </ng-template>
         <div class="recent-invoices" *ngIf="!loading">
           <div class="invoice-item" *ngFor="let invoice of recentInvoices">
             <div class="invoice-header">

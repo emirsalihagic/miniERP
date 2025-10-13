@@ -205,6 +205,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/orders/components/orders-management-list/orders-management-list.component').then(m => m.OrdersManagementListComponent)
       },
       {
+        path: 'new',
+        loadComponent: () => import('./features/orders/components/order-form/order-form.component').then(m => m.OrderFormComponent)
+      },
+      {
         path: 'pending',
         loadComponent: () => import('./features/orders/components/orders-management-list/orders-management-list.component').then(m => m.OrdersManagementListComponent)
       },

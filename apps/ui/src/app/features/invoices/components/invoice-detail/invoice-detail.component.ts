@@ -75,7 +75,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
           <div class="items-header">
             <h2>Invoice Items</h2>
             <button 
-              *ngIf="canEdit && invoice.status === 'DRAFT'" 
+              *ngIf="canEdit && invoice.status === 'QUOTE'" 
               (click)="showAddItemForm = !showAddItemForm"
               class="btn btn-primary btn-sm">
               + Add Item
@@ -83,7 +83,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
           </div>
 
           <!-- Add Item Form -->
-          <div *ngIf="showAddItemForm && canEdit && invoice.status === 'DRAFT'" class="add-item-form">
+          <div *ngIf="showAddItemForm && canEdit && invoice.status === 'QUOTE'" class="add-item-form">
             <form [formGroup]="addItemForm" (ngSubmit)="addItem()">
               <div class="form-row">
                 <div class="form-group">
@@ -148,11 +148,11 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
                   <th>SKU</th>
                   <th>Quantity</th>
                   <th>Unit</th>
-                  <th>Unit Price</th>
+                  <th>Unit Price (excl. VAT)</th>
                   <th>Discount</th>
                   <th>Tax</th>
                   <th>Total</th>
-                  <th *ngIf="canEdit && invoice.status === 'DRAFT'">Actions</th>
+                  <th *ngIf="canEdit && invoice.status === 'QUOTE'">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,7 +165,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
                   <td>{{ item.discountPercent }}%</td>
                   <td>{{ item.taxRate }}%</td>
                   <td class="amount">{{ item.lineTotal | currency:'EUR':'symbol':'1.2-2' }}</td>
-                  <td *ngIf="canEdit && invoice.status === 'DRAFT'" class="actions">
+                  <td *ngIf="canEdit && invoice.status === 'QUOTE'" class="actions">
                     <button 
                       (click)="removeItem(item.id!)"
                       class="btn btn-sm btn-danger"
@@ -182,7 +182,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
             <div class="empty-items">
               <p>No items added to this invoice yet.</p>
               <button 
-                *ngIf="canEdit && invoice.status === 'DRAFT'" 
+                *ngIf="canEdit && invoice.status === 'QUOTE'" 
                 (click)="showAddItemForm = true"
                 class="btn btn-primary">
                 Add First Item
@@ -192,7 +192,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
         </div>
 
         <!-- Invoice Discount Controls -->
-        <div class="invoice-discount-section" *ngIf="canEdit && invoice.status === 'DRAFT' && invoice.items.length > 0">
+        <div class="invoice-discount-section" *ngIf="canEdit && invoice.status === 'QUOTE' && invoice.items.length > 0">
           <div class="discount-header">
             <h3>Invoice Discount</h3>
             <button 
@@ -710,10 +710,9 @@ export class InvoiceDetailComponent implements OnInit {
     return Boolean(this.loading);
   }
 
-  // Getter to check if user can edit invoices
+  // Getter to check if user can edit invoices (EMPLOYEE only)
   get canEdit(): boolean {
-    const currentUser = this.authService.getCurrentUser();
-    return currentUser?.role === UserRole.EMPLOYEE;
+    return this.authService.getCurrentUser()?.role === UserRole.EMPLOYEE;
   }
 
   // Getter to check if user can issue invoices
@@ -859,8 +858,8 @@ export class InvoiceDetailComponent implements OnInit {
       return false;
     }
     
-    // Check if invoice is in DRAFT status
-    if (this.invoice.status !== 'DRAFT') {
+    // Check if invoice is in QUOTE status
+    if (this.invoice.status !== 'QUOTE') {
       return false;
     }
     

@@ -150,20 +150,15 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
-    console.log('🔍 [AuthService] Loading user from storage...');
     const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-    console.log('🔍 [AuthService] User string from storage:', userStr);
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        console.log('✅ [AuthService] User loaded from storage:', user);
         this.currentUserSubject.next(user);
       } catch (e) {
         console.error('❌ [AuthService] Error parsing user from storage:', e);
         this.clearSession();
       }
-    } else {
-      console.log('❌ [AuthService] No user found in storage');
     }
   }
 

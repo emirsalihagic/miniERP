@@ -7,7 +7,7 @@ export enum UserRole {
 }
 
 export enum InvoiceStatus {
-  DRAFT = 'DRAFT',
+  QUOTE = 'QUOTE',
   ISSUED = 'ISSUED',
   SENT = 'SENT',
   PAID = 'PAID',

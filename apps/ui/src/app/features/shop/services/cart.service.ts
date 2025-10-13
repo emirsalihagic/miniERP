@@ -49,6 +49,7 @@ export interface AddCartItemDto {
 
 export interface UpdateCartItemDto {
   quantity: number;
+  clientId?: string; // For EMPLOYEE users
 }
 
 @Injectable({
@@ -61,8 +62,9 @@ export class CartService {
 
   constructor(private http: HttpClient) {}
 
-  getCart(): Observable<Cart> {
-    return this.http.get<Cart>(this.apiUrl).pipe(
+  getCart(clientId?: string): Observable<Cart> {
+    const url = clientId ? `${this.apiUrl}?clientId=${clientId}` : this.apiUrl;
+    return this.http.get<Cart>(url).pipe(
       tap(cart => {
         const itemCount = cart.items.reduce((sum, item) => sum + Number(item.quantity), 0);
         this.itemCountSubject.next(itemCount);
@@ -80,8 +82,8 @@ export class CartService {
     );
   }
 
-  updateItemQuantity(productId: string, quantity: number): Observable<Cart> {
-    const dto: UpdateCartItemDto = { quantity };
+  updateItemQuantity(productId: string, quantity: number, clientId?: string): Observable<Cart> {
+    const dto: UpdateCartItemDto = { quantity, clientId };
     return this.http.put<Cart>(`${this.apiUrl}/items/${productId}`, dto).pipe(
       tap(cart => {
         const itemCount = cart.items.reduce((sum, item) => sum + Number(item.quantity), 0);
@@ -90,17 +92,19 @@ export class CartService {
     );
   }
 
-  removeItem(productId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/items/${productId}`).pipe(
+  removeItem(productId: string, clientId?: string): Observable<void> {
+    const url = clientId ? `${this.apiUrl}/items/${productId}?clientId=${clientId}` : `${this.apiUrl}/items/${productId}`;
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         // Refresh cart to get updated item count
-        this.getCart().subscribe();
+        this.getCart(clientId).subscribe();
       })
     );
   }
 
-  clearCart(): Observable<void> {
-    return this.http.delete<void>(this.apiUrl).pipe(
+  clearCart(clientId?: string): Observable<void> {
+    const url = clientId ? `${this.apiUrl}?clientId=${clientId}` : this.apiUrl;
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         this.itemCountSubject.next(0);
       })

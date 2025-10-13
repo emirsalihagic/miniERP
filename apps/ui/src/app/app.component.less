@@ -82,6 +82,13 @@
     max-height: none !important;
     overflow: visible !important;
     
+    // Ensure all icons are visible by default
+    .anticon {
+      color: #fff !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
     .ant-menu-item {
       margin: 0;
       height: 48px;
@@ -139,6 +146,23 @@
           .anticon {
             margin-right: 8px;
             font-size: 14px;
+            color: #fff;
+            opacity: 1;
+            visibility: visible;
+          }
+          
+          &:hover {
+            .anticon {
+              transform: scale(1.1);
+            }
+          }
+          
+          &.ant-menu-item-selected {
+            .anticon {
+              color: #fff !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+            }
           }
         }
       }
@@ -224,7 +248,9 @@
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          margin-right: 50px;
+          margin-right: 30px;
+          position: relative;
+          z-index: 1000;
 
           &:hover {
             transform: scale(1.05);
@@ -232,6 +258,68 @@
             box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
           }
         }
+  }
+}
+
+// Fix dropdown menu positioning
+.ant-dropdown {
+  z-index: 1050 !important;
+  position: fixed !important;
+  
+  .ant-dropdown-menu {
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    position: relative !important;
+    
+    .ant-dropdown-menu-item {
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &:hover {
+        background-color: #f5f5f5;
+      }
+      
+      .anticon {
+        font-size: 14px;
+      }
+    }
+    
+    .ant-dropdown-menu-divider {
+      margin: 4px 0;
+    }
+  }
+}
+
+// Force dropdown positioning for user avatar
+.right-content {
+  position: relative;
+  z-index: 1000;
+  
+  .user-avatar {
+    position: relative;
+    z-index: 1001;
+  }
+}
+
+// Override any conflicting positioning
+.ant-layout-header {
+  position: relative;
+  z-index: 999;
+}
+
+// Specific styling for user dropdown overlay
+.user-dropdown-overlay {
+  z-index: 1050 !important;
+  position: fixed !important;
+  
+  .ant-dropdown-menu {
+    position: relative !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
   }
 }
 

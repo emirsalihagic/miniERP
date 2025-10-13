@@ -19,8 +19,8 @@ export class PermissionService {
 
   /**
    * Define permissions for each role
-   * EMPLOYEE: Full access to all modules, removed shop permission
-   * CLIENT_USER: Limited access - can view invoices, products, and their own client info
+   * EMPLOYEE: Full access to all modules except shop (shop is for clients only)
+   * CLIENT_USER: Limited access - can view invoices and shop (includes "My Orders"), but not main Orders/Products menus
    * SUPPLIER_USER: Limited access - can view products, suppliers, and their own supplier info
    */
   private rolePermissions: Record<string, MenuPermission> = {
@@ -36,13 +36,13 @@ export class PermissionService {
     },
     [UserRole.CLIENT_USER]: {
       invoices: true,  // Can view invoices related to their client
-      products: true,  // Can view products for ordering
+      products: false, // Cannot access products menu (only through shop)
       clients: false, // Cannot manage clients
       suppliers: false, // Cannot manage suppliers
       users: false,   // Cannot manage users
       pricing: false,  // Cannot manage pricing
-      shop: true,     // Can access shop
-      orders: true    // Can view their orders
+      shop: true,     // Can access shop (includes "My Orders")
+      orders: false   // Cannot access orders menu (only through shop)
     },
     [UserRole.SUPPLIER_USER]: {
       invoices: false, // Cannot view invoices
@@ -60,7 +60,6 @@ export class PermissionService {
    * Get menu permissions for a specific role
    */
   getMenuPermissions(role: string): MenuPermission {
-    console.log('🔐 [PermissionService] Getting permissions for role:', role);
     const permissions = this.rolePermissions[role] || {
       invoices: false,
       products: false,
@@ -71,7 +70,6 @@ export class PermissionService {
       shop: false,
       orders: false
     };
-    console.log('🔐 [PermissionService] Permissions for', role, ':', permissions);
     return permissions;
   }
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Invoice UI</title>
+</head>
+<body>
+    <h1>Test Invoice UI Functionality</h1>
+    
+    <h2>Steps to Test:</h2>
+    <ol>
+        <li>Open the application at <a href="http://localhost:4200" target="_blank">http://localhost:4200</a></li>
+        <li>Login as EMPLOYEE user:
+            <ul>
+                <li>Email: admin@minierp.com</li>
+                <li>Password: password123</li>
+            </ul>
+        </li>
+        <li>Navigate to Invoices → All Invoices</li>
+        <li>Click on invoice "INV-2024-000001" (should have QUOTE status)</li>
+        <li>Check the debug info section - it should show:
+            <ul>
+                <li>User Role: EMPLOYEE</li>
+                <li>Can Edit: true</li>
+                <li>Invoice Status: QUOTE</li>
+                <li>Show Add Button: true</li>
+            </ul>
+        </li>
+        <li>You should see a "+ Add Item" button</li>
+        <li>Click the "+ Add Item" button to test the form</li>
+        <li>Fill out the form and submit to test adding an item</li>
+    </ol>
+    
+    <h2>Expected Results:</h2>
+    <ul>
+        <li>✅ Debug info shows correct user role and permissions</li>
+        <li>✅ "+ Add Item" button is visible</li>
+        <li>✅ Add item form appears when button is clicked</li>
+        <li>✅ Form submission successfully adds item to invoice</li>
+        <li>✅ New item appears in the invoice items table</li>
+    </ul>
+    
+    <h2>Backend API Test (Already Working):</h2>
+    <p>The backend API is already working correctly. We tested it with:</p>
+    <pre>
+curl -X POST "http://localhost:3000/api/v1/invoices/d68252f6-8522-402e-a488-520a3fc7018e/items" \
+  -H "Authorization: Bearer [EMPLOYEE_TOKEN]" \
+  -H "Content-Type: application/json" \
+  -d '{"productId": "c2809d59-0c0a-4efe-a54a-62a4a683592b", "quantity": 1, "discountPercent": 0}'
+    </pre>
+    <p>✅ This returned a successful response with the new item.</p>
+</body>
+</html>

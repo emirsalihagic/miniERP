@@ -32,7 +32,7 @@ export interface Invoice {
     name: string;
     email: string;
   };
-  status: 'DRAFT' | 'ISSUED' | 'SENT' | 'PAID' | 'CANCELLED';
+  status: 'QUOTE' | 'ISSUED' | 'SENT' | 'PAID' | 'CANCELLED';
   subtotal: number;
   taxTotal: number;
   discountTotal: number;

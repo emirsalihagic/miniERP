@@ -99,7 +99,7 @@ import { NavigationService } from '../../../../core/services/navigation.service'
           
           <div class="form-row">
             <div class="form-group">
-              <label for="price">Price *</label>
+              <label for="price">Unit Price (excl. VAT) *</label>
               <input 
                 type="number" 
                 id="price" 

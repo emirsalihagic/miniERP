@@ -77,7 +77,7 @@ import { NavigationService } from '../../../../core/services/navigation.service'
           <h2>Pricing Information</h2>
           <div class="detail-grid">
             <div class="detail-item">
-              <label>Price</label>
+              <label>Unit Price (excl. VAT)</label>
               <span class="price">{{ pricing.price | currency:pricing.currency:'symbol':'1.2-2' }}</span>
             </div>
             <div class="detail-item">

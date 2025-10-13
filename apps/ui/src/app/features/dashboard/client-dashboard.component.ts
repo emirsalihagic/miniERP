@@ -7,13 +7,13 @@ import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { AuthService, User } from '../../core/services/auth.service';
-import { ProductsService } from '../products/services/products.service';
 import { InvoicesService, Invoice } from '../invoices/services/invoices.service';
 import { ClientsService } from '../clients/services/clients.service';
-import { ClientSummary } from '../../shared/interfaces/client.interface';
-import { Client } from '../../shared/interfaces/client.interface';
+import { ClientSummary, Client } from '../../shared/interfaces/client.interface';
+import { CartService } from '../shop/services/cart.service';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -27,6 +27,7 @@ import { Client } from '../../shared/interfaces/client.interface';
     NzGridModule,
     NzButtonModule,
     NzTableModule,
+    NzBadgeModule,
     NzTagModule
   ],
   templateUrl: './client-dashboard.component.html',
@@ -38,19 +39,19 @@ export class ClientDashboardComponent implements OnInit {
   clientSummary: ClientSummary | null = null;
   recentInvoices: Invoice[] = [];
   stats = {
-    availableProducts: 0,
-    myInvoices: 0,
+    totalInvoices: 0,
     pendingOrders: 0,
-    totalSpent: 0,
-    unpaidTotal: 0
+    unpaidAmount: 0,
+    totalSpent: 0
   };
+  cartItemCount = 0;
   loading = true;
 
   constructor(
     private authService: AuthService,
-    private productsService: ProductsService,
     private invoicesService: InvoicesService,
-    private clientsService: ClientsService
+    private clientsService: ClientsService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +70,7 @@ export class ClientDashboardComponent implements OnInit {
 
     const clientId = this.currentUser.clientId;
     let completedRequests = 0;
-    const totalRequests = 4;
+    const totalRequests = 5; // Load client info, summary, recent invoices, all invoices, cart
 
     const checkComplete = () => {
       completedRequests++;
@@ -90,12 +91,13 @@ export class ClientDashboardComponent implements OnInit {
       }
     });
 
-    // Load client summary statistics
+    // Load client summary statistics (unpaid amount, invoice count, etc.)
     this.clientsService.getClientSummary(clientId).subscribe({
       next: (summary) => {
         this.clientSummary = summary;
-        this.stats.myInvoices = summary.invoicesCount;
-        this.stats.unpaidTotal = summary.unpaidTotal;
+        this.stats.totalInvoices = summary.invoicesCount;
+        // Note: summary.unpaidTotal only includes ISSUED/SENT invoices
+        // We'll calculate unpaid amount from all invoices below
         checkComplete();
       },
       error: (error) => {
@@ -104,33 +106,10 @@ export class ClientDashboardComponent implements OnInit {
       }
     });
 
-    // Load available products count
-    this.productsService.getAll().subscribe({
-      next: (response) => {
-        this.stats.availableProducts = response.data.length;
-        checkComplete();
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-        this.stats.availableProducts = 0;
-        checkComplete();
-      }
-    });
-
-    // Load recent invoices
+    // Load recent invoices for this client (for display)
     this.clientsService.getClientInvoices(clientId, 1, 5).subscribe({
       next: (response) => {
         this.recentInvoices = response.data || [];
-        // Calculate pending orders (invoices with status ISSUED or SENT)
-        this.stats.pendingOrders = this.recentInvoices.filter(
-          invoice => invoice.status === 'ISSUED' || invoice.status === 'SENT'
-        ).length;
-        
-        // Calculate total spent (sum of paid invoices)
-        this.stats.totalSpent = this.recentInvoices
-          .filter(invoice => invoice.status === 'PAID')
-          .reduce((sum, invoice) => sum + invoice.grandTotal, 0);
-        
         checkComplete();
       },
       error: (error) => {
@@ -139,11 +118,52 @@ export class ClientDashboardComponent implements OnInit {
         checkComplete();
       }
     });
+
+    // Load ALL invoices for this client (for accurate statistics)
+    this.clientsService.getClientInvoices(clientId, 1, 1000).subscribe({
+      next: (response) => {
+        const allInvoices = response.data || [];
+        
+        // Calculate pending orders (invoices with status QUOTE, ISSUED, or SENT)
+        this.stats.pendingOrders = allInvoices.filter(
+          (invoice: any) => invoice.status === 'QUOTE' || invoice.status === 'ISSUED' || invoice.status === 'SENT'
+        ).length;
+        
+        // Calculate unpaid amount (invoices that are not PAID)
+        this.stats.unpaidAmount = allInvoices
+          .filter((invoice: any) => invoice.status !== 'PAID')
+          .reduce((sum: number, invoice: any) => sum + parseFloat(invoice.grandTotal || '0'), 0);
+        
+        // Calculate total spent (sum of paid invoices)
+        this.stats.totalSpent = allInvoices
+          .filter((invoice: any) => invoice.status === 'PAID')
+          .reduce((sum: number, invoice: any) => sum + parseFloat(invoice.grandTotal || '0'), 0);
+        
+        checkComplete();
+      },
+      error: (error) => {
+        console.error('Error loading all invoices:', error);
+        checkComplete();
+      }
+    });
+
+    // Load cart items count
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        this.cartItemCount = cart.items?.length || 0;
+        checkComplete();
+      },
+      error: (error) => {
+        console.error('Error loading cart:', error);
+        this.cartItemCount = 0;
+        checkComplete();
+      }
+    });
   }
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'DRAFT':
+      case 'QUOTE':
         return 'default';
       case 'ISSUED':
         return 'blue';

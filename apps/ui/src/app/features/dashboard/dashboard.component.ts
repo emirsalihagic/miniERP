@@ -55,7 +55,14 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // Route based on user role
+    // Route based on user role and client association
+    // If user has a clientId, show client dashboard regardless of role
+    if (this.currentUser.clientId) {
+      this.router.navigate(['/dashboard/client']);
+      return;
+    }
+
+    // For users without clientId, route based on role
     switch (this.currentUser.role) {
       case 'EMPLOYEE':
         this.router.navigate(['/dashboard/employee']);

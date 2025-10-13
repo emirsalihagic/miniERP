@@ -96,7 +96,7 @@ export class ProductsController {
   }
 
   @Get('shop')
-  @Roles(UserRole.CLIENT_USER)
+  @Roles(UserRole.CLIENT_USER, UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Get shop products (active and sellable only)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })

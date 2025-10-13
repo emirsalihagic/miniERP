@@ -12,6 +12,8 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { InvoicesService, Invoice } from '../../services/invoices.service';
 import { ClientsService } from '../../../clients/services/clients.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UserRole } from '../../../../shared/interfaces/user.interface';
 
 @Component({
   selector: 'app-invoices-list',
@@ -21,7 +23,11 @@ import { ClientsService } from '../../../clients/services/clients.service';
     <div class="invoices-container">
       <div class="header">
         <h1>Invoices</h1>
-        <button nz-button nzType="primary" routerLink="/invoices/new">
+        <button 
+          *ngIf="canCreateInvoice" 
+          nz-button 
+          nzType="primary" 
+          routerLink="/invoices/new">
           <span nz-icon nzType="plus"></span>
           New Invoice
         </button>
@@ -85,7 +91,7 @@ import { ClientsService } from '../../../clients/services/clients.service';
                   View
                 </button>
                 <button 
-                  *ngIf="invoice.status === 'DRAFT'" 
+                  *ngIf="canManageInvoices && invoice.status === 'QUOTE'" 
                   nz-button 
                   nzType="link" 
                   nzDanger
@@ -94,7 +100,7 @@ import { ClientsService } from '../../../clients/services/clients.service';
                   Issue
                 </button>
                 <button 
-                  *ngIf="invoice.status === 'ISSUED'" 
+                  *ngIf="canManageInvoices && invoice.status === 'ISSUED'" 
                   nz-button 
                   nzType="link" 
                   nzDanger
@@ -108,7 +114,11 @@ import { ClientsService } from '../../../clients/services/clients.service';
         </nz-table>
 
         <nz-empty *ngIf="!loading && invoices.length === 0" nzNotFoundContent="No invoices found">
-          <button nz-button nzType="primary" routerLink="/invoices/new">
+          <button 
+            *ngIf="canCreateInvoice" 
+            nz-button 
+            nzType="primary" 
+            routerLink="/invoices/new">
             Create Invoice
           </button>
         </nz-empty>
@@ -165,12 +175,22 @@ import { ClientsService } from '../../../clients/services/clients.service';
 export class InvoicesListComponent implements OnInit {
   private invoicesService = inject(InvoicesService);
   private clientsService = inject(ClientsService);
+  private authService = inject(AuthService);
 
   invoices: Invoice[] = [];
   clients: any[] = [];
   selectedClientId = '';
   loading = false;
   errorMessage = '';
+
+  // Permission getters
+  get canCreateInvoice(): boolean {
+    return this.authService.getCurrentUser()?.role === UserRole.EMPLOYEE;
+  }
+
+  get canManageInvoices(): boolean {
+    return this.authService.getCurrentUser()?.role === UserRole.EMPLOYEE;
+  }
 
   ngOnInit() {
     this.loadInvoices();
@@ -236,7 +256,7 @@ export class InvoicesListComponent implements OnInit {
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'DRAFT':
+      case 'QUOTE':
         return 'orange';
       case 'ISSUED':
         return 'blue';

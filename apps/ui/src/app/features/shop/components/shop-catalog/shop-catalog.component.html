@@ -51,8 +51,8 @@
   <!-- Products Grid -->
   <div class="products-section">
     <nz-spin [nzSpinning]="loading">
-      <div nz-row [nzGutter]="[16, 16]" *ngIf="products.length > 0">
-        <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="6" *ngFor="let product of products">
+      <div nz-row [nzGutter]="[16, 16]" *ngIf="groupedProducts.length > 0">
+        <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="6" *ngFor="let groupedProduct of groupedProducts">
           <nz-card 
             [nzHoverable]="true" 
             class="product-card"
@@ -60,35 +60,52 @@
           >
             <div class="product-image">
               <img 
-                [src]="getProductImage(product)" 
-                [alt]="product.name"
+                [src]="getProductImage(groupedProduct)" 
+                [alt]="groupedProduct.baseName"
                 class="product-img"
               />
             </div>
             
             <div class="product-info">
-              <h3 class="product-name">{{ product.name }}</h3>
-              <p class="product-sku">SKU: {{ product.sku }}</p>
+              <h3 class="product-name">{{ groupedProduct.baseName }}</h3>
+              
+              <!-- Variant Selection -->
+              <div class="variant-selection" *ngIf="groupedProduct.variants.length > 1">
+                <nz-select 
+                  [ngModel]="groupedProduct.selectedVariant.id"
+                  (ngModelChange)="onVariantChange(groupedProduct, $event)"
+                  nzSize="small"
+                  style="width: 100%; margin-bottom: 8px;"
+                >
+                  <nz-option 
+                    *ngFor="let variant of groupedProduct.variants" 
+                    [nzValue]="variant.id" 
+                    [nzLabel]="getVariantDisplayText(variant)"
+                  ></nz-option>
+                </nz-select>
+              </div>
+              
+              <p class="product-sku">SKU: {{ groupedProduct.selectedVariant.sku }}</p>
               
               <div class="product-details">
-                <div class="product-brand" *ngIf="product.brand">
-                  <nz-tag nzColor="blue">{{ product.brand }}</nz-tag>
+                <div class="product-brand" *ngIf="groupedProduct.brand">
+                  <nz-tag nzColor="blue">{{ groupedProduct.brand }}</nz-tag>
                 </div>
                 
                 <div class="product-supplier">
                   <span class="supplier-label">Supplier:</span>
-                  <span class="supplier-name">{{ product.supplier?.name }}</span>
+                  <span class="supplier-name">{{ groupedProduct.supplier?.name }}</span>
                 </div>
                 
-                <div class="product-unit" *ngIf="product.unit">
+                <div class="product-unit" *ngIf="groupedProduct.unit">
                   <span class="unit-label">Unit:</span>
-                  <span class="unit-name">{{ product.unit.name }} ({{ product.unit.code }})</span>
+                  <span class="unit-name">{{ groupedProduct.unit.name }} ({{ groupedProduct.unit.code }})</span>
                 </div>
               </div>
 
               <!-- Product Attributes -->
-              <div class="product-attributes" *ngIf="hasAttributes(product)">
-                <div class="attribute-item" *ngFor="let attr of product.attributes | keyvalue">
+              <div class="product-attributes" *ngIf="hasAttributes(groupedProduct.selectedVariant)">
+                <div class="attribute-item" *ngFor="let attr of groupedProduct.selectedVariant.attributes | keyvalue">
                   <span class="attr-name">{{ attr.key }}:</span>
                   <span class="attr-value">{{ attr.value }}</span>
                 </div>
@@ -98,10 +115,10 @@
             <div class="product-footer">
               <div class="product-price">
                 <span class="price-label">Price:</span>
-                <span class="price-value" *ngIf="!isPriceLoading(product.id)">
-                  {{ formatPrice(getProductPrice(product)) }}
+                <span class="price-value" *ngIf="!isPriceLoading(groupedProduct.selectedVariant.id)">
+                  {{ formatPrice(getProductPrice(groupedProduct.selectedVariant)) }} <span class="vat-label">(excl. VAT)</span>
                 </span>
-                <span class="price-loading" *ngIf="isPriceLoading(product.id)">
+                <span class="price-loading" *ngIf="isPriceLoading(groupedProduct.selectedVariant.id)">
                   <nz-spin nzSize="small"></nz-spin>
                 </span>
               </div>
@@ -109,7 +126,7 @@
               <div class="product-actions">
                 <div class="quantity-input">
                   <nz-input-number
-                    [(ngModel)]="productQuantities[product.id]"
+                    [(ngModel)]="productQuantities[groupedProduct.selectedVariant.id]"
                     [nzMin]="0.1"
                     [nzStep]="0.1"
                     [nzPrecision]="1"
@@ -122,9 +139,9 @@
                   nz-button 
                   nzType="primary" 
                   nzSize="small"
-                  (click)="addToCart(product)"
+                  (click)="addToCart(groupedProduct)"
                   class="add-to-cart-btn"
-                  [disabled]="!productQuantities[product.id] || productQuantities[product.id] <= 0 || isPriceLoading(product.id)"
+                  [disabled]="!productQuantities[groupedProduct.selectedVariant.id] || productQuantities[groupedProduct.selectedVariant.id] <= 0 || isPriceLoading(groupedProduct.selectedVariant.id)"
                 >
                   <span nz-icon nzType="plus"></span>
                   Add to Cart
@@ -136,7 +153,7 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!loading && products.length === 0" class="empty-state">
+      <div *ngIf="!loading && groupedProducts.length === 0" class="empty-state">
         <nz-empty 
           nzNotFoundImage="simple"
           nzNotFoundContent="No products found"

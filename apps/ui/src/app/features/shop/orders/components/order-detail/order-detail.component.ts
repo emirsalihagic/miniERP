@@ -101,7 +101,7 @@ export class OrderDetailComponent implements OnInit {
 
   getInvoiceStatusColor(status: string): string {
     switch (status) {
-      case 'DRAFT':
+      case 'QUOTE':
         return 'default';
       case 'ISSUED':
         return 'blue';

@@ -484,7 +484,7 @@ async function main() {
       data: {
         invoiceNumber: 'INV-2024-000001',
         clientId: clientUserWithClient.clientId,
-        status: 'DRAFT',
+        status: 'QUOTE',
         subtotal: '200.00',
         taxTotal: '40.00',
         grandTotal: '240.00',

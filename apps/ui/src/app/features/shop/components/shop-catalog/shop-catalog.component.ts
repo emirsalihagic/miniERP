@@ -18,8 +18,18 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { HttpClient } from '@angular/common/http';
 import { ShopProductsService, Product, ShopProductFilters } from '../../services/shop-products.service';
 import { CartService } from '../../services/cart.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService, User } from '../../../../core/services/auth.service';
 import { environment } from '../../../../../environments/environment';
+
+export interface GroupedProduct {
+  baseName: string;
+  variants: Product[];
+  selectedVariant: Product;
+  brand?: string;
+  supplier?: { name: string };
+  unit?: { name: string; code: string };
+  productGroup?: { name: string };
+}
 
 @Component({
   selector: 'app-shop-catalog',
@@ -46,6 +56,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class ShopCatalogComponent implements OnInit {
   products: Product[] = [];
+  groupedProducts: GroupedProduct[] = [];
   loading = false;
   total = 0;
   page = 1;
@@ -59,6 +70,7 @@ export class ShopCatalogComponent implements OnInit {
   // Cart
   cartItemCount = 0;
   productQuantities: { [productId: string]: number } = {};
+  selectedVariants: { [baseName: string]: string } = {}; // Track selected variant for each product group
   
   // Brands and groups for filters
   brands: string[] = [];
@@ -102,6 +114,7 @@ export class ShopCatalogComponent implements OnInit {
       next: (response) => {
         this.products = response.data;
         this.total = response.meta.total;
+        this.groupProducts();
         this.extractBrandsAndGroups();
         this.initializeProductQuantities();
         this.resolveProductPrices();
@@ -112,6 +125,44 @@ export class ShopCatalogComponent implements OnInit {
         this.message.error('Failed to load products');
         this.loading = false;
       }
+    });
+  }
+
+  groupProducts(): void {
+    const productGroups = new Map<string, Product[]>();
+    
+    // Group products by product group name
+    this.products.forEach(product => {
+      const groupKey = product.productGroup?.name || product.name;
+      if (!productGroups.has(groupKey)) {
+        productGroups.set(groupKey, []);
+      }
+      productGroups.get(groupKey)!.push(product);
+    });
+    
+    // Convert to GroupedProduct array
+    this.groupedProducts = Array.from(productGroups.entries()).map(([groupName, variants]) => {
+      // Sort variants by name for consistent ordering
+      variants.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Get the first variant as default selected, or use previously selected variant
+      const selectedVariantId = this.selectedVariants[groupName];
+      const selectedVariant = selectedVariantId 
+        ? variants.find(v => v.id === selectedVariantId) || variants[0]
+        : variants[0];
+      
+      // Update selected variant tracking
+      this.selectedVariants[groupName] = selectedVariant.id;
+      
+      return {
+        baseName: groupName, // This will be the product group name (e.g., "iPhone 16")
+        variants,
+        selectedVariant,
+        brand: variants[0].brand,
+        supplier: variants[0].supplier,
+        unit: variants[0].unit,
+        productGroup: variants[0].productGroup
+      };
     });
   }
 
@@ -189,7 +240,24 @@ export class ShopCatalogComponent implements OnInit {
     this.loadProducts();
   }
 
-  addToCart(product: Product): void {
+  onVariantChange(groupedProduct: GroupedProduct, variantId: string): void {
+    const selectedVariant = groupedProduct.variants.find(v => v.id === variantId);
+    if (selectedVariant) {
+      groupedProduct.selectedVariant = selectedVariant;
+      this.selectedVariants[groupedProduct.baseName] = variantId;
+      
+      // Initialize quantity for the new variant if not exists
+      if (!this.productQuantities[variantId]) {
+        this.productQuantities[variantId] = 1;
+      }
+      
+      // Resolve price for the new variant
+      this.resolvePrice(variantId);
+    }
+  }
+
+  addToCart(groupedProduct: GroupedProduct): void {
+    const product = groupedProduct.selectedVariant;
     const quantity = this.productQuantities[product.id] || 1;
     
     console.log('🔍 [ShopCatalog] Adding to cart:', {
@@ -217,9 +285,14 @@ export class ShopCatalogComponent implements OnInit {
     });
   }
 
-  getProductImage(product: Product): string {
+  getProductImage(groupedProduct: GroupedProduct): string {
     // Placeholder image - in real app, this would come from product data
-    return 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(product.name);
+    return 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(groupedProduct.baseName);
+  }
+
+  getVariantDisplayText(variant: Product): string {
+    // Show the product name (e.g., "iPhone 16 Pro Max")
+    return variant.name;
   }
 
   getProductPrice(product: Product): number {
@@ -236,14 +309,11 @@ export class ShopCatalogComponent implements OnInit {
       return 'Price loading...';
     }
     
-    // Convert USD to EUR (approximate rate: 1 USD = 0.85 EUR)
-    // In a real application, this would use a live exchange rate API
-    const eurPrice = price * 0.85;
-    
+    // Price is already in EUR, no conversion needed
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'EUR'
-    }).format(eurPrice);
+    }).format(price);
   }
 
   getAttributeValue(product: Product, attributeName: string): string {

@@ -68,7 +68,7 @@ import { ClientsService } from '../../../clients/services/clients.service';
         <div class="result-card">
           <div class="result-grid">
             <div class="result-item">
-              <label>Price</label>
+              <label>Unit Price (excl. VAT)</label>
               <span class="price">{{ resolvedPrice.price | currency:resolvedPrice.currency:'symbol':'1.2-2' }}</span>
             </div>
             <div class="result-item">

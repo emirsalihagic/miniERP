@@ -524,7 +524,7 @@ export class ClientDetailComponent implements OnInit {
       case 'ISSUED':
       case 'SENT':
         return 'blue';
-      case 'DRAFT':
+      case 'QUOTE':
         return 'orange';
       case 'VOID':
         return 'red';

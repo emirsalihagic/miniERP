@@ -35,7 +35,7 @@ export class InvoicesController {
   constructor(private readonly invoicesService: InvoicesService) {}
 
   @Post()
-  @Roles(UserRole.EMPLOYEE, UserRole.CLIENT_USER)
+  @Roles(UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Create a new invoice' })
   @ApiResponse({ status: 201, description: 'Invoice created successfully' })
   create(@Body() dto: CreateInvoiceDto, @CurrentUser() user: any) {
@@ -56,7 +56,7 @@ export class InvoicesController {
   }
 
   @Post(':id/items')
-  @Roles(UserRole.EMPLOYEE, UserRole.CLIENT_USER)
+  @Roles(UserRole.EMPLOYEE)
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
   @ApiOperation({ summary: 'Add item to invoice' })
   @ApiResponse({ status: 201, description: 'Item added successfully' })
@@ -69,7 +69,7 @@ export class InvoicesController {
   }
 
   @Patch(':id/discount')
-  @Roles(UserRole.EMPLOYEE, UserRole.CLIENT_USER)
+  @Roles(UserRole.EMPLOYEE)
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
   @ApiOperation({ summary: 'Update invoice discount' })
   @ApiResponse({ status: 200, description: 'Discount updated successfully' })

@@ -63,7 +63,7 @@ export class InvoicesService {
       throw new BadRequestException('Invoice not found');
     }
 
-    if (invoice.status !== InvoiceStatus.DRAFT) {
+    if (invoice.status !== InvoiceStatus.QUOTE) {
       throw new ForbiddenException('Cannot modify invoice after it has been issued');
     }
 
@@ -125,7 +125,7 @@ export class InvoicesService {
       throw new BadRequestException('Invoice not found');
     }
 
-    if (invoice.status !== InvoiceStatus.DRAFT) {
+    if (invoice.status !== InvoiceStatus.QUOTE) {
       throw new ForbiddenException('Cannot modify invoice after it has been issued');
     }
 
@@ -157,7 +157,7 @@ export class InvoicesService {
       throw new BadRequestException('Invoice not found');
     }
 
-    if (invoice.status !== InvoiceStatus.DRAFT) {
+    if (invoice.status !== InvoiceStatus.QUOTE) {
       throw new BadRequestException('Invoice is already issued');
     }
 
@@ -174,7 +174,7 @@ export class InvoicesService {
     });
 
     await this.createAuditLog(invoiceId, 'STATUS_CHANGED', userId, {
-      from: InvoiceStatus.DRAFT,
+      from: InvoiceStatus.QUOTE,
       to: InvoiceStatus.ISSUED,
     });
 

@@ -70,7 +70,7 @@ import { NavigationService } from '../../../../core/services/navigation.service'
             <tr>
               <th>Product</th>
               <th>SKU</th>
-              <th>Price</th>
+              <th>Unit Price (excl. VAT)</th>
               <th>Currency</th>
               <th>Tax Rate</th>
               <th>Discount</th>

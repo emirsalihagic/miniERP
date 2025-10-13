@@ -87,7 +87,7 @@
                 </div>
               </td>
               <td>
-                <span class="unit-price">{{ formatPrice(Number(item.unitPrice)) }}</span>
+                <span class="unit-price">{{ formatPrice(Number(item.unitPrice)) }} <span class="vat-label">(excl. VAT)</span></span>
               </td>
               <td>
                 <nz-input-number
@@ -101,7 +101,7 @@
                 ></nz-input-number>
               </td>
               <td>
-                <span class="tax-rate">20%</span>
+                <span class="tax-rate">{{ item.taxRate || 0 }}%</span>
               </td>
               <td>
                 <span class="line-total">{{ formatPrice(Number(item.lineTotal)) }}</span>

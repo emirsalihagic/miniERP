@@ -18,6 +18,28 @@
           <span>Dashboard</span>
         </li>
         
+        <!-- Shop Menu -->
+        <li nz-submenu nzTitle="Shop" nzIcon="shopping-cart" [nzOpen]="isShopMenuOpen" *ngIf="menuPermissions.shop">
+          <ul>
+            <li nz-menu-item routerLink="/shop" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="shopping-cart"></span>
+              <span>Catalog</span>
+            </li>
+            <li nz-menu-item routerLink="/shop/cart" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="shopping-cart"></span>
+              <span>Shopping Cart</span>
+            </li>
+            <li nz-menu-item routerLink="/shop/checkout" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="credit-card"></span>
+              <span>Checkout</span>
+            </li>
+            <li nz-menu-item routerLink="/shop/orders" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="file-text"></span>
+              <span>My Orders</span>
+            </li>
+          </ul>
+        </li>
+        
         <!-- Invoices Menu -->
         <li nz-submenu nzTitle="Invoices" nzIcon="file-text" [nzOpen]="isInvoicesMenuOpen" *ngIf="menuPermissions.invoices">
           <ul>
@@ -25,7 +47,7 @@
               <span nz-icon nzType="file-text"></span>
               <span>All Invoices</span>
             </li>
-            <li nz-menu-item routerLink="/invoices/new" routerLinkActive="ant-menu-item-selected">
+            <li nz-menu-item routerLink="/invoices/new" routerLinkActive="ant-menu-item-selected" *ngIf="canCreateInvoice">
               <span nz-icon nzType="plus"></span>
               <span>Create Invoice</span>
             </li>
@@ -97,7 +119,7 @@
         </li>
         
         <!-- Pricing Menu -->
-        <li nz-submenu nzTitle="Pricing" nzIcon="dollar" [nzOpen]="false" *ngIf="menuPermissions.pricing">
+        <li nz-submenu nzTitle="Pricing" nzIcon="dollar" [nzOpen]="isPricingMenuOpen" *ngIf="menuPermissions.pricing">
           <ul>
             <li nz-menu-item routerLink="/pricing" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
               <span nz-icon nzType="dollar"></span>
@@ -110,26 +132,8 @@
           </ul>
         </li>
         
-        <!-- Shop Menu -->
-        <li nz-submenu nzTitle="Shop" nzIcon="shopping-cart" [nzOpen]="false" *ngIf="menuPermissions.shop">
-          <ul>
-            <li nz-menu-item routerLink="/shop" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
-              <span nz-icon nzType="shopping-cart"></span>
-              <span>Catalog</span>
-            </li>
-            <li nz-menu-item routerLink="/shop/cart" routerLinkActive="ant-menu-item-selected">
-              <span nz-icon nzType="shopping-cart"></span>
-              <span>Shopping Cart</span>
-            </li>
-            <li nz-menu-item routerLink="/shop/checkout" routerLinkActive="ant-menu-item-selected">
-              <span nz-icon nzType="credit-card"></span>
-              <span>Checkout</span>
-            </li>
-          </ul>
-        </li>
-        
         <!-- Orders Menu -->
-        <li nz-submenu nzTitle="Orders" nzIcon="file-text" [nzOpen]="false" *ngIf="menuPermissions.orders">
+        <li nz-submenu nzTitle="Orders" nzIcon="file-text" [nzOpen]="isOrdersMenuOpen" *ngIf="menuPermissions.orders">
           <ul>
             <li nz-menu-item routerLink="/orders" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
               <span nz-icon nzType="file-text"></span>
@@ -152,11 +156,14 @@
         <div class="page-title">{{ getPageTitle() }}</div>
         <div class="right-content">
           <nz-avatar
-            nzIcon="user"
-            [nzText]="currentUser?.name?.charAt(0) || 'U'"
+            [nzText]="getUserInitials()"
             nz-dropdown
             [nzDropdownMenu]="menu"
-            style="background-color: #667eea; cursor: pointer;"
+            nzTrigger="click"
+            nzPlacement="bottomRight"
+            nzOverlayClassName="user-dropdown-overlay"
+            (nzVisibleChange)="onDropdownVisibleChange($event)"
+            class="user-avatar"
           ></nz-avatar>
           <nz-dropdown-menu #menu="nzDropdownMenu">
             <ul nz-menu>

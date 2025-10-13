@@ -21,7 +21,13 @@ export class OrdersController {
 
   @Post()
   async createOrder(@Request() req, @Body() createOrderDto: CreateOrderDto) {
-    const clientId = req.user.clientId;
+    let clientId = req.user.clientId;
+    
+    // For EMPLOYEE users, allow specifying clientId in request body
+    if (!clientId && req.user.role === 'EMPLOYEE' && createOrderDto.clientId) {
+      clientId = createOrderDto.clientId;
+    }
+    
     if (!clientId) {
       throw new Error('Client ID not found in user context');
     }

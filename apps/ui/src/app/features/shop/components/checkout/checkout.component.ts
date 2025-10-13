@@ -86,15 +86,13 @@ export class CheckoutComponent implements OnInit {
   }
 
   formatPrice(price: number | string): string {
-    // Convert USD to EUR (approximate rate: 1 USD = 0.85 EUR)
-    // In a real application, this would use a live exchange rate API
+    // Price is already in EUR, no conversion needed
     const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-    const eurPrice = numericPrice * 0.85;
     
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'EUR'
-    }).format(eurPrice);
+    }).format(numericPrice);
   }
 
   getProductImage(item: any): string {
