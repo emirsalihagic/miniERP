@@ -35,7 +35,7 @@ case $choice in
     1)
         echo "🔧 Deploying Backend..."
         cd apps/api
-        vercel --prod
+        vercel --prod --yes
         echo "✅ Backend deployed successfully!"
         echo "📝 Don't forget to:"
         echo "   - Set environment variables in Vercel dashboard"
@@ -44,13 +44,13 @@ case $choice in
     2)
         echo "🎨 Deploying Frontend..."
         cd apps/ui
-        vercel --prod
+        vercel --prod --yes
         echo "✅ Frontend deployed successfully!"
         ;;
     3)
         echo "🔧 Deploying Backend first..."
         cd apps/api
-        vercel --prod
+        vercel --prod --yes
         echo "✅ Backend deployed!"
         
         echo ""
@@ -62,7 +62,7 @@ case $choice in
         
         echo "🎨 Deploying Frontend..."
         cd ../ui
-        vercel --prod
+        vercel --prod --yes
         echo "✅ Both applications deployed successfully!"
         ;;
     4)
