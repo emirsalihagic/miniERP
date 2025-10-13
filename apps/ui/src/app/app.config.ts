@@ -29,7 +29,12 @@ import {
   EyeInvisibleOutline,
   LockOutline,
   SettingOutline,
-  LogoutOutline
+  LogoutOutline,
+  UserAddOutline,
+  AppstoreOutline,
+  TagsOutline,
+  ClusterOutline,
+  CreditCardOutline
 } from '@ant-design/icons-angular/icons';
 
 export const appConfig: ApplicationConfig = {
@@ -68,7 +73,12 @@ export const appConfig: ApplicationConfig = {
         EyeInvisibleOutline,
         LockOutline,
         SettingOutline,
-        LogoutOutline
+        LogoutOutline,
+        UserAddOutline,
+        AppstoreOutline,
+        TagsOutline,
+        ClusterOutline,
+        CreditCardOutline
       ]
     },
     {

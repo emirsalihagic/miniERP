@@ -11,79 +11,138 @@
     <div class="sidebar-logo">
       <h1>{{ isCollapsed ? 'ERP' : 'miniERP' }}</h1>
     </div>
-    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-      <li nz-menu-item routerLink="/dashboard" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
-        <span nz-icon nzType="dashboard"></span>
-        <span>Dashboard</span>
-      </li>
-      
-      <!-- Invoices Menu -->
-      <li nz-submenu nzTitle="Invoices" nzIcon="file-text" [nzOpen]="isInvoicesMenuOpen" *ngIf="menuPermissions.invoices">
-        <ul>
-          <li nz-menu-item routerLink="/invoices" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Invoices</li>
-          <li nz-menu-item routerLink="/invoices/new" routerLinkActive="ant-menu-item-selected">Create Invoice</li>
-        </ul>
-      </li>
-      
-      <!-- Products Menu -->
-      <li nz-submenu nzTitle="Products" nzIcon="shopping" [nzOpen]="isProductsMenuOpen" *ngIf="menuPermissions.products">
-        <ul>
-          <li nz-menu-item routerLink="/products" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Products</li>
-          <li nz-menu-item routerLink="/products/categories" routerLinkActive="ant-menu-item-selected">Categories</li>
-          <li nz-menu-item routerLink="/products/attributes" routerLinkActive="ant-menu-item-selected">Attributes</li>
-          <li nz-menu-item routerLink="/products/product-groups" routerLinkActive="ant-menu-item-selected">Product Groups</li>
-        </ul>
-      </li>
-      
-      <!-- Clients Menu -->
-      <li nz-submenu nzTitle="Clients" nzIcon="team" [nzOpen]="isClientsMenuOpen" *ngIf="menuPermissions.clients">
-        <ul>
-          <li nz-menu-item routerLink="/clients" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Clients</li>
-          <li nz-menu-item routerLink="/clients/new" routerLinkActive="ant-menu-item-selected">Create Client</li>
-        </ul>
-      </li>
-      
-      <!-- Suppliers Menu -->
-      <li nz-submenu nzTitle="Suppliers" nzIcon="shop" [nzOpen]="isSuppliersMenuOpen" *ngIf="menuPermissions.suppliers">
-        <ul>
-          <li nz-menu-item routerLink="/suppliers" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Suppliers</li>
-          <li nz-menu-item routerLink="/suppliers/new" routerLinkActive="ant-menu-item-selected">Add Supplier</li>
-        </ul>
-      </li>
-      
-      <!-- Users Menu -->
-      <li nz-submenu nzTitle="Users" nzIcon="user" [nzOpen]="isUsersMenuOpen" *ngIf="menuPermissions.users">
-        <ul>
-          <li nz-menu-item routerLink="/users" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Users</li>
-          <li nz-menu-item routerLink="/users/create" routerLinkActive="ant-menu-item-selected">Create User</li>
-        </ul>
-      </li>
-      
-      <!-- Pricing Menu -->
-      <li nz-submenu nzTitle="Pricing" nzIcon="dollar" [nzOpen]="false" *ngIf="menuPermissions.pricing">
-        <ul>
-          <li nz-menu-item routerLink="/pricing" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Pricing</li>
-          <li nz-menu-item routerLink="/pricing/new" routerLinkActive="ant-menu-item-selected">Create Pricing</li>
-        </ul>
-      </li>
-      
-      <!-- Shop Menu -->
-      <li nz-submenu nzTitle="Shop" nzIcon="shopping-cart" [nzOpen]="false" *ngIf="menuPermissions.shop">
-        <ul>
-          <li nz-menu-item routerLink="/shop" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">Catalog</li>
-          <li nz-menu-item routerLink="/shop/cart" routerLinkActive="ant-menu-item-selected">Shopping Cart</li>
-          <li nz-menu-item routerLink="/shop/checkout" routerLinkActive="ant-menu-item-selected">Checkout</li>
-        </ul>
-      </li>
-      
-      <!-- Orders Menu -->
-      <li nz-submenu nzTitle="Orders" nzIcon="file-text" [nzOpen]="false" *ngIf="menuPermissions.orders">
-        <ul>
-          <li nz-menu-item routerLink="/orders" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">All Orders</li>
-          <li nz-menu-item routerLink="/orders/new" routerLinkActive="ant-menu-item-selected">Create Order</li>
-        </ul>
-      </li>
-    </ul>
+    <div class="menu-container">
+      <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+        <li nz-menu-item routerLink="/dashboard" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+          <span nz-icon nzType="dashboard"></span>
+          <span>Dashboard</span>
+        </li>
+        
+        <!-- Invoices Menu -->
+        <li nz-submenu nzTitle="Invoices" nzIcon="file-text" [nzOpen]="isInvoicesMenuOpen" *ngIf="menuPermissions.invoices">
+          <ul>
+            <li nz-menu-item routerLink="/invoices" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="file-text"></span>
+              <span>All Invoices</span>
+            </li>
+            <li nz-menu-item routerLink="/invoices/new" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="plus"></span>
+              <span>Create Invoice</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Products Menu -->
+        <li nz-submenu nzTitle="Products" nzIcon="shopping" [nzOpen]="isProductsMenuOpen" *ngIf="menuPermissions.products">
+          <ul>
+            <li nz-menu-item routerLink="/products" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="shopping"></span>
+              <span>All Products</span>
+            </li>
+            <li nz-menu-item routerLink="/products/categories" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="appstore"></span>
+              <span>Categories</span>
+            </li>
+            <li nz-menu-item routerLink="/products/attributes" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="tags"></span>
+              <span>Attributes</span>
+            </li>
+            <li nz-menu-item routerLink="/products/product-groups" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="cluster"></span>
+              <span>Product Groups</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Clients Menu -->
+        <li nz-submenu nzTitle="Clients" nzIcon="team" [nzOpen]="isClientsMenuOpen" *ngIf="menuPermissions.clients">
+          <ul>
+            <li nz-menu-item routerLink="/clients" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="team"></span>
+              <span>All Clients</span>
+            </li>
+            <li nz-menu-item routerLink="/clients/new" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="user-add"></span>
+              <span>Create Client</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Suppliers Menu -->
+        <li nz-submenu nzTitle="Suppliers" nzIcon="shop" [nzOpen]="isSuppliersMenuOpen" *ngIf="menuPermissions.suppliers">
+          <ul>
+            <li nz-menu-item routerLink="/suppliers" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="shop"></span>
+              <span>All Suppliers</span>
+            </li>
+            <li nz-menu-item routerLink="/suppliers/new" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="plus"></span>
+              <span>Add Supplier</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Users Menu -->
+        <li nz-submenu nzTitle="Users" nzIcon="user" [nzOpen]="isUsersMenuOpen" *ngIf="menuPermissions.users">
+          <ul>
+            <li nz-menu-item routerLink="/users" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="user"></span>
+              <span>All Users</span>
+            </li>
+            <li nz-menu-item routerLink="/users/create" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="user-add"></span>
+              <span>Create User</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Pricing Menu -->
+        <li nz-submenu nzTitle="Pricing" nzIcon="dollar" [nzOpen]="false" *ngIf="menuPermissions.pricing">
+          <ul>
+            <li nz-menu-item routerLink="/pricing" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="dollar"></span>
+              <span>All Pricing</span>
+            </li>
+            <li nz-menu-item routerLink="/pricing/new" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="plus"></span>
+              <span>Create Pricing</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Shop Menu -->
+        <li nz-submenu nzTitle="Shop" nzIcon="shopping-cart" [nzOpen]="false" *ngIf="menuPermissions.shop">
+          <ul>
+            <li nz-menu-item routerLink="/shop" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="shopping-cart"></span>
+              <span>Catalog</span>
+            </li>
+            <li nz-menu-item routerLink="/shop/cart" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="shopping-cart"></span>
+              <span>Shopping Cart</span>
+            </li>
+            <li nz-menu-item routerLink="/shop/checkout" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="credit-card"></span>
+              <span>Checkout</span>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Orders Menu -->
+        <li nz-submenu nzTitle="Orders" nzIcon="file-text" [nzOpen]="false" *ngIf="menuPermissions.orders">
+          <ul>
+            <li nz-menu-item routerLink="/orders" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
+              <span nz-icon nzType="file-text"></span>
+              <span>All Orders</span>
+            </li>
+            <li nz-menu-item routerLink="/orders/new" routerLinkActive="ant-menu-item-selected">
+              <span nz-icon nzType="plus"></span>
+              <span>Create Order</span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </nz-sider>
   <nz-layout>
     <nz-header *ngIf="!hideSidebar">

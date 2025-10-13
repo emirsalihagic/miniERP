@@ -19,7 +19,7 @@ export class PermissionService {
 
   /**
    * Define permissions for each role
-   * EMPLOYEE: Full access to all modules
+   * EMPLOYEE: Full access to all modules, removed shop permission
    * CLIENT_USER: Limited access - can view invoices, products, and their own client info
    * SUPPLIER_USER: Limited access - can view products, suppliers, and their own supplier info
    */
@@ -31,8 +31,8 @@ export class PermissionService {
       suppliers: true,
       users: true,
       pricing: true,
-      shop: true,   // Enable shop access for employees
-      orders: true  // Employees manage orders
+      shop: false,   
+      orders: true  
     },
     [UserRole.CLIENT_USER]: {
       invoices: true,  // Can view invoices related to their client
