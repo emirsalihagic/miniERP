@@ -33,6 +33,22 @@
 }
 
 .login-form {
+  .form-field {
+    margin-bottom: 24px;
+    
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #262626;
+      font-size: 14px;
+    }
+    
+    .field-input {
+      width: 100%;
+    }
+  }
+
   .password-toggle {
     cursor: pointer;
     color: #8c8c8c;
@@ -95,10 +111,20 @@
 :host ::ng-deep {
   .ant-input-affix-wrapper {
     padding: 8px 11px;
+    height: 44px;
   }
 
   .ant-input {
     height: 44px;
+    border-radius: 6px;
+  }
+
+  .ant-form-item-label {
+    padding-bottom: 0;
+  }
+
+  .ant-form-item-control {
+    line-height: 1.5;
   }
 }
 

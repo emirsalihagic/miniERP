@@ -7,8 +7,8 @@
 
     <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Email Field -->
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true">Email</nz-form-label>
+      <nz-form-item class="form-field">
+        <nz-form-label [nzRequired]="true" class="field-label">Email</nz-form-label>
         <nz-form-control nzErrorTip="Please enter a valid email address">
           <nz-input-group nzPrefixIcon="user">
             <input
@@ -17,14 +17,15 @@
               formControlName="email"
               placeholder="Enter your email"
               autocomplete="email"
+              class="field-input"
             />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Password Field -->
-      <nz-form-item>
-        <nz-form-label [nzRequired]="true">Password</nz-form-label>
+      <nz-form-item class="form-field">
+        <nz-form-label [nzRequired]="true" class="field-label">Password</nz-form-label>
         <nz-form-control nzErrorTip="Password must be at least 6 characters">
           <nz-input-group [nzSuffix]="suffixTemplate" nzPrefixIcon="lock">
             <input
@@ -33,6 +34,7 @@
               formControlName="password"
               placeholder="Enter your password"
               autocomplete="current-password"
+              class="field-input"
             />
           </nz-input-group>
           <ng-template #suffixTemplate>
