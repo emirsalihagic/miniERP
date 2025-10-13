@@ -1,28 +1,32 @@
-FROM node:20-alpine AS builder
+# Use Node.js 18 Alpine image
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
+COPY apps/api/package*.json ./apps/api/
 
-RUN npm ci
+# Install dependencies
+RUN npm ci --only=production
 
-COPY . .
+# Copy source code
+COPY apps/api ./apps/api
+COPY prisma ./prisma
 
-RUN npm run build
-
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/package*.json ./
-
+# Generate Prisma client
 RUN npx prisma generate
 
+# Build the application
+RUN npm run build --workspace=apps/api
+
+# Expose port
 EXPOSE 3000
 
-CMD ["npm", "run", "start:prod"]
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
 
+# Start the application
+CMD ["npm", "run", "start:prod", "--workspace=apps/api"]
