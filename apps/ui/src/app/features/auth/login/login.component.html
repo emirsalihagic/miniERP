@@ -5,7 +5,7 @@
       <p>Sign in to your account</p>
     </div>
 
-    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" nzLayout="vertical">
       <!-- Email Field -->
       <nz-form-item class="form-field">
         <nz-form-label [nzRequired]="true" class="field-label">Email</nz-form-label>
