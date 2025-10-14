@@ -1,81 +1,132 @@
-<div class="login-container">
-  <nz-card class="login-card" [nzBordered]="true">
-    <div class="login-header">
-      <h1>miniERP</h1>
-      <p>Sign in to your account</p>
+<div class="page-bg">
+  <div class="login-card">
+    <!-- Brand Header -->
+    <div class="login-brand">
+      <div class="login-brand-content">
+        <div class="login-icon">
+          <span nz-icon nzType="appstore" class="brand-icon"></span>
+        </div>
+        <div class="login-title">miniERP</div>
+        <div class="login-sub">Sign in to your account</div>
+      </div>
     </div>
 
-    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" nzLayout="vertical">
-      <!-- Email Field -->
-      <nz-form-item class="form-field">
-        <nz-form-label [nzRequired]="true" class="field-label">Email</nz-form-label>
-        <nz-form-control nzErrorTip="Please enter a valid email address">
-          <nz-input-group nzPrefixIcon="user">
-            <input
-              type="email"
-              nz-input
-              formControlName="email"
-              placeholder="Enter your email"
-              autocomplete="email"
-              class="field-input"
-            />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+    <!-- Form Body -->
+    <div class="login-body">
+      <!-- SSO Section -->
+      <div class="sso-section">
+        <div class="sso-buttons">
+          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('okta')">
+            <span nz-icon nzType="safety-certificate" class="sso-icon"></span>
+            Okta
+          </button>
+          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('azure')">
+            <span nz-icon nzType="cloud" class="sso-icon"></span>
+            Azure AD
+          </button>
+          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('google')">
+            <span nz-icon nzType="google" class="sso-icon"></span>
+            Google
+          </button>
+        </div>
+        <div class="sso-divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">or continue with email</span>
+          <div class="divider-line"></div>
+        </div>
+      </div>
 
-      <!-- Password Field -->
-      <nz-form-item class="form-field">
-        <nz-form-label [nzRequired]="true" class="field-label">Password</nz-form-label>
-        <nz-form-control nzErrorTip="Password must be at least 6 characters">
-          <nz-input-group [nzSuffix]="suffixTemplate" nzPrefixIcon="lock">
-            <input
-              [type]="passwordVisible ? 'text' : 'password'"
-              nz-input
-              formControlName="password"
-              placeholder="Enter your password"
-              autocomplete="current-password"
-              class="field-input"
-            />
-          </nz-input-group>
-          <ng-template #suffixTemplate>
-            <span
-              nz-icon
-              [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-              (click)="togglePasswordVisibility()"
-              class="password-toggle"
-            ></span>
-          </ng-template>
-        </nz-form-control>
-      </nz-form-item>
+      <!-- Login Form -->
+      <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" nzLayout="vertical">
+        <!-- Email Field -->
+        <nz-form-item class="login-field">
+          <nz-form-label nzRequired class="login-label">Email Address</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid email address">
+            <nz-input-group [nzPrefix]="emailPrefix">
+              <input 
+                nz-input 
+                formControlName="email" 
+                placeholder="Enter your email address"
+                autocomplete="email"
+                [nzSize]="'large'"
+                class="login-input"
+                [attr.aria-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              />
+              <ng-template #emailPrefix>
+                <span nz-icon nzType="mail" class="input-icon"></span>
+              </ng-template>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <!-- Remember Me & Forgot Password -->
-      <nz-form-item class="login-options">
-        <nz-form-control>
-          <label nz-checkbox formControlName="remember">
-            <span>Remember me</span>
+        <!-- Password Field -->
+        <nz-form-item class="login-field">
+          <nz-form-label nzRequired class="login-label">Password</nz-form-label>
+          <nz-form-control nzErrorTip="Password must be at least 6 characters">
+            <nz-input-group [nzPrefix]="passwordPrefix" [nzSuffix]="passwordToggle">
+              <input 
+                nz-input 
+                [type]="passwordVisible ? 'text' : 'password'"
+                formControlName="password" 
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                [nzSize]="'large'"
+                class="login-input"
+                [attr.aria-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              />
+              <ng-template #passwordPrefix>
+                <span nz-icon nzType="lock" class="input-icon"></span>
+              </ng-template>
+              <ng-template #passwordToggle>
+                <span 
+                  nz-icon 
+                  [nzType]="passwordVisible ? 'eye' : 'eye-invisible'"
+                  (click)="togglePasswordVisibility()"
+                  class="password-toggle-icon"
+                  [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+                  role="button"
+                  tabindex="0"
+                  (keydown.enter)="togglePasswordVisibility()"
+                  (keydown.space)="togglePasswordVisibility()"
+                ></span>
+              </ng-template>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Remember Me & Forgot Password Row -->
+        <div class="login-row">
+          <label nz-checkbox formControlName="remember" class="login-remember">
+            Remember me (30 days)
           </label>
-          <a class="login-form-forgot" routerLink="/auth/forgot-password">
+          <a routerLink="/auth/forgot-password" class="forgot-link">
             Forgot password?
           </a>
-        </nz-form-control>
-      </nz-form-item>
+        </div>
 
-      <!-- Submit Button -->
-      <nz-form-item>
-        <nz-form-control>
-          <button
-            nz-button
-            nzType="primary"
-            nzBlock
-            [nzLoading]="isLoading"
-            [disabled]="!loginForm.valid"
-            type="submit"
-          >
-            Sign In
-          </button>
-        </nz-form-control>
-      </nz-form-item>
-    </form>
-  </nz-card>
+        <!-- Submit Button -->
+        <button 
+          nz-button 
+          nzType="primary" 
+          nzSize="large" 
+          nzBlock
+          [nzLoading]="isLoading"
+          [disabled]="!loginForm.valid"
+          type="submit"
+          class="login-primary"
+        >
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <div class="footer-content">
+        <span class="credibility-text">SAML/SSO · MFA · Audit logging</span>
+        <span class="footer-text">Trust Blue Theme • Enterprise Security</span>
+      </div>
+    </div>
+  </div>
 </div>
 

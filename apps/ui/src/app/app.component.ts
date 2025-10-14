@@ -98,9 +98,9 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(preferences => {
         if (preferences) {
-          this.currentTheme = preferences.theme.toLowerCase() as 'light' | 'dark' | 'auto';
+          this.currentTheme = this.userPreferencesService.getTheme();
           // Apply theme immediately
-          this.themeService.setTheme(preferences.theme.toLowerCase() as 'light' | 'dark' | 'auto');
+          this.themeService.setTheme(this.userPreferencesService.getTheme());
         }
       });
 

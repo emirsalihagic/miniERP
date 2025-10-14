@@ -57,7 +57,7 @@ export interface UserPreferencesResponse {
 }
 
 export const DEFAULT_USER_PREFERENCES: Partial<UserPreferences> = {
-  theme: 'LIGHT',
+  theme: 'LIGHT' as 'LIGHT' | 'DARK' | 'AUTO',
   dateFormat: DateFormat.DD_MM_YYYY,
   timeFormat: TimeFormat.HOUR_24,
   currency: Currency.BAM,

@@ -91,4 +91,10 @@ export class LoginComponent implements OnInit {
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
+
+  onSSOLogin(provider: 'okta' | 'azure' | 'google'): void {
+    // TODO: Implement SSO login for provider
+    console.log(`SSO login with ${provider}`);
+    this.message.info(`SSO login with ${provider} - Coming soon!`);
+  }
 }

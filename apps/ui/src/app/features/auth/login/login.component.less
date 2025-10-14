@@ -1,173 +1,552 @@
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+// Enterprise Login Page - Trust Blue Theme
+// Clean, trustworthy, accessible design with 440px card width
+
+.page-bg {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(1200px 600px at 50% 0%, rgba(37, 99, 235, 0.05), transparent 60%), var(--color-bg-base);
+  padding: var(--spacing-lg);
 }
 
 .login-card {
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 32px;
-
-  h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #667eea;
-    margin-bottom: 8px;
-  }
-
-  p {
-    color: #8c8c8c;
-    font-size: 14px;
-    margin: 0;
-  }
-}
-
-.login-form {
-  width: 100%;
-  max-width: 100%;
+  width: 440px;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-container);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+// Brand Header - Slimmer blue block
+.login-brand {
+  background: linear-gradient(180deg, var(--color-primary) 0%, #1D4ED8 100%);
+  padding: var(--spacing-lg) var(--spacing-md);
+  position: relative;
   
-  .form-field {
-    margin-bottom: 24px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.login-brand-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.login-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-sm);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.brand-icon {
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+}
+
+.login-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 var(--spacing-xs);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.3px;
+}
+
+.login-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  font-weight: 400;
+}
+
+// Form Body
+.login-body {
+  padding: var(--spacing-md);
+}
+
+// SSO Section
+.sso-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sso-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.sso-button {
+  flex: 1;
+  height: 44px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-container);
+  color: var(--color-text-base);
+  transition: all var(--transition-base);
+  
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.sso-icon {
+  margin-right: var(--spacing-xs);
+  font-size: 16px;
+}
+
+.sso-divider {
+  display: flex;
+  align-items: center;
+  margin: var(--spacing-md) 0;
+  
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+  
+  .divider-text {
+    padding: 0 var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Form Fields
+.login-form {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}
+
+.login-field {
+  margin-bottom: var(--spacing-md);
+  
+  // Reserve space for error messages to prevent layout shift
+  .ant-form-item-control {
+    min-height: 72px; // 44px input + 16px error space + 12px margin
+  }
+}
+
+.login-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-base);
+  font-size: 14px;
+  
+  &::after {
+    content: ' *';
+    color: var(--color-error);
+  }
+}
+
+.login-input {
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+  font-size: 16px;
+  
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--focus-ring);
+  }
+  
+  &:hover {
+    border-color: var(--color-primary-hover);
+  }
+  
+  &[aria-invalid="true"] {
+    border-color: var(--color-error);
+  }
+}
+
+.input-icon {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  transition: color var(--transition-base);
+}
+
+.password-toggle-icon {
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all var(--transition-base);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  
+  &:hover {
+    color: var(--color-primary);
+    background: var(--color-bg-base);
+  }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+// Remember Me & Forgot Password Row
+.login-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-sm) 0 var(--spacing-md);
+}
+
+.login-remember {
+  font-size: 14px;
+  color: var(--color-text-base);
+  cursor: pointer;
+  
+  .ant-checkbox {
+    transform: scale(1.05);
+    margin-right: var(--spacing-xs);
+  }
+  
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.forgot-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-base);
+  
+  &:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+  }
+}
+
+// Primary CTA Button
+.login-primary {
+  height: 48px;
+  font-weight: 600;
+  width: 100%;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius-base);
+  background: var(--color-primary);
+  border: none;
+  transition: all var(--transition-base);
+  
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Footer
+.login-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-base);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.credibility-text {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.footer-text {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+// Dark theme overrides
+:host-context(.dark) {
+  .login-card {
+    background: var(--color-bg-container);
+    border-color: var(--color-border);
+  }
+  
+  .login-brand {
+    background: linear-gradient(180deg, var(--color-primary) 0%, #60A5FA 100%);
+  }
+  
+  .login-icon {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .login-input {
+    background: var(--color-bg-container);
+    border-color: var(--color-border);
+    color: var(--color-text-base);
+    
+    &:focus {
+      border-color: var(--color-primary);
+    }
+  }
+  
+  .sso-button {
+    background: var(--color-bg-container);
+    border-color: var(--color-border);
+    color: var(--color-text-base);
+    
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+  
+  .login-footer {
+    background: var(--color-bg-base);
+    border-color: var(--color-border);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .page-bg {
+    padding: var(--spacing-md);
+  }
+  
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .login-brand {
+    padding: var(--spacing-md);
+  }
+  
+  .login-title {
+    font-size: 18px;
+  }
+  
+  .login-sub {
+    font-size: 13px;
+  }
+  
+  .login-body {
+    padding: var(--spacing-md);
+  }
+  
+  .sso-buttons {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .sso-button {
+    height: 42px;
+  }
+  
+  .login-input {
+    height: 42px;
+    font-size: 16px;
+  }
+  
+  .login-primary {
+    height: 46px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-bg {
+    padding: var(--spacing-sm);
+  }
+  
+  .login-card {
     width: 100%;
     max-width: 100%;
-    
-    .field-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #262626;
-      font-size: 14px;
-    }
-    
-    .field-input {
-      width: 100%;
-      max-width: 100%;
-    }
   }
-
-  .password-toggle {
-    cursor: pointer;
-    color: #8c8c8c;
-    transition: color 0.3s;
-
-    &:hover {
-      color: #1890ff;
-    }
+  
+  .login-brand {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
-
-  .login-options {
-    margin-bottom: 24px;
-
-    nz-form-control {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      label {
-        margin: 0;
-      }
-    }
-
-    .login-form-forgot {
-      color: #667eea;
-      text-decoration: none;
-      transition: color 0.3s;
-
-      &:hover {
-        color: #764ba2;
-      }
-    }
+  
+  .login-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: var(--spacing-xs);
   }
-
-  button[nz-button] {
-    height: 44px;
+  
+  .brand-icon {
     font-size: 16px;
-    font-weight: 500;
   }
-
-  .register-link {
+  
+  .login-title {
+    font-size: 16px;
+  }
+  
+  .login-sub {
+    font-size: 12px;
+  }
+  
+  .login-body {
+    padding: var(--spacing-sm);
+  }
+  
+  .login-input {
+    height: 40px;
+    font-size: 15px;
+  }
+  
+  .login-primary {
+    height: 44px;
+    font-size: 14px;
+  }
+  
+  .login-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .footer-content {
     text-align: center;
-    margin-top: 16px;
-    color: #8c8c8c;
-
-    a {
-      color: #667eea;
-      font-weight: 500;
-      text-decoration: none;
-      margin-left: 4px;
-      transition: color 0.3s;
-
-      &:hover {
-        color: #764ba2;
-      }
-    }
+  }
+  
+  .credibility-text,
+  .footer-text {
+    font-size: 11px;
   }
 }
 
+// Global Ant Design overrides for this component
 :host ::ng-deep {
   .ant-input-affix-wrapper {
-    padding: 8px 11px;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    overflow: hidden;
+    border-radius: var(--radius-base);
+    transition: all var(--transition-base);
+    padding: var(--spacing-md) var(--spacing-sm);
+    min-height: 48px;
+    
+    &:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
+    }
+    
+    &:hover {
+      border-color: var(--color-primary-hover);
+    }
   }
-
+  
   .ant-input {
-    border-radius: 6px;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    padding: 0;
+    
+    &:focus {
+      box-shadow: none;
+    }
   }
-
+  
+  .ant-input-prefix {
+    margin-right: var(--spacing-sm);
+  }
+  
+  .ant-input-suffix {
+    margin-left: var(--spacing-sm);
+  }
+  
   .ant-form-item-label {
-    padding-bottom: 0;
-    text-align: left;
-    width: 100%;
-    max-width: 100%;
+    padding-bottom: var(--spacing-xs);
+    
+    > label {
+      height: auto;
+      line-height: 1.4;
+    }
   }
-
+  
   .ant-form-item-control {
-    line-height: 1.5;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden;
+    line-height: 1.4;
   }
-
-  .ant-form-item {
-    display: block;
-    margin-bottom: 24px;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
+  
+  .ant-form-item-explain-error {
+    font-size: 12px;
+    margin-top: var(--spacing-xs);
+    color: var(--color-error);
   }
-
-  .ant-form-item-label > label {
-    height: auto;
-    line-height: 1.5;
+  
+  .ant-checkbox-wrapper {
+    font-size: 14px;
+    color: var(--color-text-base);
+    
+    &:hover {
+      color: var(--color-primary);
+    }
   }
-
-  .ant-form-item-control-input {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden;
-  }
-
-  .ant-form-item-control-input-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden;
+  
+  .ant-checkbox {
+    .ant-checkbox-inner {
+      border-radius: var(--radius-sm);
+      border-color: var(--color-border);
+      
+      &:hover {
+        border-color: var(--color-primary);
+      }
+    }
+    
+    &.ant-checkbox-checked .ant-checkbox-inner {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
   }
 }
-
