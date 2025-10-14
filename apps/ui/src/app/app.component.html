@@ -22,7 +22,12 @@
           <span>Dashboard</span>
         </li>
         
-        <!-- Shop Menu -->
+        <!-- AI Assistant Menu -->
+        <li nz-menu-item routerLink="/ai" routerLinkActive="ant-menu-item-selected">
+          <span nz-icon nzType="robot"></span>
+          <span>AI Assistant</span>
+        </li>
+        
         <li nz-submenu nzTitle="Shop" nzIcon="shopping-cart" [nzOpen]="isShopMenuOpen" *ngIf="menuPermissions.shop">
           <ul>
             <li nz-menu-item routerLink="/shop" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
