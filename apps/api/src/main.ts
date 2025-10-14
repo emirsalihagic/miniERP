@@ -39,7 +39,6 @@ async function bootstrap() {
     .addTag('Products', 'Product catalog')
     .addTag('Pricing', 'Pricing & overrides')
     .addTag('Invoices', 'Invoice management')
-    .addTag('Health', 'Health checks')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

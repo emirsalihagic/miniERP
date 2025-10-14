@@ -55,6 +55,8 @@ enum Currency {
   BAM
   EUR
   USD
+  GBP
+  CHF
 }
 
 enum UnitGroup {
@@ -187,6 +189,7 @@ model User {
   client            Client?   @relation("ClientUsers", fields: [clientId], references: [id], onDelete: Cascade)
   supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   assignedClients   Client[]  @relation("ClientAssignedTo")
+  preferences       UserPreferences?
   
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
@@ -194,6 +197,51 @@ model User {
   @@map("users")
   @@index([email])
   @@index([role])
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  AUTO
+}
+
+enum DateFormat {
+  DD_MM_YYYY
+  MM_DD_YYYY
+  YYYY_MM_DD
+  DD_MMM_YYYY
+  MMM_DD_YYYY
+}
+
+enum TimeFormat {
+  HOUR_12
+  HOUR_24
+}
+
+enum Language {
+  EN
+  BS
+  HR
+  SR
+}
+
+model UserPreferences {
+  id                String      @id @default(uuid()) @db.Uuid
+  userId            String      @unique @map("user_id") @db.Uuid
+  theme             Theme       @default(LIGHT)
+  dateFormat        DateFormat  @default(DD_MM_YYYY) @map("date_format")
+  timeFormat        TimeFormat  @default(HOUR_24) @map("time_format")
+  currency          Currency    @default(BAM)
+  autoSaveForms     Boolean     @default(true) @map("auto_save_forms")
+  emailNotifications Boolean    @default(false) @map("email_notifications")
+  language          Language    @default(EN)
+  timezone          String      @default("Europe/Sarajevo")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
 }
 
 model Client {

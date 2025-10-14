@@ -4,16 +4,16 @@ A modern, modular ERP system built with NestJS, PostgreSQL, Prisma, and Redis.
 
 ## Features
 
-- 🔐 **Authentication & Authorization**: JWT-based auth with refresh tokens, RBAC with role guards
-- 👥 **User Management**: Support for Employees, Client Users, and Supplier Users
-- 🏢 **Client & Supplier Management**: Complete CRUD operations
-- 📦 **Product Catalog**: Product management with supplier relationships
-- 💰 **Dynamic Pricing**: Hierarchical pricing with client/supplier overrides
-- 🧾 **Invoice System**: Draft→Issued→Paid workflow with immutable totals
-- 📊 **Audit Trail**: Track critical changes across the system
-- 🔒 **Resource Locking**: Redis-based edit locks (coming soon)
-- 📡 **Real-time Updates**: WebSocket support (coming soon)
-- 📝 **OpenAPI Documentation**: Auto-generated Swagger docs
+- **Authentication & Authorization**: JWT-based auth with refresh tokens, RBAC with role guards
+- **User Management**: Support for Employees, Client Users, and Supplier Users
+- **Client & Supplier Management**: Complete CRUD operations
+- **Product Catalog**: Product management with supplier relationships
+- **Dynamic Pricing**: Hierarchical pricing with client/supplier overrides
+- **Invoice System**: Draft→Issued→Paid workflow with immutable totals
+- **Audit Trail**: Track critical changes across the system
+- **Resource Locking**: Redis-based edit locks (coming soon)
+- **Real-time Updates**: WebSocket support (coming soon)
+- **OpenAPI Documentation**: Auto-generated Swagger docs
 
 ## Tech Stack
 

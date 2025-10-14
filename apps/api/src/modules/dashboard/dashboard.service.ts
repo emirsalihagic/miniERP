@@ -68,7 +68,7 @@ export class DashboardService {
 
     recentProducts.forEach(product => {
       activities.push({
-        icon: '📦',
+        icon: 'shopping',
         description: `New product "${product.name}" added`,
         timestamp: product.createdAt,
         type: 'product'
@@ -77,7 +77,7 @@ export class DashboardService {
 
     recentClients.forEach(client => {
       activities.push({
-        icon: '👥',
+        icon: 'team',
         description: `New client "${client.name}" registered`,
         timestamp: client.createdAt,
         type: 'client'
@@ -86,7 +86,7 @@ export class DashboardService {
 
     recentSuppliers.forEach(supplier => {
       activities.push({
-        icon: '🏪',
+        icon: 'shop',
         description: `New supplier "${supplier.name}" added`,
         timestamp: supplier.createdAt,
         type: 'supplier'

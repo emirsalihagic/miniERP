@@ -116,7 +116,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ Created ${units.length} units`);
+  console.log(`[SUCCESS] Created ${units.length} units`);
 
   // Create admin user
   const hashedPassword = await bcrypt.hash('password123', 10);
@@ -135,7 +135,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Created admin user:', adminUser.email);
+  console.log('[SUCCESS] Created admin user:', adminUser.email);
 
   // Create client user for Royal Agencija
   const clientUser = await prisma.user.upsert({
@@ -152,7 +152,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Created client user:', clientUser.email);
+  console.log('[SUCCESS] Created client user:', clientUser.email);
 
   // Create suppliers
   const suppliers = await Promise.all([
@@ -184,7 +184,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ Created ${suppliers.length} suppliers`);
+  console.log(`[SUCCESS] Created ${suppliers.length} suppliers`);
 
   // Create products
   const products = await Promise.all([
@@ -229,7 +229,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ Created ${products.length} products`);
+  console.log(`[SUCCESS] Created ${products.length} products`);
 
   // Create base pricing
   await Promise.all(
@@ -247,7 +247,7 @@ async function main() {
     ),
   );
 
-  console.log('✅ Created base pricing for all products');
+  console.log('[SUCCESS] Created base pricing for all products');
 
   // Create clients with new structure
   const clients = await Promise.all([
@@ -316,7 +316,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ Created ${clients.length} clients`);
+  console.log(`[SUCCESS] Created ${clients.length} clients`);
 
   // Associate client user with Royal Agencija client
   // Check if there's already a user associated with this client
@@ -329,9 +329,9 @@ async function main() {
       where: { id: clientUser.id },
       data: { clientId: clients[0].id },
     });
-    console.log('✅ Associated client user with Royal Agencija client');
+    console.log('[SUCCESS] Associated client user with Royal Agencija client');
   } else {
-    console.log('✅ Client user already associated with Royal Agencija client');
+    console.log('[SUCCESS] Client user already associated with Royal Agencija client');
   }
 
   // Create client-specific pricing override
@@ -347,7 +347,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Created client-specific pricing override');
+  console.log('[SUCCESS] Created client-specific pricing override');
 
   // Create sample cart for client user
   const clientUserWithClient = await prisma.user.findFirst({
@@ -392,7 +392,7 @@ async function main() {
       });
     }
 
-    console.log('✅ Created sample cart with items');
+    console.log('[SUCCESS] Created sample cart with items');
 
     // Delete existing orders first to ensure clean creation
     await prisma.orderItem.deleteMany({
@@ -514,15 +514,15 @@ async function main() {
       data: { invoiceId: invoice.id },
     });
 
-    console.log('✅ Created sample orders and invoice');
+    console.log('[SUCCESS] Created sample orders and invoice');
   }
 
-  console.log('🎉 Database seed completed!');
+  console.log('[SUCCESS] Database seed completed!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error seeding database:', e);
+    console.error('[ERROR] Error seeding database:', e);
     process.exit(1);
   })
   .finally(async () => {

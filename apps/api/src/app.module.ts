@@ -15,6 +15,7 @@ import { InvoicesModule } from './modules/invoices/invoices.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { UserPreferencesModule } from './modules/user-preferences/user-preferences.module';
 import { HealthModule } from './modules/health/health.module';
 import { TestModule } from './modules/test/test.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -43,7 +44,8 @@ import redisConfig from './config/redis.config';
     CartModule,
     OrdersModule,
     DashboardModule,
-    HealthModule,
+    UserPreferencesModule,
+    // HealthModule, // Temporarily disabled due to TypeOrmHealthIndicator error
     TestModule,
   ],
   providers: [
