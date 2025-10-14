@@ -1,6 +1,6 @@
 <div class="supplier-dashboard">
   <div class="welcome-section">
-    <h1>Supplier Portal 🏪</h1>
+    <h1>Supplier Portal <span nz-icon nzType="shop"></span></h1>
     <p>Welcome, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
     <p>Manage your products and track your business performance.</p>
   </div>
@@ -11,8 +11,10 @@
         <nz-statistic
           nzTitle="My Products"
           [nzValue]="stats.myProducts"
-          nzPrefix="📦"
           [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="shopping"></span>
+          </ng-template>
         </nz-statistic>
       </nz-card>
     </div>
@@ -22,8 +24,10 @@
         <nz-statistic
           nzTitle="Active Orders"
           [nzValue]="stats.activeOrders"
-          nzPrefix="📋"
           [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="file-text"></span>
+          </ng-template>
         </nz-statistic>
       </nz-card>
     </div>
@@ -44,8 +48,10 @@
         <nz-statistic
           nzTitle="Pending Deliveries"
           [nzValue]="stats.pendingDeliveries"
-          nzPrefix="🚚"
           [nzLoading]="loading">
+          <ng-template #nzPrefix>
+            <span nz-icon nzType="shopping-cart"></span>
+          </ng-template>
         </nz-statistic>
       </nz-card>
     </div>

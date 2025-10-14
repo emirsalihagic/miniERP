@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { initializeAuth } from './core/initializers/auth.initializer';
 import { AuthService } from './core/services/auth.service';
+import { THEME_PROVIDER, initializeTheme } from './theme';
 import {
   DashboardOutline,
   FileTextOutline,
@@ -34,7 +35,22 @@ import {
   AppstoreOutline,
   TagsOutline,
   ClusterOutline,
-  CreditCardOutline
+  CreditCardOutline,
+  SunOutline,
+  MoonOutline,
+  ThunderboltOutline,
+  ClockCircleOutline,
+  InboxOutline,
+  InfoCircleOutline,
+  FilterOutline,
+  ReloadOutline,
+  SmileOutline,
+  DollarCircleOutline,
+  SyncOutline,
+  CalendarOutline,
+  SaveOutline,
+  DoubleLeftOutline,
+  DoubleRightOutline
 } from '@ant-design/icons-angular/icons';
 
 export const appConfig: ApplicationConfig = {
@@ -50,6 +66,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     { provide: NZ_I18N, useValue: en_US },
+    THEME_PROVIDER,
     {
       provide: NZ_ICONS,
       useValue: [
@@ -78,13 +95,33 @@ export const appConfig: ApplicationConfig = {
         AppstoreOutline,
         TagsOutline,
         ClusterOutline,
-        CreditCardOutline
+        CreditCardOutline,
+        SunOutline,
+        MoonOutline,
+        ThunderboltOutline,
+        ClockCircleOutline,
+        InboxOutline,
+        InfoCircleOutline,
+        FilterOutline,
+        ReloadOutline,
+        SmileOutline,
+        DollarCircleOutline,
+        SyncOutline,
+        CalendarOutline,
+        SaveOutline,
+        DoubleLeftOutline,
+        DoubleRightOutline
       ]
     },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,
       deps: [AuthService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeTheme,
       multi: true
     }
   ]

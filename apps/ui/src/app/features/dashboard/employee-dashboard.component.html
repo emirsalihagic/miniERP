@@ -1,101 +1,154 @@
-<div class="employee-dashboard">
+<div class="dashboard-container">
+  <!-- Welcome Section -->
   <div class="welcome-section">
-    <h1>Employee Dashboard 👨‍💼</h1>
-    <p>Welcome back, <strong>{{ currentUser?.name || currentUser?.email }}</strong>!</p>
-    <p>Manage your organization's operations efficiently.</p>
-  </div>
-
-  <div nz-row [nzGutter]="[16, 16]" class="stats-section">
-    <div nz-col nzXs="24" nzSm="12" nzMd="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="Total Products"
-          [nzValue]="stats.products"
-          nzPrefix="📦"
-          [nzLoading]="loading">
-        </nz-statistic>
-      </nz-card>
-    </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="Active Clients"
-          [nzValue]="stats.clients"
-          nzPrefix="👥"
-          [nzLoading]="loading">
-        </nz-statistic>
-      </nz-card>
-    </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="Suppliers"
-          [nzValue]="stats.suppliers"
-          nzPrefix="🏪"
-          [nzLoading]="loading">
-        </nz-statistic>
-      </nz-card>
-    </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="Invoices"
-          [nzValue]="stats.invoices"
-          nzPrefix="📄"
-          [nzLoading]="loading">
-        </nz-statistic>
-      </nz-card>
+    <div class="welcome-content">
+      <h1>Welcome back, {{ currentUser?.name || currentUser?.email }}! <span nz-icon nzType="smile"></span></h1>
+      <p>Manage your organization's operations efficiently with our comprehensive ERP system.</p>
     </div>
   </div>
 
-  <div nz-row [nzGutter]="[16, 16]" class="quick-actions">
-    <div nz-col nzXs="24" nzSm="12" nzMd="8">
-      <nz-card nzTitle="Quick Actions" nzSize="small">
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <span nz-icon nzType="shopping"></span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" [class.loading]="loading">{{ loading ? '...' : stats.products }}</div>
+        <div class="stat-label">Total Products</div>
+        <div class="stat-description">Active inventory items</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <span nz-icon nzType="team"></span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" [class.loading]="loading">{{ loading ? '...' : stats.clients }}</div>
+        <div class="stat-label">Active Clients</div>
+        <div class="stat-description">Registered customers</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <span nz-icon nzType="shop"></span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" [class.loading]="loading">{{ loading ? '...' : stats.suppliers }}</div>
+        <div class="stat-label">Suppliers</div>
+        <div class="stat-description">Vendor partners</div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <span nz-icon nzType="file-text"></span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" [class.loading]="loading">{{ loading ? '...' : stats.invoices }}</div>
+        <div class="stat-label">Invoices</div>
+        <div class="stat-description">Generated documents</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+    <!-- Quick Actions -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3>
+          <span nz-icon nzType="thunderbolt"></span>
+          Quick Actions
+        </h3>
+        <p>Common tasks and shortcuts</p>
+      </div>
+      <div class="card-content">
         <div class="action-buttons">
-          <button nz-button nzType="primary" nzSize="large" routerLink="/products/new">
+          <button nz-button nzType="primary" nzSize="large" routerLink="/products/new" class="action-btn">
             <span nz-icon nzType="plus"></span>
             Add Product
           </button>
-          <button nz-button nzSize="large" routerLink="/clients/new">
+          <button nz-button nzSize="large" routerLink="/clients/new" class="action-btn">
             <span nz-icon nzType="user-add"></span>
             Add Client
           </button>
-          <button nz-button nzSize="large" routerLink="/suppliers/new">
+          <button nz-button nzSize="large" routerLink="/suppliers/new" class="action-btn">
             <span nz-icon nzType="shop"></span>
             Add Supplier
           </button>
+          <button nz-button nzSize="large" routerLink="/invoices/new" class="action-btn">
+            <span nz-icon nzType="file-text"></span>
+            Create Invoice
+          </button>
         </div>
-      </nz-card>
+      </div>
     </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="8">
-      <nz-card nzTitle="Recent Activity" nzSize="small">
-        <div class="recent-activity" *ngIf="!loadingActivity; else activityLoading">
-          <p *ngFor="let activity of recentActivity">
-            {{ activity.icon }} {{ activity.description }}
-          </p>
-          <p *ngIf="recentActivity.length === 0" class="no-data">No recent activity</p>
+
+    <!-- Recent Activity -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3>
+          <span nz-icon nzType="clock-circle"></span>
+          Recent Activity
+        </h3>
+        <p>Latest system events</p>
+      </div>
+      <div class="card-content">
+        <div class="activity-list" *ngIf="!loadingActivity; else activityLoading">
+          <div class="activity-item" *ngFor="let activity of recentActivity">
+            <div class="activity-icon">
+              <span nz-icon [nzType]="activity.icon || 'info-circle'"></span>
+            </div>
+            <div class="activity-content">
+              <div class="activity-description">{{ activity.description }}</div>
+              <div class="activity-time">{{ activity.timestamp | date:'short' }}</div>
+            </div>
+          </div>
+          <div class="no-data" *ngIf="recentActivity.length === 0">
+            <span nz-icon nzType="inbox"></span>
+            <p>No recent activity</p>
+          </div>
         </div>
         <ng-template #activityLoading>
-          <nz-spin nzSimple></nz-spin>
+          <div class="loading-skeleton">
+            <div class="skeleton-item" *ngFor="let item of [1,2,3]"></div>
+          </div>
         </ng-template>
-      </nz-card>
+      </div>
     </div>
-    
-    <div nz-col nzXs="24" nzSm="12" nzMd="8">
-      <nz-card nzTitle="System Status" nzSize="small">
-        <div class="system-status" *ngIf="!loadingStatus; else statusLoading">
-          <p *ngFor="let status of systemStatus">
-            <span class="status-indicator" [ngClass]="status.status"></span> {{ status.description }}
-          </p>
+
+    <!-- System Status -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3>
+          <span nz-icon nzType="check-circle"></span>
+          System Status
+        </h3>
+        <p>Current system health</p>
+      </div>
+      <div class="card-content">
+        <div class="status-list" *ngIf="!loadingStatus; else statusLoading">
+          <div class="status-item" *ngFor="let status of systemStatus">
+            <div class="status-indicator" [ngClass]="status.status"></div>
+            <div class="status-content">
+              <div class="status-description">{{ status.description }}</div>
+              <div class="status-detail">{{ status.detail }}</div>
+            </div>
+          </div>
+          <div class="no-data" *ngIf="systemStatus.length === 0">
+            <span nz-icon nzType="info-circle"></span>
+            <p>System status unavailable</p>
+          </div>
         </div>
         <ng-template #statusLoading>
-          <nz-spin nzSimple></nz-spin>
+          <div class="loading-skeleton">
+            <div class="skeleton-item" *ngFor="let item of [1,2]"></div>
+          </div>
         </ng-template>
-      </nz-card>
+      </div>
     </div>
   </div>
 </div>

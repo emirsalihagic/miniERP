@@ -4,6 +4,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 @Component({
   selector: 'app-simple-login',
@@ -11,209 +20,266 @@ import { environment } from '../../../environments/environment';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    NzIconModule,
+    NzButtonModule,
+    NzInputModule,
+    NzFormModule,
+    NzCardModule,
+    NzCheckboxModule,
+    NzTypographyModule,
+    NzSpaceModule,
+    NzDividerModule
   ],
   template: `
     <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <h1>miniERP</h1>
-          <p>Sign in to your account</p>
+      <div class="login-background">
+        <div class="login-content">
+          <nz-card class="login-card" [nzBordered]="false">
+            <div class="login-header">
+              <div class="logo-section">
+                <span nz-icon nzType="appstore" class="logo-icon"></span>
+                <h1 nz-typography nzTitle>miniERP</h1>
+              </div>
+              <p nz-typography nzType="secondary">Sign in to your account</p>
+            </div>
+
+            <nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nzLayout="vertical" class="login-form">
+              <!-- Email Field -->
+              <nz-form-item>
+                <nz-form-label nzRequired>Email</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter a valid email address">
+                  <input 
+                    nz-input 
+                    formControlName="email" 
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    [nzSize]="'large'"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+
+              <!-- Password Field -->
+              <nz-form-item>
+                <nz-form-label nzRequired>Password</nz-form-label>
+                <nz-form-control nzErrorTip="Password must be at least 6 characters">
+                  <nz-input-group [nzSuffix]="passwordToggle">
+                    <input 
+                      nz-input 
+                      [type]="passwordVisible ? 'text' : 'password'"
+                      formControlName="password" 
+                      placeholder="Enter your password"
+                      autocomplete="current-password"
+                      [nzSize]="'large'"
+                    />
+                    <ng-template #passwordToggle>
+                      <span 
+                        nz-icon 
+                        [nzType]="passwordVisible ? 'eye' : 'eye-invisible'"
+                        (click)="togglePasswordVisibility()"
+                        class="password-toggle-icon"
+                      ></span>
+                    </ng-template>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <!-- Remember Me & Forgot Password -->
+              <nz-form-item>
+                <div class="form-options">
+                  <label nz-checkbox formControlName="remember">
+                    Remember me
+                  </label>
+                  <a routerLink="/auth/forgot-password" class="forgot-link">
+                    Forgot password?
+                  </a>
+                </div>
+              </nz-form-item>
+
+              <!-- Submit Button -->
+              <nz-form-item>
+                <button 
+                  nz-button 
+                  nzType="primary" 
+                  nzSize="large" 
+                  nzBlock
+                  [nzLoading]="isLoading"
+                  [disabled]="!loginForm.valid"
+                  type="submit"
+                >
+                  {{ isLoading ? 'Signing in...' : 'Sign In' }}
+                </button>
+              </nz-form-item>
+            </nz-form>
+
+            <nz-divider nzText="Welcome to miniERP"></nz-divider>
+            
+            <div class="login-footer">
+              <p nz-typography nzType="secondary" nzAlign="center">
+                Trust Blue Theme • Modern ERP Solution
+              </p>
+            </div>
+          </nz-card>
         </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-          <!-- Email Field -->
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              formControlName="email"
-              placeholder="Enter your email"
-              autocomplete="email"
-              class="form-input"
-            />
-            <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.dirty" class="error">
-              Please enter a valid email address
-            </div>
-          </div>
-
-          <!-- Password Field -->
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-input">
-              <input
-                [type]="passwordVisible ? 'text' : 'password'"
-                id="password"
-                formControlName="password"
-                placeholder="Enter your password"
-                autocomplete="current-password"
-                class="form-input"
-              />
-              <button
-                type="button"
-                (click)="togglePasswordVisibility()"
-                class="password-toggle"
-              >
-                {{ passwordVisible ? '👁️' : '👁️‍🗨️' }}
-              </button>
-            </div>
-            <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.dirty" class="error">
-              Password must be at least 6 characters
-            </div>
-          </div>
-
-          <!-- Remember Me & Forgot Password -->
-          <div class="form-options">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="remember" />
-              <span>Remember me</span>
-            </label>
-            <a routerLink="/auth/forgot-password" class="forgot-link">
-              Forgot password?
-            </a>
-          </div>
-
-          <!-- Submit Button -->
-          <button
-            type="submit"
-            [disabled]="!loginForm.valid || isLoading"
-            class="submit-btn"
-          >
-            {{ isLoading ? 'Signing in...' : 'Sign In' }}
-          </button>
-        </form>
       </div>
     </div>
   `,
   styles: [`
     .login-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--trust-blue-gradient, linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%));
       padding: 20px;
     }
 
-    .login-card {
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    .login-background {
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .login-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
     }
 
     .login-header {
       text-align: center;
       margin-bottom: 32px;
+      padding: 24px 24px 0;
     }
 
-    .login-header h1 {
+    .logo-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
       font-size: 32px;
-      font-weight: 700;
-      color: #667eea;
-      margin-bottom: 8px;
+      color: var(--trust-blue-primary, #3b82f6);
     }
 
-    .login-header p {
-      color: #8c8c8c;
-      font-size: 14px;
-      margin: 0;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #262626;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-    }
-
-    .password-input {
-      position: relative;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .error {
-      color: #ff4d4f;
-      font-size: 12px;
-      margin-top: 4px;
+    .login-form {
+      padding: 0 24px 24px;
     }
 
     .form-options {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .password-toggle-icon {
       cursor: pointer;
+      color: var(--trust-blue-text-secondary, #6b7280);
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle-icon:hover {
+      color: var(--trust-blue-primary, #3b82f6);
     }
 
     .forgot-link {
-      color: #667eea;
+      color: var(--trust-blue-primary, #3b82f6);
       text-decoration: none;
       font-size: 14px;
+      transition: color 0.3s ease;
     }
 
     .forgot-link:hover {
-      color: #764ba2;
+      color: var(--trust-blue-primary-dark, #1e40af);
+      text-decoration: underline;
     }
 
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.3s;
+    .login-footer {
+      padding: 16px 24px 24px;
+      text-align: center;
     }
 
-    .submit-btn:hover:not(:disabled) {
-      background: #764ba2;
+    /* Trust Blue Theme Variables */
+    :host {
+      --trust-blue-primary: #3b82f6;
+      --trust-blue-primary-dark: #1e40af;
+      --trust-blue-primary-light: #60a5fa;
+      --trust-blue-secondary: #1e3a8a;
+      --trust-blue-accent: #06b6d4;
+      --trust-blue-text-primary: #1f2937;
+      --trust-blue-text-secondary: #6b7280;
+      --trust-blue-background: #f8fafc;
+      --trust-blue-surface: #ffffff;
+      --trust-blue-border: #e5e7eb;
+      --trust-blue-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
     }
 
-    .submit-btn:disabled {
-      background: #d9d9d9;
-      cursor: not-allowed;
+    /* Dark theme support */
+    @media (prefers-color-scheme: dark) {
+      .login-card {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(71, 85, 105, 0.3);
+      }
+      
+      :host {
+        --trust-blue-text-primary: #f1f5f9;
+        --trust-blue-text-secondary: #94a3b8;
+        --trust-blue-background: #0f172a;
+        --trust-blue-surface: #1e293b;
+        --trust-blue-border: #334155;
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 16px;
+      }
+      
+      .login-card {
+        border-radius: 12px;
+      }
+      
+      .login-header {
+        padding: 20px 20px 0;
+        margin-bottom: 24px;
+      }
+      
+      .login-form {
+        padding: 0 20px 20px;
+      }
+      
+      .login-footer {
+        padding: 12px 20px 20px;
+      }
+    }
+
+    /* Animation for smooth appearance */
+    .login-card {
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   `]
 })

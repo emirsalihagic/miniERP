@@ -14,6 +14,7 @@ import { InvoicesService, Invoice } from '../invoices/services/invoices.service'
 import { ClientsService } from '../clients/services/clients.service';
 import { ClientSummary, Client } from '../../shared/interfaces/client.interface';
 import { CartService } from '../shop/services/cart.service';
+import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -28,7 +29,8 @@ import { CartService } from '../shop/services/cart.service';
     NzButtonModule,
     NzTableModule,
     NzBadgeModule,
-    NzTagModule
+    NzTagModule,
+    CurrencyFormatPipe
   ],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.less']
@@ -38,14 +40,17 @@ export class ClientDashboardComponent implements OnInit {
   clientInfo: Client | null = null;
   clientSummary: ClientSummary | null = null;
   recentInvoices: Invoice[] = [];
+  accountInfo: any[] = [];
   stats = {
     totalInvoices: 0,
-    pendingOrders: 0,
-    unpaidAmount: 0,
-    totalSpent: 0
+    outstandingOrders: 0,
+    amountDue: 0,
+    totalPaid: 0
   };
   cartItemCount = 0;
   loading = true;
+  loadingInvoices = true;
+  loadingAccount = true;
 
   constructor(
     private authService: AuthService,
@@ -83,10 +88,13 @@ export class ClientDashboardComponent implements OnInit {
     this.clientsService.getClientById(clientId).subscribe({
       next: (client) => {
         this.clientInfo = client;
+        this.populateAccountInfo(); // Populate account info after client is loaded
         checkComplete();
       },
       error: (error) => {
         console.error('Error loading client info:', error);
+        // Still populate account info with default values even if client load fails
+        this.populateAccountInfo();
         checkComplete();
       }
     });
@@ -110,11 +118,13 @@ export class ClientDashboardComponent implements OnInit {
     this.clientsService.getClientInvoices(clientId, 1, 5).subscribe({
       next: (response) => {
         this.recentInvoices = response.data || [];
+        this.loadingInvoices = false;
         checkComplete();
       },
       error: (error) => {
         console.error('Error loading recent invoices:', error);
         this.recentInvoices = [];
+        this.loadingInvoices = false;
         checkComplete();
       }
     });
@@ -124,20 +134,22 @@ export class ClientDashboardComponent implements OnInit {
       next: (response) => {
         const allInvoices = response.data || [];
         
-        // Calculate pending orders (invoices with status QUOTE, ISSUED, or SENT)
-        this.stats.pendingOrders = allInvoices.filter(
+        // Calculate outstanding orders (invoices with status QUOTE, ISSUED, or SENT)
+        this.stats.outstandingOrders = allInvoices.filter(
           (invoice: any) => invoice.status === 'QUOTE' || invoice.status === 'ISSUED' || invoice.status === 'SENT'
         ).length;
         
-        // Calculate unpaid amount (invoices that are not PAID)
-        this.stats.unpaidAmount = allInvoices
+        // Calculate amount due (invoices that are not PAID)
+        const unpaidAmount = allInvoices
           .filter((invoice: any) => invoice.status !== 'PAID')
           .reduce((sum: number, invoice: any) => sum + parseFloat(invoice.grandTotal || '0'), 0);
+        this.stats.amountDue = unpaidAmount.toString();
         
-        // Calculate total spent (sum of paid invoices)
-        this.stats.totalSpent = allInvoices
+        // Calculate total paid (sum of paid invoices)
+        const totalPaid = allInvoices
           .filter((invoice: any) => invoice.status === 'PAID')
           .reduce((sum: number, invoice: any) => sum + parseFloat(invoice.grandTotal || '0'), 0);
+        this.stats.totalPaid = totalPaid.toString();
         
         checkComplete();
       },
@@ -159,6 +171,39 @@ export class ClientDashboardComponent implements OnInit {
         checkComplete();
       }
     });
+  }
+
+  populateAccountInfo(): void {
+    this.loadingAccount = true;
+    
+    if (this.clientInfo) {
+      this.accountInfo = [
+        {
+          label: 'Account Status',
+          value: 'ACTIVE',
+          status: 'active'
+        },
+        {
+          label: 'Credit Limit',
+          value: this.clientInfo.creditLimit ? `€${this.clientInfo.creditLimit.toFixed(2)}` : '€50,000.00',
+          status: 'active'
+        },
+        {
+          label: 'Payment Terms',
+          value: this.clientInfo.paymentTerms || 'D30',
+          status: 'active'
+        },
+        {
+          label: 'Currency',
+          value: this.clientInfo.preferredCurrency || 'BAM',
+          status: 'active'
+        }
+      ];
+    } else {
+      this.accountInfo = [];
+    }
+    
+    this.loadingAccount = false;
   }
 
   getStatusColor(status: string): string {

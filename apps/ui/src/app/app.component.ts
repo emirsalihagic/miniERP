@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, RouterModule, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -9,7 +9,10 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { AuthService, User } from './core/services/auth.service';
 import { PermissionService, MenuPermission } from './core/services/permission.service';
-import { filter } from 'rxjs/operators';
+import { ThemeService } from './core/services/theme.service';
+import { UserPreferencesService } from './core/services/user-preferences.service';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -28,11 +31,14 @@ import { filter } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   title = 'miniERP-ui';
   isCollapsed = false;
   currentUser: User | null = null;
   hideSidebar = false;
+  isDarkMode = false;
+  currentTheme: 'light' | 'dark' | 'auto' = 'light';
   menuPermissions: MenuPermission = {
     invoices: false,
     products: false,
@@ -57,6 +63,8 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private permissionService: PermissionService,
+    private themeService: ThemeService,
+    private userPreferencesService: UserPreferencesService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -64,15 +72,44 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
 
+    // Load user preferences first
+    this.loadUserPreferences();
+
     // Subscribe to user changes
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      this.updateMenuPermissions();
-    });
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        this.updateMenuPermissions();
+        if (user) {
+          this.loadUserPreferences();
+        }
+      });
+
+    // Subscribe to theme changes
+    this.themeService.isDarkMode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isDark => {
+        this.isDarkMode = isDark;
+      });
+
+    // Subscribe to user preferences changes
+    this.userPreferencesService.preferences$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(preferences => {
+        if (preferences) {
+          this.currentTheme = preferences.theme.toLowerCase() as 'light' | 'dark' | 'auto';
+          // Apply theme immediately
+          this.themeService.setTheme(preferences.theme.toLowerCase() as 'light' | 'dark' | 'auto');
+        }
+      });
 
     // Subscribe to route changes to check if sidebar should be hidden and update menu states
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
       .subscribe((event: NavigationEnd) => {
         this.checkHideSidebar(event.url);
         this.updateMenuStates(event.url);
@@ -82,6 +119,27 @@ export class AppComponent implements OnInit {
     this.checkHideSidebar(this.router.url);
     this.updateMenuStates(this.router.url);
     this.updateMenuPermissions();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadUserPreferences(): void {
+    if (this.currentUser) {
+      this.userPreferencesService.getUserPreferences().subscribe({
+        next: (response) => {
+          // Preferences are automatically applied via the preferences$ subscription
+        },
+        error: (error) => {
+          console.error('Error loading user preferences:', error);
+          // Use default theme if preferences fail to load
+          this.currentTheme = 'light';
+          this.themeService.setTheme('light');
+        }
+      });
+    }
   }
 
   private updateMenuPermissions(): void {
@@ -101,6 +159,7 @@ export class AppComponent implements OnInit {
     if (url.includes('/pricing')) return 'Pricing';
     if (url.includes('/shop')) return 'Shop';
     if (url.includes('/orders')) return 'Orders';
+    if (url.includes('/settings')) return 'User Preferences';
     return 'miniERP';
   }
 
@@ -165,6 +224,10 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
   }
 
   // Method to handle dropdown positioning

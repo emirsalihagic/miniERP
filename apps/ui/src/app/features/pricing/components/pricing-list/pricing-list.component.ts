@@ -4,11 +4,12 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PricingService, Pricing, PricingListResponse } from '../../services/pricing.service';
 import { NavigationService } from '../../../../core/services/navigation.service';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'app-pricing-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, NzIconModule],
   template: `
     <div class="pricing-list-container">
       <div class="header">
@@ -146,7 +147,9 @@ import { NavigationService } from '../../../../core/services/navigation.service'
 
       <!-- Empty State -->
       <div *ngIf="!loading && pricingRules.length === 0" class="empty-state">
-        <div class="empty-icon">💰</div>
+        <div class="empty-icon">
+          <span nz-icon nzType="dollar-circle" style="font-size: 3rem; color: #28a745;"></span>
+        </div>
         <h3>No Pricing Rules Found</h3>
         <p>Start by creating your first pricing rule for a product.</p>
         <button type="button" (click)="goToCreate()" class="btn btn-primary">

@@ -223,6 +223,11 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'permission-test',
     loadComponent: () => import('./features/permission-test/permission-test.component').then(m => m.PermissionTestComponent),
     canActivate: [AuthGuard]

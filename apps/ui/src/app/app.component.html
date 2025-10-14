@@ -8,11 +8,15 @@
     [(nzCollapsed)]="isCollapsed"
     [nzTrigger]="null"
   >
+    <!-- Circular Fold Button -->
+    <div class="sidebar-fold-button" (click)="toggleSidebar()">
+      <span nz-icon [nzType]="isCollapsed ? 'double-right' : 'double-left'" class="fold-icon"></span>
+    </div>
     <div class="sidebar-logo">
       <h1>{{ isCollapsed ? 'ERP' : 'miniERP' }}</h1>
     </div>
     <div class="menu-container">
-      <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
         <li nz-menu-item routerLink="/dashboard" routerLinkActive="ant-menu-item-selected" [routerLinkActiveOptions]="{ exact: true }">
           <span nz-icon nzType="dashboard"></span>
           <span>Dashboard</span>
@@ -151,8 +155,6 @@
   <nz-layout>
     <nz-header *ngIf="!hideSidebar">
       <div class="app-header">
-        <span class="header-trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
-          (click)="isCollapsed = !isCollapsed"></span>
         <div class="page-title">{{ getPageTitle() }}</div>
         <div class="right-content">
           <nz-avatar
@@ -171,9 +173,10 @@
                 <span nz-icon nzType="user"></span>
                 {{ currentUser?.name || 'User' }}
               </li>
-              <li nz-menu-item>
+              <li nz-menu-divider></li>
+              <li nz-menu-item routerLink="/settings">
                 <span nz-icon nzType="setting"></span>
-                Settings
+                User Preferences
               </li>
               <li nz-menu-divider></li>
               <li nz-menu-item (click)="logout()">
