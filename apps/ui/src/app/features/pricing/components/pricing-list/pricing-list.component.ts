@@ -33,6 +33,72 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
         </div>
       </div>
 
+      <!-- Quick Filters -->
+      <div class="quick-filters">
+        <div class="filter-group">
+          <label>Scope:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="scopeFilter === 'ALL'" 
+              (click)="setScopeFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="scopeFilter === 'GLOBAL'" 
+              (click)="setScopeFilter('GLOBAL')">
+              Global
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="scopeFilter === 'CLIENT'" 
+              (click)="setScopeFilter('CLIENT')">
+              Client
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="scopeFilter === 'PRODUCT'" 
+              (click)="setScopeFilter('PRODUCT')">
+              Product
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Type:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'ALL'" 
+              (click)="setTypeFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'FIXED'" 
+              (click)="setTypeFilter('FIXED')">
+              Fixed
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'PERCENTAGE'" 
+              (click)="setTypeFilter('PERCENTAGE')">
+              Percentage
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="clear-filters-btn" (click)="clearAllFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
       <!-- AG-Grid -->
       <div class="enterprise-grid">
         <ag-grid-angular
@@ -63,7 +129,7 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
     .pricing-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 90vh;
       background: var(--color-bg-base);
       padding: var(--spacing-lg);
     }
@@ -154,29 +220,6 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
       font-weight: 500;
     }
 
-    /* Scope badge styling */
-    .scope-badge {
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      
-      &.scope-base {
-        background: rgba(136, 136, 136, 0.1);
-        color: var(--color-text-secondary);
-      }
-      
-      &.scope-client {
-        background: rgba(34, 197, 94, 0.1);
-        color: var(--color-success);
-      }
-      
-      &.scope-supplier {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--color-primary);
-      }
-    }
 
     .entity-name {
       color: var(--color-text-secondary);
@@ -251,6 +294,91 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
         font-size: 1.75rem;
       }
     }
+
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+      }
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      
+      &.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        
+        &:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
+        }
+      }
+    }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+
+    .clear-filters-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--color-error);
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
+    }
   `]
 })
 export class PricingListComponent implements OnInit {
@@ -270,6 +398,10 @@ export class PricingListComponent implements OnInit {
   isDarkMode: boolean = false;
   gridClass: string = 'ag-theme-alpine';
   gridApi: any = null;
+
+  // Filter state
+  scopeFilter: string | 'ALL' = 'ALL';
+  typeFilter: string | 'ALL' = 'ALL';
 
   // AG-Grid column definitions
   columnDefs: ColDef[] = [
@@ -378,11 +510,20 @@ export class PricingListComponent implements OnInit {
         const pricing = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-outline" onclick="window.editPricing('${pricing.id}')" title="Edit Pricing">
-              <span nz-icon nzType="edit"></span>
+            <button class="action-btn view-btn" onclick="window.viewPricing('${pricing.id}')" title="View Details">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.deletePricing('${pricing.id}')" title="Delete Pricing">
-              <span nz-icon nzType="delete"></span>
+            <button class="action-btn edit-btn" onclick="window.editPricing('${pricing.id}')" title="Edit Pricing">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
+            <button class="action-btn delete-btn" onclick="window.deletePricing('${pricing.id}')" title="Delete Pricing">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -398,11 +539,34 @@ export class PricingListComponent implements OnInit {
       resizable: true,
       flex: 1,
       minWidth: 100,
-      floatingFilter: false
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
     animateRows: true,
-    suppressMenuHide: true
+    suppressMenuHide: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   ngOnInit() {
@@ -413,6 +577,7 @@ export class PricingListComponent implements OnInit {
     this.loadPricing();
     
     // Set up global window functions for AG-Grid cell renderers
+    (window as any).viewPricing = (id: string) => this.viewPricing(id);
     (window as any).editPricing = (id: string) => this.editPricing(id);
     (window as any).deletePricing = (id: string) => this.deletePricing(id);
   }
@@ -506,6 +671,10 @@ export class PricingListComponent implements OnInit {
     this.router.navigate(['/pricing/new']);
   }
 
+  viewPricing(id: string) {
+    this.router.navigate(['/pricing', id]);
+  }
+
   editPricing(id: string) {
     this.router.navigate(['/pricing', id, 'edit']);
   }
@@ -536,6 +705,57 @@ export class PricingListComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Quick filter methods
+  setScopeFilter(scope: string | 'ALL') {
+    this.scopeFilter = scope;
+    this.applyClientSideFilters();
+  }
+
+  setTypeFilter(type: string | 'ALL') {
+    this.typeFilter = type;
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      const filters: any = {};
+      
+      // Apply scope filter if not 'ALL'
+      if (this.scopeFilter !== 'ALL') {
+        filters.scope = {
+          type: 'equals',
+          filter: this.scopeFilter
+        };
+      }
+      
+      // Apply type filter if not 'ALL'
+      if (this.typeFilter !== 'ALL') {
+        filters.type = {
+          type: 'equals',
+          filter: this.typeFilter
+        };
+      }
+      
+      // Apply filters if any exist
+      if (Object.keys(filters).length > 0) {
+        this.gridApi.setFilterModel(filters);
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.scopeFilter = 'ALL';
+    this.typeFilter = 'ALL';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
+    }
   }
 
 }

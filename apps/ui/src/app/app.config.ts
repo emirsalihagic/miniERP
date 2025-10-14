@@ -53,9 +53,7 @@ import {
   DoubleRightOutline,
   MailOutline,
   LoginOutline,
-  SafetyCertificateOutline,
-  CloudOutline,
-  GoogleOutline
+  SendOutline
 } from '@ant-design/icons-angular/icons';
 
 export const appConfig: ApplicationConfig = {
@@ -118,9 +116,7 @@ export const appConfig: ApplicationConfig = {
         DoubleRightOutline,
         MailOutline,
         LoginOutline,
-        SafetyCertificateOutline,
-        CloudOutline,
-        GoogleOutline
+        SendOutline
       ]
     },
     {

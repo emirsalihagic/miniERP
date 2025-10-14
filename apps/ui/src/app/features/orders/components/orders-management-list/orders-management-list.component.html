@@ -12,6 +12,72 @@
     </div>
   </div>
 
+  <!-- Quick Filters -->
+  <div class="quick-filters">
+    <div class="filter-group">
+      <label>Status:</label>
+      <div class="filter-chips">
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === 'ALL'" 
+          (click)="setStatusFilter('ALL')">
+          All
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.PENDING" 
+          (click)="setStatusFilter(OrderStatus.PENDING)">
+          Pending
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.INVOICE_CREATED" 
+          (click)="setStatusFilter(OrderStatus.INVOICE_CREATED)">
+          Invoice Created
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.INVOICE_ISSUED" 
+          (click)="setStatusFilter(OrderStatus.INVOICE_ISSUED)">
+          Invoice Issued
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.SHIPPED" 
+          (click)="setStatusFilter(OrderStatus.SHIPPED)">
+          Shipped
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.DELIVERED" 
+          (click)="setStatusFilter(OrderStatus.DELIVERED)">
+          Delivered
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.COMPLETED" 
+          (click)="setStatusFilter(OrderStatus.COMPLETED)">
+          Completed
+        </button>
+        <button 
+          class="filter-chip" 
+          [class.active]="statusFilter === OrderStatus.CANCELLED" 
+          (click)="setStatusFilter(OrderStatus.CANCELLED)">
+          Cancelled
+        </button>
+      </div>
+    </div>
+    
+    <div class="filter-actions">
+      <button class="clear-filters-btn" (click)="clearAllFilters()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+        Clear All
+      </button>
+    </div>
+  </div>
+
   <!-- AG-Grid -->
   <div class="enterprise-grid">
     <ag-grid-angular

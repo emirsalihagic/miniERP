@@ -17,8 +17,6 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { UserPreferencesModule } from './modules/user-preferences/user-preferences.module';
 import { HealthModule } from './modules/health/health.module';
-import { AiModule } from './modules/ai/ai.module';
-import { TestModule } from './modules/test/test.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { validationSchema } from './config/validation.schema';
 import jwtConfig from './config/jwt.config';
@@ -47,9 +45,7 @@ import redisConfig from './config/redis.config';
     OrdersModule,
     DashboardModule,
     UserPreferencesModule,
-    AiModule,
     // HealthModule, // Temporarily disabled due to TypeOrmHealthIndicator error
-    TestModule,
   ],
   providers: [
     {

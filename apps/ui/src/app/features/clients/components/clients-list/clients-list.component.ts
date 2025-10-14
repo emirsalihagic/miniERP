@@ -69,6 +69,72 @@ import {
         </div>
       </div>
 
+      <!-- Quick Filters -->
+      <div class="quick-filters">
+        <div class="filter-group">
+          <label>Status:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'ALL'" 
+              (click)="setStatusFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === ClientStatus.ACTIVE" 
+              (click)="setStatusFilter(ClientStatus.ACTIVE)">
+              Active
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === ClientStatus.INACTIVE" 
+              (click)="setStatusFilter(ClientStatus.INACTIVE)">
+              Inactive
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === ClientStatus.PROSPECT" 
+              (click)="setStatusFilter(ClientStatus.PROSPECT)">
+              Prospect
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Type:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'ALL'" 
+              (click)="setTypeFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === ClientType.COMPANY" 
+              (click)="setTypeFilter(ClientType.COMPANY)">
+              Company
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === ClientType.INDIVIDUAL" 
+              (click)="setTypeFilter(ClientType.INDIVIDUAL)">
+              Individual
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="clear-filters-btn" (click)="clearAllFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
       <!-- AG-Grid -->
       <div class="enterprise-grid">
         <ag-grid-angular
@@ -87,7 +153,7 @@ import {
     .clients-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 90vh;
       background: var(--color-bg-base);
       padding: var(--spacing-lg);
     }
@@ -140,47 +206,91 @@ import {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    /* Status badge styling */
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
       
-      &.status-active {
-        background: rgba(22, 163, 74, 0.1);
-        color: var(--color-success);
-      }
-      
-      &.status-inactive {
-        background: rgba(107, 114, 128, 0.1);
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
         color: var(--color-text-secondary);
-      }
-      
-      &.status-prospect {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--color-warning);
+        white-space: nowrap;
       }
     }
 
-    /* Type badge styling */
-    .type-badge {
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
+    .filter-chips {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
+      font-size: 0.875rem;
       font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
       
-      &.type-company {
-        background: rgba(37, 99, 235, 0.1);
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-bg);
         color: var(--color-primary);
       }
       
-      &.type-individual {
-        background: rgba(22, 163, 74, 0.1);
-        color: var(--color-success);
+      &.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        
+        &:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
+        }
       }
     }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+
+    .clear-filters-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--color-error);
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
+    }
+
 
     /* Action buttons */
     .action-buttons {
@@ -222,7 +332,8 @@ export class ClientsListComponent implements OnInit {
 
   // Filter and search state
   searchQuery = '';
-  statusFilter: ClientStatus | null = null;
+  statusFilter: ClientStatus | 'ALL' = 'ALL';
+  typeFilter: ClientType | 'ALL' = 'ALL';
   cityFilter = '';
   tagsFilter = '';
   sortField = 'name';
@@ -230,6 +341,10 @@ export class ClientsListComponent implements OnInit {
 
   // Math property for template
   Math = Math;
+  
+  // Enum properties for template
+  ClientStatus = ClientStatus;
+  ClientType = ClientType;
 
   // AG-Grid properties
   isDarkMode: boolean = false;
@@ -263,8 +378,7 @@ export class ClientsListComponent implements OnInit {
       filter: 'agTextColumnFilter',
       cellRenderer: (params: any) => {
         const type = params.value;
-        const typeClass = `type-${type.toLowerCase()}`;
-        return `<span class="type-badge ${typeClass}">${type}</span>`;
+        return type;
       }
     },
     {
@@ -290,8 +404,7 @@ export class ClientsListComponent implements OnInit {
       filter: 'agTextColumnFilter',
       cellRenderer: (params: any) => {
         const status = params.value;
-        const statusClass = `status-${status.toLowerCase()}`;
-        return `<span class="status-badge ${statusClass}">${status}</span>`;
+        return status;
       }
     },
     {
@@ -307,38 +420,6 @@ export class ClientsListComponent implements OnInit {
             ${client.billingCountry ? `<div class="country">${client.billingCountry}</div>` : ''}
           </div>
         `;
-      }
-    },
-    {
-      field: 'tags',
-      headerName: 'Tags',
-      width: 150,
-      filter: 'agTextColumnFilter',
-      cellRenderer: (params: any) => {
-        const tags = params.value || [];
-        if (tags.length === 0) {
-          return '<span class="no-tags">-</span>';
-        }
-        const visibleTags = tags.slice(0, 2);
-        const remainingCount = tags.length - 2;
-        let html = visibleTags.map((tag: string) => `<span class="tag">${tag}</span>`).join('');
-        if (remainingCount > 0) {
-          html += `<span class="tag">+${remainingCount}</span>`;
-        }
-        return `<div class="tags-container">${html}</div>`;
-      }
-    },
-    {
-      field: 'assignedTo',
-      headerName: 'Assigned To',
-      width: 150,
-      filter: 'agTextColumnFilter',
-      cellRenderer: (params: any) => {
-        const assignedTo = params.value;
-        if (!assignedTo) {
-          return '<span class="not-assigned">-</span>';
-        }
-        return `<span class="assigned-user">${assignedTo.firstName} ${assignedTo.lastName}</span>`;
       }
     },
     {
@@ -359,14 +440,20 @@ export class ClientsListComponent implements OnInit {
         const client = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-outline" onclick="window.viewClient('${client.id}')" title="View Details">
-              <span nz-icon nzType="eye"></span>
+            <button class="action-btn view-btn" onclick="window.viewClient('${client.id}')" title="View Details">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-outline" onclick="window.editClient('${client.id}')" title="Edit Client">
-              <span nz-icon nzType="edit"></span>
+            <button class="action-btn edit-btn" onclick="window.editClient('${client.id}')" title="Edit Client">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.deleteClient('${client.id}')" title="Delete Client">
-              <span nz-icon nzType="delete"></span>
+            <button class="action-btn delete-btn" onclick="window.deleteClient('${client.id}')" title="Delete Client">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -382,11 +469,34 @@ export class ClientsListComponent implements OnInit {
       resizable: true,
       flex: 1,
       minWidth: 100,
-      floatingFilter: false
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
     animateRows: true,
-    suppressMenuHide: true
+    suppressMenuHide: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   private clientsService = inject(ClientsService);
@@ -418,7 +528,8 @@ export class ClientsListComponent implements OnInit {
       sort: this.sortField,
       order: this.sortOrder,
       q: this.searchQuery || undefined,
-      status: this.statusFilter || undefined,
+      status: this.statusFilter !== 'ALL' ? this.statusFilter : undefined,
+      type: this.typeFilter !== 'ALL' ? this.typeFilter : undefined,
       city: this.cityFilter || undefined,
       tags: this.tagsFilter || undefined
     };
@@ -462,6 +573,50 @@ export class ClientsListComponent implements OnInit {
   onFilterChange() {
     this.currentPage.set(1);
     this.loadClients();
+  }
+
+  // Quick filter methods
+  setStatusFilter(status: ClientStatus | 'ALL') {
+    this.statusFilter = status;
+    this.onFilterChange();
+  }
+
+  setTypeFilter(type: ClientType | 'ALL') {
+    this.typeFilter = type;
+    // Apply client-side filtering since backend doesn't support type filtering
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      // Apply type filter if not 'ALL'
+      if (this.typeFilter !== 'ALL') {
+        this.gridApi.setFilterModel({
+          type: {
+            type: 'equals',
+            filter: this.typeFilter
+          }
+        });
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.statusFilter = 'ALL';
+    this.typeFilter = 'ALL';
+    this.searchQuery = '';
+    this.cityFilter = '';
+    this.tagsFilter = '';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
+    }
+    
+    this.onFilterChange();
   }
 
   onSortChange() {

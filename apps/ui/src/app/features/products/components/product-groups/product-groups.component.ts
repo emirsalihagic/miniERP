@@ -213,7 +213,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     .product-groups-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 90vh;
       background: var(--color-bg-base);
       padding: var(--spacing-lg);
     }
@@ -491,21 +491,25 @@ export class ProductGroupsComponent implements OnInit {
         const group = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-success" onclick="window.createProductFromGroup('${group.id}')" title="Create Product from Group">
-              <span nz-icon nzType="plus"></span>
-              Create Product
+            <button class="action-btn create-btn" onclick="window.createProductFromGroup('${group.id}')" title="Create Product from Group">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-secondary" onclick="window.manageAttributes('${group.id}')" title="Manage Attributes">
-              <span nz-icon nzType="setting"></span>
-              Attributes
+            <button class="action-btn settings-btn" onclick="window.manageAttributes('${group.id}')" title="Manage Attributes">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-primary" onclick="window.editGroup('${group.id}')" title="Edit Group">
-              <span nz-icon nzType="edit"></span>
-              Edit
+            <button class="action-btn edit-btn" onclick="window.editGroup('${group.id}')" title="Edit Group">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.deleteGroup('${group.id}')" title="Delete Group">
-              <span nz-icon nzType="delete"></span>
-              Delete
+            <button class="action-btn delete-btn" onclick="window.deleteGroup('${group.id}')" title="Delete Group">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -519,10 +523,36 @@ export class ProductGroupsComponent implements OnInit {
       sortable: true,
       filter: true,
       resizable: true,
+      flex: 1,
+      minWidth: 100,
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     suppressRowClickSelection: true,
     rowSelection: 'multiple',
     animateRows: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   availableAttributes: Attribute[] = [];

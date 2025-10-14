@@ -43,6 +43,90 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         </div>
       </div>
 
+      <!-- Quick Filters -->
+      <div class="quick-filters">
+        <div class="filter-group">
+          <label>Status:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'ALL'" 
+              (click)="setStatusFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'ACTIVE'" 
+              (click)="setStatusFilter('ACTIVE')">
+              Active
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'INACTIVE'" 
+              (click)="setStatusFilter('INACTIVE')">
+              Inactive
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'REGISTRATION'" 
+              (click)="setStatusFilter('REGISTRATION')">
+              Registration
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Storage:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'ALL'" 
+              (click)="setStorageFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'AMBIENT'" 
+              (click)="setStorageFilter('AMBIENT')">
+              Ambient
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'CHILLED'" 
+              (click)="setStorageFilter('CHILLED')">
+              Chilled
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'FROZEN'" 
+              (click)="setStorageFilter('FROZEN')">
+              Frozen
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'HAZMAT'" 
+              (click)="setStorageFilter('HAZMAT')">
+              Hazmat
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="storageFilter === 'DRY'" 
+              (click)="setStorageFilter('DRY')">
+              Dry
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="clear-filters-btn" (click)="clearAllFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
       <!-- AG-Grid -->
       <div class="enterprise-grid">
         <ag-grid-angular
@@ -66,7 +150,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     .products-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 90vh;
       background: var(--color-bg-base);
       padding: var(--spacing-lg);
     }
@@ -378,41 +462,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         }
       }
       
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 8px;
-        border-radius: var(--radius-sm);
-        font-size: 12px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        
-        &.status-active {
-          background: rgba(34, 197, 94, 0.1);
-          color: var(--color-success);
-          border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-        
-        &.status-inactive {
-          background: rgba(248, 113, 113, 0.1);
-          color: var(--color-error);
-          border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-        
-        &.status-registration {
-          background: rgba(245, 158, 11, 0.1);
-          color: var(--color-warning);
-          border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-        
-        &.status-stand_by {
-          background: rgba(59, 130, 246, 0.1);
-          color: var(--color-primary);
-          border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-      }
       
       .action-buttons {
         display: flex;
@@ -429,9 +478,117 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           }
         }
+        
+        .edit-btn {
+          background: #fef3c7;
+          color: #d97706;
+          border: 1px solid #f59e0b;
+          
+          &:hover {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+          }
+        }
+        
+        .delete-btn {
+          background: #fee2e2;
+          color: #dc2626;
+          border: 1px solid #ef4444;
+          
+          &:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+          }
+        }
       }
     }
 
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+      }
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      
+      &.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        
+        &:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
+        }
+      }
+    }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+
+    .clear-filters-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--color-error);
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
+    }
   `]
 })
 export class ProductsListComponent implements OnInit {
@@ -442,6 +599,10 @@ export class ProductsListComponent implements OnInit {
   isDarkMode: boolean = false;
   gridClass: string = 'ag-theme-alpine';
   gridApi: any = null;
+
+  // Filter state
+  statusFilter: string | 'ALL' = 'ALL';
+  storageFilter: string | 'ALL' = 'ALL';
 
   // AG-Grid Configuration
   columnDefs: ColDef[] = [
@@ -541,8 +702,15 @@ export class ProductsListComponent implements OnInit {
         const product = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-primary" onclick="window.editProduct('${product.id}')">
-              Edit
+            <button class="action-btn edit-btn" onclick="window.editProduct('${product.id}')" title="Edit Product">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
+            <button class="action-btn delete-btn" onclick="window.deleteProduct('${product.id}')" title="Delete Product">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -557,11 +725,34 @@ export class ProductsListComponent implements OnInit {
       resizable: true,
       flex: 1,
       minWidth: 100,
-      floatingFilter: false
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
     animateRows: true,
-    suppressMenuHide: true
+    suppressMenuHide: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   ngOnInit() {
@@ -572,8 +763,16 @@ export class ProductsListComponent implements OnInit {
 
   setupGlobalHandlers() {
     // Setup global handlers for AG-Grid cell renderer buttons
+    (window as any).viewProduct = (id: string) => {
+      this.router.navigate(['/products', id]);
+    };
+    
     (window as any).editProduct = (id: string) => {
       this.router.navigate(['/products/edit', id]);
+    };
+    
+    (window as any).deleteProduct = (id: string) => {
+      this.deleteProduct(id);
     };
     
     (window as any).showAttributes = (id: string) => {
@@ -662,6 +861,57 @@ export class ProductsListComponent implements OnInit {
           console.error('Error deleting product:', error);
         }
       });
+    }
+  }
+
+  // Quick filter methods
+  setStatusFilter(status: string | 'ALL') {
+    this.statusFilter = status;
+    this.applyClientSideFilters();
+  }
+
+  setStorageFilter(storage: string | 'ALL') {
+    this.storageFilter = storage;
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      const filters: any = {};
+      
+      // Apply status filter if not 'ALL'
+      if (this.statusFilter !== 'ALL') {
+        filters.status = {
+          type: 'equals',
+          filter: this.statusFilter
+        };
+      }
+      
+      // Apply storage filter if not 'ALL'
+      if (this.storageFilter !== 'ALL') {
+        filters.storageType = {
+          type: 'equals',
+          filter: this.storageFilter
+        };
+      }
+      
+      // Apply filters if any exist
+      if (Object.keys(filters).length > 0) {
+        this.gridApi.setFilterModel(filters);
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.statusFilter = 'ALL';
+    this.storageFilter = 'ALL';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
     }
   }
 }

@@ -100,64 +100,6 @@
   padding: var(--spacing-md);
 }
 
-// SSO Section
-.sso-section {
-  margin-bottom: var(--spacing-lg);
-}
-
-.sso-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-}
-
-.sso-button {
-  flex: 1;
-  height: 44px;
-  font-weight: 500;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-container);
-  color: var(--color-text-base);
-  transition: all var(--transition-base);
-  
-  &:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
-  }
-  
-  &:focus-visible {
-    box-shadow: var(--focus-ring);
-  }
-}
-
-.sso-icon {
-  margin-right: var(--spacing-xs);
-  font-size: 16px;
-}
-
-.sso-divider {
-  display: flex;
-  align-items: center;
-  margin: var(--spacing-md) 0;
-  
-  .divider-line {
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
-  }
-  
-  .divider-text {
-    padding: 0 var(--spacing-sm);
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-}
-
 // Form Fields
 .login-form {
   .ant-form-item {
@@ -320,13 +262,6 @@
   gap: var(--spacing-xs);
 }
 
-.credibility-text {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
 .footer-text {
   font-size: 12px;
   color: var(--color-text-secondary);
@@ -356,17 +291,6 @@
     
     &:focus {
       border-color: var(--color-primary);
-    }
-  }
-  
-  .sso-button {
-    background: var(--color-bg-container);
-    border-color: var(--color-border);
-    color: var(--color-text-base);
-    
-    &:hover {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
     }
   }
   
@@ -401,15 +325,6 @@
   
   .login-body {
     padding: var(--spacing-md);
-  }
-  
-  .sso-buttons {
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-  
-  .sso-button {
-    height: 42px;
   }
   
   .login-input {
@@ -479,7 +394,6 @@
     text-align: center;
   }
   
-  .credibility-text,
   .footer-text {
     font-size: 11px;
   }

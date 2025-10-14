@@ -223,11 +223,6 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'ai',
-    loadComponent: () => import('./features/ai-chat/ai-chat.component').then(m => m.AiChatComponent),
-    canActivate: [AuthGuard]
-  },
-  {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
     canActivate: [AuthGuard]

@@ -13,29 +13,6 @@
 
     <!-- Form Body -->
     <div class="login-body">
-      <!-- SSO Section -->
-      <div class="sso-section">
-        <div class="sso-buttons">
-          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('okta')">
-            <span nz-icon nzType="safety-certificate" class="sso-icon"></span>
-            Okta
-          </button>
-          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('azure')">
-            <span nz-icon nzType="cloud" class="sso-icon"></span>
-            Azure AD
-          </button>
-          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('google')">
-            <span nz-icon nzType="google" class="sso-icon"></span>
-            Google
-          </button>
-        </div>
-        <div class="sso-divider">
-          <div class="divider-line"></div>
-          <span class="divider-text">or continue with email</span>
-          <div class="divider-line"></div>
-        </div>
-      </div>
-
       <!-- Login Form -->
       <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" nzLayout="vertical">
         <!-- Email Field -->
@@ -106,14 +83,13 @@
 
         <!-- Submit Button -->
         <button 
+          nz-button
           type="submit"
+          nzType="primary"
+          nzSize="large"
           class="btn btn-lg btn-primary login-primary"
           [disabled]="loginForm.invalid || isLoading"
-        >
           [nzLoading]="isLoading"
-          [disabled]="!loginForm.valid"
-          type="submit"
-          class="login-primary"
         >
           {{ isLoading ? 'Signing in...' : 'Sign In' }}
         </button>
@@ -123,7 +99,6 @@
     <!-- Footer -->
     <div class="login-footer">
       <div class="footer-content">
-        <span class="credibility-text">SAML/SSO · MFA · Audit logging</span>
         <span class="footer-text">Trust Blue Theme • Enterprise Security</span>
       </div>
     </div>

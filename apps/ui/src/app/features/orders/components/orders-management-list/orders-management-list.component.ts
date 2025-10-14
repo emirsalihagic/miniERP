@@ -142,19 +142,25 @@ export class OrdersManagementListComponent implements OnInit {
         let buttons = '';
         
         if (this.canShipOrder(order)) {
-          buttons += `<button class="btn btn-sm btn-primary" onclick="window.shipOrder('${order.id}')" title="Ship Order">
-            <span nz-icon nzType="car"></span> Ship
+          buttons += `<button class="action-btn ship-btn" onclick="window.shipOrder('${order.id}')" title="Ship Order">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
           </button>`;
         }
         
         if (this.canMarkDelivered(order)) {
-          buttons += `<button class="btn btn-sm btn-success" onclick="window.markDelivered('${order.id}')" title="Mark Delivered">
-            <span nz-icon nzType="check"></span> Delivered
+          buttons += `<button class="action-btn delivered-btn" onclick="window.markDelivered('${order.id}')" title="Mark Delivered">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
           </button>`;
         }
         
-        buttons += `<button class="btn btn-sm btn-outline" onclick="window.viewOrder('${order.id}')" title="View Order">
-          <span nz-icon nzType="eye"></span> View
+        buttons += `<button class="action-btn view-btn" onclick="window.viewOrder('${order.id}')" title="View Order">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
         </button>`;
         
         return `<div class="action-buttons">${buttons}</div>`;
@@ -170,11 +176,32 @@ export class OrdersManagementListComponent implements OnInit {
       resizable: true,
       flex: 1,
       minWidth: 100,
-      floatingFilter: false
+      floatingFilter: false,
+      cellStyle: {
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
     animateRows: true,
-    suppressMenuHide: true
+    suppressMenuHide: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   // Services
@@ -348,5 +375,21 @@ export class OrdersManagementListComponent implements OnInit {
       style: 'currency',
       currency: 'EUR'
     }).format(price);
+  }
+
+  // Enum property for template
+  OrderStatus = OrderStatus;
+
+  // Quick filter methods
+  setStatusFilter(status: OrderStatus | 'ALL') {
+    this.statusFilter = status;
+    this.onStatusFilterChange();
+  }
+
+  clearAllFilters() {
+    this.statusFilter = 'ALL';
+    this.searchTerm = '';
+    this.dateRange = null;
+    this.onStatusFilterChange();
   }
 }

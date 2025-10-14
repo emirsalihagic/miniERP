@@ -47,6 +47,10 @@ export class UsersListComponent implements OnInit {
   gridClass: string = 'ag-theme-alpine';
   gridApi: any = null;
 
+  // Filter state
+  roleFilter: string | 'ALL' = 'ALL';
+  verificationFilter: string | 'ALL' = 'ALL';
+
   // AG-Grid column definitions
   columnDefs: ColDef[] = [
     {
@@ -115,11 +119,15 @@ export class UsersListComponent implements OnInit {
         const user = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-outline" onclick="window.editUser('${user.id}')" title="Edit User">
-              <span nz-icon nzType="edit"></span>
+            <button class="action-btn edit-btn" onclick="window.editUser('${user.id}')" title="Edit User">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.deleteUser('${user.id}')" title="Delete User">
-              <span nz-icon nzType="delete"></span>
+            <button class="action-btn delete-btn" onclick="window.deleteUser('${user.id}')" title="Delete User">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -135,11 +143,34 @@ export class UsersListComponent implements OnInit {
       resizable: true,
       flex: 1,
       minWidth: 100,
-      floatingFilter: false
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
     animateRows: true,
-    suppressMenuHide: true
+    suppressMenuHide: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   // Services
@@ -229,7 +260,7 @@ export class UsersListComponent implements OnInit {
   }
 
   editUser(id: string): void {
-    this.router.navigate(['/users', id, 'edit']);
+    this.router.navigate(['/users/edit', id]);
   }
 
   deleteUser(id: string): void {
@@ -283,6 +314,57 @@ export class UsersListComponent implements OnInit {
         return 'orange';
       default:
         return 'default';
+    }
+  }
+
+  // Quick filter methods
+  setRoleFilter(role: string | 'ALL') {
+    this.roleFilter = role;
+    this.applyClientSideFilters();
+  }
+
+  setVerificationFilter(verification: string | 'ALL') {
+    this.verificationFilter = verification;
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      const filters: any = {};
+      
+      // Apply role filter if not 'ALL'
+      if (this.roleFilter !== 'ALL') {
+        filters.role = {
+          type: 'equals',
+          filter: this.roleFilter
+        };
+      }
+      
+      // Apply verification filter if not 'ALL'
+      if (this.verificationFilter !== 'ALL') {
+        filters.isVerified = {
+          type: 'equals',
+          filter: this.verificationFilter === 'VERIFIED'
+        };
+      }
+      
+      // Apply filters if any exist
+      if (Object.keys(filters).length > 0) {
+        this.gridApi.setFilterModel(filters);
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.roleFilter = 'ALL';
+    this.verificationFilter = 'ALL';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
     }
   }
 }

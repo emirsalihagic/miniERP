@@ -34,6 +34,84 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         </div>
       </div>
 
+      <!-- Quick Filters -->
+      <div class="quick-filters">
+        <div class="filter-group">
+          <label>Type:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'ALL'" 
+              (click)="setTypeFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'TEXT'" 
+              (click)="setTypeFilter('TEXT')">
+              Text
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'NUMBER'" 
+              (click)="setTypeFilter('NUMBER')">
+              Number
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'BOOLEAN'" 
+              (click)="setTypeFilter('BOOLEAN')">
+              Boolean
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'DATE'" 
+              (click)="setTypeFilter('DATE')">
+              Date
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="typeFilter === 'SELECT'" 
+              (click)="setTypeFilter('SELECT')">
+              List
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <label>Required:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="requiredFilter === 'ALL'" 
+              (click)="setRequiredFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="requiredFilter === 'REQUIRED'" 
+              (click)="setRequiredFilter('REQUIRED')">
+              Required
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="requiredFilter === 'OPTIONAL'" 
+              (click)="setRequiredFilter('OPTIONAL')">
+              Optional
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="clear-filters-btn" (click)="clearAllFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
       <!-- AG-Grid -->
       <div class="enterprise-grid">
         <ag-grid-angular
@@ -171,7 +249,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     .attributes-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 90vh;
       background: var(--color-bg-base);
       padding: var(--spacing-lg);
     }
@@ -333,6 +411,90 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       border-top: 1px solid var(--color-border);
     }
 
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+      }
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      
+      &.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        
+        &:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
+        }
+      }
+    }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+
+    .clear-filters-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--color-error);
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
+    }
   `]
 })
 export class AttributesComponent implements OnInit {
@@ -347,6 +509,10 @@ export class AttributesComponent implements OnInit {
   isDarkMode: boolean = false;
   gridClass: string = 'ag-theme-alpine';
   gridApi: any = null;
+
+  // Filter state
+  typeFilter: string | 'ALL' = 'ALL';
+  requiredFilter: string | 'ALL' = 'ALL';
 
   // AG-Grid column definitions
   columnDefs: ColDef[] = [
@@ -399,13 +565,20 @@ export class AttributesComponent implements OnInit {
         const attribute = params.data;
         return `
           <div class="action-buttons">
-            <button class="btn btn-sm btn-primary" onclick="window.editAttribute('${attribute.id}')" title="Edit Attribute">
-              <span nz-icon nzType="edit"></span>
-              Edit
+            <button class="action-btn view-btn" onclick="window.viewAttribute('${attribute.id}')" title="View Details">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.deleteAttribute('${attribute.id}')" title="Delete Attribute">
-              <span nz-icon nzType="delete"></span>
-              Delete
+            <button class="action-btn edit-btn" onclick="window.editAttribute('${attribute.id}')" title="Edit Attribute">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
+            <button class="action-btn delete-btn" onclick="window.deleteAttribute('${attribute.id}')" title="Delete Attribute">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
             </button>
           </div>
         `;
@@ -419,10 +592,36 @@ export class AttributesComponent implements OnInit {
       sortable: true,
       filter: true,
       resizable: true,
+      flex: 1,
+      minWidth: 100,
+      floatingFilter: false,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        fontSize: '14px',
+        fontWeight: '400',
+        color: '#181d1f',
+        borderBottom: '1px solid #babfc7'
+      },
+      headerClass: 'custom-header'
     },
     suppressRowClickSelection: true,
     rowSelection: 'multiple',
     animateRows: true,
+    rowHeight: 56,
+    headerHeight: 48,
+    suppressRowHoverHighlight: false,
+    rowClassRules: {
+      'row-hover': () => true
+    },
+    getRowStyle: (params) => {
+      if (params.node?.rowIndex !== null && params.node.rowIndex % 2 === 0) {
+        return { backgroundColor: '#ffffff' };
+      } else {
+        return { backgroundColor: '#f8f9fa' };
+      }
+    }
   };
 
   showModal = false;
@@ -461,6 +660,14 @@ export class AttributesComponent implements OnInit {
   }
 
   setupGlobalHandlers() {
+    (window as any).viewAttribute = (id: string) => {
+      const attribute = this.attributes().find(a => a.id === id);
+      if (attribute) {
+        console.log('Viewing attribute:', attribute);
+        // You can implement a view modal or navigate to a detail page
+      }
+    };
+    
     (window as any).editAttribute = (id: string) => {
       const attribute = this.attributes().find(a => a.id === id);
       if (attribute) {
@@ -600,6 +807,57 @@ export class AttributesComponent implements OnInit {
           alert('Error deleting attribute. Please try again.');
         }
       });
+    }
+  }
+
+  // Quick filter methods
+  setTypeFilter(type: string | 'ALL') {
+    this.typeFilter = type;
+    this.applyClientSideFilters();
+  }
+
+  setRequiredFilter(required: string | 'ALL') {
+    this.requiredFilter = required;
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      const filters: any = {};
+      
+      // Apply type filter if not 'ALL'
+      if (this.typeFilter !== 'ALL') {
+        filters.type = {
+          type: 'equals',
+          filter: this.typeFilter
+        };
+      }
+      
+      // Apply required filter if not 'ALL'
+      if (this.requiredFilter !== 'ALL') {
+        filters.isRequired = {
+          type: 'equals',
+          filter: this.requiredFilter === 'REQUIRED'
+        };
+      }
+      
+      // Apply filters if any exist
+      if (Object.keys(filters).length > 0) {
+        this.gridApi.setFilterModel(filters);
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.typeFilter = 'ALL';
+    this.requiredFilter = 'ALL';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
     }
   }
 }
