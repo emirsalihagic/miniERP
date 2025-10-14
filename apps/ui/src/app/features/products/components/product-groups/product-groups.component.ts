@@ -1,81 +1,56 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductGroupsService, ProductGroup, GroupAttribute } from '../../services/product-groups.service';
 import { AttributesService, Attribute } from '../../services/attributes.service';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, GridReadyEvent, CellClickedEvent, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
+// Register AG-Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-product-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AgGridAngular, NzIconModule],
   template: `
     <div class="product-groups-container">
-      <div class="header">
-        <h2>Product Groups</h2>
-        <div class="header-actions">
-          <button 
-            class="btn btn-primary" 
-            (click)="openCreateModal()"
-          >
-            Add Product Group
-          </button>
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <div class="header-info">
+            <h1>Product Groups</h1>
+            <p>Organize products into groups with shared attributes</p>
+          </div>
+          <div class="header-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="openCreateModal()"
+            >
+              <span nz-icon nzType="plus"></span>
+              Add Product Group
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="table-container">
-        <table class="product-groups-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let group of productGroups">
-              <td>{{ group.name }}</td>
-              <td>{{ group.code }}</td>
-              <td>{{ group.description || '-' }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button 
-                    class="btn btn-sm btn-success"
-                    (click)="createProductFromGroup(group)"
-                    title="Create Product from Group"
-                  >
-                    Create Product
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-secondary"
-                    (click)="openManageAttributesModal(group)"
-                    title="Manage Attributes"
-                  >
-                    Attributes
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-primary"
-                    (click)="openEditModal(group)"
-                    title="Edit Group"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-danger"
-                    (click)="deleteGroup(group.id)"
-                    title="Delete Group"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- AG-Grid -->
+      <div class="enterprise-grid">
+        <ag-grid-angular
+          [class]="gridClass"
+          [rowData]="productGroups()"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClicked($event)"
+          style="width: 100%; height: 100%;"
+        ></ag-grid-angular>
       </div>
 
-      <div *ngIf="productGroups.length === 0" class="no-groups">
+      <!-- Empty State -->
+      <div *ngIf="productGroups().length === 0" class="empty-state">
         <p>No product groups found. <a href="#" (click)="openCreateModal(); $event.preventDefault()">Create your first product group</a></p>
       </div>
 
@@ -236,81 +211,74 @@ import { AttributesService, Attribute } from '../../services/attributes.service'
   `,
   styles: [`
     .product-groups-container {
-      padding: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       background: var(--color-bg-base);
-      min-height: 100vh;
+      padding: var(--spacing-lg);
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-xl);
+    .page-header {
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
+      
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--spacing-lg);
+        
+        .header-info {
+          flex: 1;
+          
+          h1 {
+            margin: 0 0 var(--spacing-sm) 0;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text-base);
+            line-height: 1.2;
+          }
+          
+          p {
+            margin: 0;
+            color: var(--color-text-base);
+            opacity: 0.7;
+            font-size: 1rem;
+            line-height: 1.5;
+          }
+        }
+        
+        .header-actions {
+          display: flex;
+          gap: var(--spacing-sm);
+          flex-shrink: 0;
+        }
+      }
     }
 
-    .header h2 {
-      margin: 0;
-      color: var(--color-text-base);
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
-    .table-container {
-      background: var(--color-bg-container);
+    .enterprise-grid {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid #e5e7eb;
       border-radius: var(--radius-base);
       overflow: hidden;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-    }
-
-    .product-groups-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .product-groups-table th {
-      background: var(--color-bg-base);
-      padding: var(--spacing-md);
-      text-align: left;
-      font-weight: 600;
-      border-bottom: 2px solid var(--color-border);
-      color: var(--color-text-base);
-    }
-
-    .product-groups-table td {
-      padding: var(--spacing-md);
-      border-bottom: 1px solid var(--color-border);
       background: var(--color-bg-container);
-      color: var(--color-text-base);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .product-groups-table tr:hover {
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
-    .no-groups {
+    .empty-state {
       text-align: center;
-      padding: var(--spacing-2xl);
-      color: var(--color-text-secondary);
-    }
-
-    .no-groups a {
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    .no-groups a:hover {
-      text-decoration: underline;
+      padding: var(--spacing-xl);
+      color: var(--color-text-base);
+      
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .large-modal {
@@ -469,7 +437,94 @@ export class ProductGroupsComponent implements OnInit {
   private productGroupsService = inject(ProductGroupsService);
   private attributesService = inject(AttributesService);
 
-  productGroups: ProductGroup[] = [];
+  // Signals for reactive state
+  productGroups = signal<ProductGroup[]>([]);
+  loading = signal(false);
+
+  // AG-Grid properties
+  isDarkMode: boolean = false;
+  gridClass: string = 'ag-theme-alpine';
+  gridApi: any = null;
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 2,
+      minWidth: 200,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        const group = params.data;
+        return `
+          <div class="group-info">
+            <div class="group-name">
+              <strong>${group.name}</strong>
+            </div>
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'code',
+      headerName: 'Code',
+      width: 120,
+      filter: 'agTextColumnFilter'
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      flex: 2,
+      minWidth: 200,
+      cellRenderer: (params: any) => {
+        return params.value || '-';
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 300,
+      pinned: 'right',
+      sortable: false,
+      filter: false,
+      cellRenderer: (params: any) => {
+        const group = params.data;
+        return `
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-success" onclick="window.createProductFromGroup('${group.id}')" title="Create Product from Group">
+              <span nz-icon nzType="plus"></span>
+              Create Product
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="window.manageAttributes('${group.id}')" title="Manage Attributes">
+              <span nz-icon nzType="setting"></span>
+              Attributes
+            </button>
+            <button class="btn btn-sm btn-primary" onclick="window.editGroup('${group.id}')" title="Edit Group">
+              <span nz-icon nzType="edit"></span>
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="window.deleteGroup('${group.id}')" title="Delete Group">
+              <span nz-icon nzType="delete"></span>
+              Delete
+            </button>
+          </div>
+        `;
+      }
+    }
+  ];
+
+  // AG-Grid options
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    suppressRowClickSelection: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+  };
+
   availableAttributes: Attribute[] = [];
 
   showModal = false;
@@ -489,16 +544,20 @@ export class ProductGroupsComponent implements OnInit {
   ngOnInit() {
     this.loadProductGroups();
     this.loadAvailableAttributes();
+    this.setupGlobalHandlers();
   }
 
   loadProductGroups() {
+    this.loading.set(true);
     this.productGroupsService.getAll().subscribe({
       next: (groups) => {
-        this.productGroups = groups;
+        this.productGroups.set(groups);
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Error loading product groups:', error);
-        this.productGroups = [];
+        this.productGroups.set([]);
+        this.loading.set(false);
       }
     });
   }
@@ -513,6 +572,52 @@ export class ProductGroupsComponent implements OnInit {
         this.availableAttributes = [];
       }
     });
+  }
+
+  setupGlobalHandlers() {
+    (window as any).createProductFromGroup = (id: string) => {
+      const group = this.productGroups().find(g => g.id === id);
+      if (group) {
+        this.createProductFromGroup(group);
+      }
+    };
+
+    (window as any).manageAttributes = (id: string) => {
+      const group = this.productGroups().find(g => g.id === id);
+      if (group) {
+        this.openManageAttributesModal(group);
+      }
+    };
+
+    (window as any).editGroup = (id: string) => {
+      const group = this.productGroups().find(g => g.id === id);
+      if (group) {
+        this.openEditModal(group);
+      }
+    };
+
+    (window as any).deleteGroup = (id: string) => {
+      this.deleteGroup(id);
+    };
+  }
+
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
+    
+    // If product groups are already loaded, set them in the grid
+    if (this.productGroups().length > 0) {
+      if (typeof event.api.setGridOption === 'function') {
+        event.api.setGridOption('rowData', this.productGroups());
+        // Force grid refresh
+        setTimeout(() => {
+          this.gridApi.refreshCells();
+        }, 100);
+      }
+    }
+  }
+
+  onCellClicked(event: CellClickedEvent) {
+    // Handle cell clicks if needed
   }
 
   openCreateModal() {
@@ -601,9 +706,11 @@ export class ProductGroupsComponent implements OnInit {
         // Update existing group
         this.productGroupsService.update(this.editingGroup.id, formData).subscribe({
           next: (updatedGroup) => {
-            const index = this.productGroups.findIndex(g => g.id === this.editingGroup!.id);
+            const currentGroups = this.productGroups();
+            const index = currentGroups.findIndex(g => g.id === this.editingGroup!.id);
             if (index !== -1) {
-              this.productGroups[index] = updatedGroup;
+              currentGroups[index] = updatedGroup;
+              this.productGroups.set([...currentGroups]);
             }
             this.closeModal();
           },
@@ -615,7 +722,8 @@ export class ProductGroupsComponent implements OnInit {
         // Create new group
         this.productGroupsService.create(formData).subscribe({
           next: (newGroup) => {
-            this.productGroups.push(newGroup);
+            const currentGroups = this.productGroups();
+            this.productGroups.set([...currentGroups, newGroup]);
             this.closeModal();
           },
           error: (error) => {
@@ -714,7 +822,8 @@ export class ProductGroupsComponent implements OnInit {
     if (confirm('Are you sure you want to delete this product group?')) {
       this.productGroupsService.delete(id).subscribe({
         next: () => {
-          this.productGroups = this.productGroups.filter(g => g.id !== id);
+          const currentGroups = this.productGroups();
+          this.productGroups.set(currentGroups.filter(g => g.id !== id));
         },
         error: (error) => {
           console.error('Error deleting product group:', error);

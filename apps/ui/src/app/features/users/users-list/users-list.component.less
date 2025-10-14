@@ -1,69 +1,134 @@
-.users-list-container {
-  padding: var(--spacing-lg);
+.users-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   background: var(--color-bg-base);
-  min-height: 100vh;
+  padding: var(--spacing-lg);
+}
 
-  .page-header {
+.page-header {
+  flex-shrink: 0;
+  margin-bottom: var(--spacing-lg);
+  
+  .header-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: var(--color-bg-container);
-    border-radius: var(--radius-base);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
-
-    h1 {
-      margin: 0;
-      color: var(--color-text-base);
-      font-size: 24px;
-      font-weight: 600;
-    }
-  }
-
-  nz-card {
-    border-radius: var(--radius-base);
-    box-shadow: var(--shadow-card);
-    background: var(--color-bg-container);
-    border: 1px solid var(--color-border);
-
-    .user-name {
-      font-weight: 500;
-      color: var(--color-text-base);
-    }
-
-    nz-table {
-      .ant-table-thead > tr > th {
-        background: var(--color-bg-base);
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    
+    .header-info {
+      flex: 1;
+      
+      h1 {
+        margin: 0 0 var(--spacing-sm) 0;
+        font-size: 2rem;
         font-weight: 600;
         color: var(--color-text-base);
-        border-bottom: 2px solid var(--color-border);
-        padding: var(--spacing-md);
-      }
-
-      .ant-table-tbody > tr:hover > td {
-        background: rgba(59, 130, 246, 0.05);
+        line-height: 1.2;
       }
       
-      .ant-table-tbody > tr > td {
-        background: var(--color-bg-container);
+      p {
+        margin: 0;
         color: var(--color-text-base);
-        border-bottom: 1px solid var(--color-border);
-        padding: var(--spacing-md);
-        vertical-align: middle;
-      }
-
-      .ant-table-pagination {
-        background: var(--color-bg-container);
-        border-top: 1px solid var(--color-border);
-        padding: var(--spacing-md);
+        opacity: 0.7;
+        font-size: 1rem;
+        line-height: 1.5;
       }
     }
-
-    .user-name {
-      font-weight: 500;
-      color: var(--color-text-base);
+    
+    .header-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-shrink: 0;
     }
+  }
+}
+
+.enterprise-grid {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-base);
+  overflow: hidden;
+  background: var(--color-bg-container);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* User info styling */
+.user-info {
+  .user-name {
+    font-weight: 500;
+    color: var(--color-text-base);
+  }
+}
+
+/* Role badge styling */
+.role-badge {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  
+  &.role-employee {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+  }
+  
+  &.role-client-user {
+    background: rgba(22, 163, 74, 0.1);
+    color: var(--color-success);
+  }
+  
+  &.role-supplier-user {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+  }
+}
+
+/* Verification badge styling */
+.verification-badge {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  
+  &.verified {
+    background: rgba(22, 163, 74, 0.1);
+    color: var(--color-success);
+  }
+  
+  &.not-verified {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+  }
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .page-header .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+    
+    .header-actions {
+      justify-content: flex-start;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .users-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .page-header .header-content .header-info h1 {
+    font-size: 1.75rem;
   }
 }

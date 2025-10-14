@@ -1,79 +1,53 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, GridReadyEvent, CellClickedEvent, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
+// Register AG-Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AgGridAngular, NzIconModule],
   template: `
     <div class="categories-container">
-      <div class="header">
-        <h2>Product Categories</h2>
-        <div class="header-actions">
-          <button 
-            class="btn btn-primary" 
-            (click)="openCreateModal()"
-          >
-            Add Category
-          </button>
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <div class="header-info">
+            <h1>Product Categories</h1>
+            <p>Manage product categories and their hierarchical structure</p>
+          </div>
+          <div class="header-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="openCreateModal()"
+            >
+              <span nz-icon nzType="plus"></span>
+              Add Category
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="table-container">
-        <table class="categories-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Parent</th>
-              <th>Description</th>
-              <th>Products</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let category of categories" [class.child-category]="category.parentId">
-              <td>
-                <span [style.padding-left.px]="getIndentLevel(category) * 20">
-                  {{ category.name }}
-                </span>
-              </td>
-              <td>{{ category.code }}</td>
-              <td>{{ getParentName(category.parentId) }}</td>
-              <td>{{ category.description || '-' }}</td>
-              <td>{{ category.productCount || 0 }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button 
-                    class="btn btn-sm btn-secondary"
-                    (click)="openCreateChildModal(category)"
-                    title="Add Child Category"
-                  >
-                    Add Child
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-primary"
-                    (click)="openEditModal(category)"
-                    title="Edit Category"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    class="btn btn-sm btn-danger"
-                    (click)="deleteCategory(category.id)"
-                    title="Delete Category"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- AG-Grid -->
+      <div class="enterprise-grid">
+        <ag-grid-angular
+          [class]="gridClass"
+          [rowData]="categories()"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClicked($event)"
+          style="width: 100%; height: 100%;"
+        ></ag-grid-angular>
       </div>
 
-      <div *ngIf="categories.length === 0" class="no-categories">
+      <!-- Empty State -->
+      <div *ngIf="categories().length === 0" class="empty-state">
         <p>No categories found. <a href="#" (click)="openCreateModal(); $event.preventDefault()">Create your first category</a></p>
       </div>
 
@@ -182,85 +156,74 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
   `,
   styles: [`
     .categories-container {
-      padding: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       background: var(--color-bg-base);
-      min-height: 100vh;
+      padding: var(--spacing-lg);
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-xl);
+    .page-header {
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
+      
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--spacing-lg);
+        
+        .header-info {
+          flex: 1;
+          
+          h1 {
+            margin: 0 0 var(--spacing-sm) 0;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text-base);
+            line-height: 1.2;
+          }
+          
+          p {
+            margin: 0;
+            color: var(--color-text-base);
+            opacity: 0.7;
+            font-size: 1rem;
+            line-height: 1.5;
+          }
+        }
+        
+        .header-actions {
+          display: flex;
+          gap: var(--spacing-sm);
+          flex-shrink: 0;
+        }
+      }
     }
 
-    .header h2 {
-      margin: 0;
-      color: var(--color-text-base);
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
-    .table-container {
-      background: var(--color-bg-container);
+    .enterprise-grid {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid #e5e7eb;
       border-radius: var(--radius-base);
       overflow: hidden;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-    }
-
-    .categories-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .categories-table th {
-      background: var(--color-bg-base);
-      padding: var(--spacing-md);
-      text-align: left;
-      font-weight: 600;
-      border-bottom: 2px solid var(--color-border);
-      color: var(--color-text-base);
-    }
-
-    .categories-table td {
-      padding: var(--spacing-md);
-      border-bottom: 1px solid var(--color-border);
       background: var(--color-bg-container);
-      color: var(--color-text-base);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .categories-table tr:hover {
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .child-category {
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
-    .no-categories {
+    .empty-state {
       text-align: center;
-      padding: var(--spacing-2xl);
-      color: var(--color-text-secondary);
-    }
-
-    .no-categories a {
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    .no-categories a:hover {
-      text-decoration: underline;
+      padding: var(--spacing-xl);
+      color: var(--color-text-base);
+      
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .modal-overlay {
@@ -349,15 +312,108 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
   `]
 })
 export class CategoriesComponent implements OnInit {
-  private fb = inject(FormBuilder);
+  private fb = inject(FormBuilder)
 
-  categories: any[] = [
-    { id: '1', name: 'Electronics', code: 'ELEC', description: 'Electronic products', productCount: 15, parentId: null },
-    { id: '2', name: 'Smartphones', code: 'SMART', description: 'Mobile phones', productCount: 8, parentId: '1' },
-    { id: '3', name: 'Laptops', code: 'LAPTOP', description: 'Portable computers', productCount: 5, parentId: '1' },
-    { id: '4', name: 'Clothing', code: 'CLOTH', description: 'Clothing and apparel', productCount: 8, parentId: null },
-    { id: '5', name: 'Food & Beverages', code: 'FOOD', description: 'Food and beverage products', productCount: 23, parentId: null },
+  // Signals for reactive state
+  categories = signal<any[]>([]);
+  loading = signal(false);
+
+  // AG-Grid properties
+  isDarkMode: boolean = false;
+  gridClass: string = 'ag-theme-alpine';
+  gridApi: any = null;
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 2,
+      minWidth: 200,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        const category = params.data;
+        return `
+          <div class="category-info">
+            <div class="category-name">
+              <strong>${category.name}</strong>
+            </div>
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'code',
+      headerName: 'Code',
+      width: 120,
+      filter: 'agTextColumnFilter'
+    },
+    {
+      field: 'parentId',
+      headerName: 'Parent',
+      width: 150,
+      cellRenderer: (params: any) => {
+        const parentName = this.getParentName(params.value);
+        return parentName || '-';
+      }
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      flex: 2,
+      minWidth: 200,
+      cellRenderer: (params: any) => {
+        return params.value || '-';
+      }
+    },
+    {
+      field: 'productCount',
+      headerName: 'Products',
+      width: 100,
+      cellRenderer: (params: any) => {
+        return params.value || 0;
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      pinned: 'right',
+      sortable: false,
+      filter: false,
+      cellRenderer: (params: any) => {
+        const category = params.data;
+        return `
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-secondary" onclick="window.addChildCategory('${category.id}')" title="Add Child Category">
+              <span nz-icon nzType="plus"></span>
+              Add Child
+            </button>
+            <button class="btn btn-sm btn-primary" onclick="window.editCategory('${category.id}')" title="Edit Category">
+              <span nz-icon nzType="edit"></span>
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="window.deleteCategory('${category.id}')" title="Delete Category">
+              <span nz-icon nzType="delete"></span>
+              Delete
+            </button>
+          </div>
+        `;
+      }
+    }
   ];
+
+  // AG-Grid options
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    suppressRowClickSelection: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+  };;
 
   showModal = false;
   isEditMode = false;
@@ -374,17 +430,71 @@ export class CategoriesComponent implements OnInit {
   get availableParents() {
     // Filter out the current category being edited and its children to prevent circular references
     if (this.isEditMode && this.editingCategory) {
-      return this.categories.filter(cat => 
+      return this.categories().filter(cat => 
         cat.id !== this.editingCategory.id && 
         !this.isChildOf(cat, this.editingCategory)
       );
     }
-    return this.categories.filter(cat => !cat.parentId);
+    return this.categories().filter(cat => !cat.parentId);
   }
 
   ngOnInit() {
-    // In a real app, you would load categories from a service
-    console.log('Categories loaded:', this.categories);
+    this.loadCategories();
+    this.setupGlobalHandlers();
+  }
+
+  loadCategories() {
+    this.loading.set(true);
+    // Simulate API call
+    setTimeout(() => {
+      this.categories.set([
+        { id: '1', name: 'Electronics', code: 'ELEC', description: 'Electronic products', productCount: 15, parentId: null },
+        { id: '2', name: 'Smartphones', code: 'SMART', description: 'Mobile phones', productCount: 8, parentId: '1' },
+        { id: '3', name: 'Laptops', code: 'LAPTOP', description: 'Portable computers', productCount: 5, parentId: '1' },
+        { id: '4', name: 'Clothing', code: 'CLOTH', description: 'Clothing and apparel', productCount: 8, parentId: null },
+        { id: '5', name: 'Food & Beverages', code: 'FOOD', description: 'Food and beverage products', productCount: 23, parentId: null },
+      ]);
+      this.loading.set(false);
+    }, 500);
+  }
+
+  setupGlobalHandlers() {
+    (window as any).addChildCategory = (id: string) => {
+      const category = this.categories().find(c => c.id === id);
+      if (category) {
+        this.openCreateChildModal(category);
+      }
+    };
+
+    (window as any).editCategory = (id: string) => {
+      const category = this.categories().find(c => c.id === id);
+      if (category) {
+        this.openEditModal(category);
+      }
+    };
+
+    (window as any).deleteCategory = (id: string) => {
+      this.deleteCategory(id);
+    };
+  }
+
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
+    
+    // If categories are already loaded, set them in the grid
+    if (this.categories().length > 0) {
+      if (typeof event.api.setGridOption === 'function') {
+        event.api.setGridOption('rowData', this.categories());
+        // Force grid refresh
+        setTimeout(() => {
+          this.gridApi.refreshCells();
+        }, 100);
+      }
+    }
+  }
+
+  onCellClicked(event: CellClickedEvent) {
+    // Handle cell clicks if needed
   }
 
   getIndentLevel(category: any): number {
@@ -395,7 +505,7 @@ export class CategoriesComponent implements OnInit {
     
     while (currentParentId) {
       level++;
-      const parent = this.categories.find(c => c.id === currentParentId);
+      const parent = this.categories().find(c => c.id === currentParentId);
       if (!parent) break;
       currentParentId = parent.parentId;
     }
@@ -405,7 +515,7 @@ export class CategoriesComponent implements OnInit {
 
   getParentName(parentId: string | null): string {
     if (!parentId) return '-';
-    const parent = this.categories.find(c => c.id === parentId);
+    const parent = this.categories().find(c => c.id === parentId);
     return parent ? parent.name : '-';
   }
 
@@ -413,7 +523,7 @@ export class CategoriesComponent implements OnInit {
     if (!category.parentId) return false;
     if (category.parentId === potentialParent.id) return true;
     
-    const parent = this.categories.find(c => c.id === category.parentId);
+    const parent = this.categories().find(c => c.id === category.parentId);
     return parent ? this.isChildOf(parent, potentialParent) : false;
   }
 
@@ -460,18 +570,21 @@ export class CategoriesComponent implements OnInit {
       
       if (this.isEditMode && this.editingCategory) {
         // Update existing category
-        const index = this.categories.findIndex(c => c.id === this.editingCategory.id);
+        const currentCategories = this.categories();
+        const index = currentCategories.findIndex(c => c.id === this.editingCategory.id);
         if (index !== -1) {
-          this.categories[index] = { ...this.editingCategory, ...formData };
+          currentCategories[index] = { ...this.editingCategory, ...formData };
+          this.categories.set([...currentCategories]);
         }
       } else {
         // Create new category
+        const currentCategories = this.categories();
         const newCategory = {
-          id: (this.categories.length + 1).toString(),
+          id: (currentCategories.length + 1).toString(),
           ...formData,
           productCount: 0
         };
-        this.categories.push(newCategory);
+        this.categories.set([...currentCategories, newCategory]);
       }
       
       this.closeModal();
@@ -480,14 +593,15 @@ export class CategoriesComponent implements OnInit {
 
   deleteCategory(id: string) {
     // Check if category has children
-    const hasChildren = this.categories.some(c => c.parentId === id);
+    const hasChildren = this.categories().some(c => c.parentId === id);
     if (hasChildren) {
       alert('Cannot delete category that has child categories. Please delete child categories first.');
       return;
     }
     
     if (confirm('Are you sure you want to delete this category?')) {
-      this.categories = this.categories.filter(c => c.id !== id);
+      const currentCategories = this.categories();
+      this.categories.set(currentCategories.filter(c => c.id !== id));
     }
   }
 }

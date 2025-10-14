@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, GridReadyEvent, CellClickedEvent, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -18,7 +19,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
 @Component({
   selector: 'app-invoices-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NzTableModule, NzButtonModule, NzIconModule, NzSelectModule, NzTagModule, NzSpinModule, NzEmptyModule, NzAlertModule],
+  imports: [CommonModule, RouterModule, FormsModule, AgGridAngular, NzButtonModule, NzIconModule, NzSelectModule, NzTagModule, NzSpinModule, NzEmptyModule, NzAlertModule],
   template: `
     <div class="invoices-container">
       <!-- Page Header -->
@@ -41,159 +42,17 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
         </div>
       </div>
 
-      <!-- Filters Card -->
-      <div class="filters-card" *ngIf="clients.length > 0">
-        <div class="card-header">
-          <h3>
-            <span nz-icon nzType="filter"></span>
-            Filters
-          </h3>
-        </div>
-        <div class="card-content">
-          <div class="filter-group">
-            <label class="filter-label">Filter by Client</label>
-            <nz-select
-              [(ngModel)]="selectedClientId"
-              (ngModelChange)="filterByClient()"
-              nzPlaceHolder="All Clients"
-              nzAllowClear
-              nzSize="large"
-              class="filter-select"
-            >
-              <nz-option
-                *ngFor="let client of clients"
-                [nzValue]="client.id"
-                [nzLabel]="client.name">
-              </nz-option>
-            </nz-select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Results Summary -->
-      <div class="results-summary" *ngIf="invoices.length > 0">
-        <div class="summary-info">
-          <span class="results-count">{{ invoices.length }} invoice{{ invoices.length !== 1 ? 's' : '' }} found</span>
-          <div class="status-summary">
-            <span class="status-item quote" *ngIf="getStatusCount('QUOTE') > 0">
-              {{ getStatusCount('QUOTE') }} Quote{{ getStatusCount('QUOTE') !== 1 ? 's' : '' }}
-            </span>
-            <span class="status-item issued" *ngIf="getStatusCount('ISSUED') > 0">
-              {{ getStatusCount('ISSUED') }} Issued
-            </span>
-            <span class="status-item paid" *ngIf="getStatusCount('PAID') > 0">
-              {{ getStatusCount('PAID') }} Paid
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table Card -->
-      <div class="table-card">
-        <div class="card-content">
-          <nz-spin [nzSpinning]="loading">
-            <div class="table-container">
-              <table class="invoices-table">
-                <thead>
-                  <tr>
-                    <th>Invoice</th>
-                    <th>Client</th>
-                    <th>Status</th>
-                    <th>Amount</th>
-                    <th>Due Date</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let invoice of invoices" class="invoice-row">
-                    <td>
-                      <div class="invoice-info">
-                        <a [routerLink]="['/invoices', invoice.id]" class="invoice-link">
-                          {{ invoice.invoiceNumber }}
-                        </a>
-                        <div class="invoice-meta" *ngIf="invoice.notes">
-                          {{ invoice.notes }}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="client-info">
-                        <div class="client-name">{{ invoice.client?.name || 'Unknown Client' }}</div>
-                        <div class="client-email" *ngIf="invoice.client?.email">{{ invoice.client?.email }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <nz-tag [nzColor]="getStatusColor(invoice.status)" class="status-tag">
-                        {{ invoice.status }}
-                      </nz-tag>
-                    </td>
-                    <td>
-                      <div class="amount-info">
-                        <div class="amount">{{ invoice.grandTotal | currency:'EUR':'symbol':'1.2-2' }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="date-info">
-                        <div class="due-date">{{ invoice.dueDate | date:'MMM dd, yyyy' }}</div>
-                        <div class="days-until" [ngClass]="getDaysUntilClass(invoice.dueDate || '')">
-                          {{ getDaysUntil(invoice.dueDate || '') }}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="created-info">
-                        {{ invoice.createdAt | date:'MMM dd, yyyy' }}
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-buttons">
-                        <button 
-                          class="btn btn-sm btn-secondary"
-                          nz-tooltip="View Details"
-                          [routerLink]="['/invoices', invoice.id]"
-                        >
-                          <span nz-icon nzType="eye"></span>
-                        </button>
-                        <button 
-                          *ngIf="canManageInvoices && invoice.status === 'QUOTE'" 
-                          class="btn btn-sm btn-danger"
-                          nz-tooltip="Issue Invoice"
-                          (click)="issueInvoice(invoice.id)"
-                        >
-                          <span nz-icon nzType="check-circle"></span>
-                        </button>
-                        <button 
-                          *ngIf="canManageInvoices && invoice.status === 'ISSUED'" 
-                          class="btn btn-sm btn-success"
-                          nz-tooltip="Mark as Paid"
-                          (click)="markAsPaid(invoice.id)"
-                        >
-                          <span nz-icon nzType="dollar"></span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="empty-state" *ngIf="!loading && invoices.length === 0">
-              <nz-empty nzNotFoundContent="No invoices found">
-                <div class="empty-actions">
-                  <button 
-                    *ngIf="canCreateInvoice" 
-                    class="btn btn-primary"
-                    routerLink="/invoices/new"
-                  >
-                    <span nz-icon nzType="plus"></span>
-                    Create Your First Invoice
-                  </button>
-                </div>
-              </nz-empty>
-            </div>
-          </nz-spin>
-        </div>
+      <!-- AG-Grid -->
+      <div class="enterprise-grid">
+        <ag-grid-angular
+          [class]="gridClass"
+          [rowData]="invoices()"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClicked($event)"
+          style="width: 100%; height: 100%;"
+        ></ag-grid-angular>
       </div>
 
       <!-- Error Alert -->
@@ -210,13 +69,16 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
   `,
   styles: [`
     .invoices-container {
-      padding: var(--spacing-lg);
-      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       background: var(--color-bg-base);
+      padding: var(--spacing-lg);
     }
 
     .page-header {
-      margin-bottom: var(--spacing-xl);
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
       
       .header-content {
         display: flex;
@@ -252,248 +114,109 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
       }
     }
 
-    .filters-card {
-      background: var(--color-bg-container);
+
+    .enterprise-grid {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid #e5e7eb;
       border-radius: var(--radius-base);
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-      margin-bottom: var(--spacing-lg);
+      overflow: hidden;
+      background: var(--color-bg-container);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status badge styling */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
       
-      .card-header {
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--color-border);
-        background: var(--color-bg-base);
-        
-        h3 {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-sm);
-          margin: 0;
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: var(--color-text-base);
-          
-          span {
-            color: var(--color-primary);
-          }
-        }
+      &.status-quote {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--color-warning);
       }
       
-      .card-content {
-        padding: var(--spacing-lg);
+      &.status-issued {
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--color-primary);
+      }
+      
+      &.status-paid {
+        background: rgba(22, 163, 74, 0.1);
+        color: var(--color-success);
+      }
+      
+      &.status-cancelled {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--color-error);
       }
     }
 
-    .filter-group {
+    /* Action buttons */
+    .action-buttons {
       display: flex;
-      flex-direction: column;
       gap: var(--spacing-xs);
+    }
+
+    /* Links and info styling */
+    .invoice-link {
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 600;
       
-      .filter-label {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .invoice-meta {
+      font-size: 0.875rem;
+      color: var(--color-text-base);
+      opacity: 0.7;
+      margin-top: var(--spacing-xs);
+    }
+
+    .client-name {
+      color: var(--color-text-base);
+      font-weight: 500;
+    }
+
+    .client-email {
+      font-size: 0.875rem;
+      color: var(--color-text-base);
+      opacity: 0.7;
+      margin-top: var(--spacing-xs);
+    }
+
+    .unknown-client {
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
+
+    .due-date {
+      color: var(--color-text-base);
+      font-weight: 500;
+    }
+
+    .days-until {
+      font-size: 0.75rem;
+      margin-top: var(--spacing-xs);
+      
+      &.overdue {
+        color: var(--color-error);
         font-weight: 500;
+      }
+      
+      &.due-soon {
+        color: var(--color-warning);
+        font-weight: 500;
+      }
+      
+      &.normal {
         color: var(--color-text-base);
-        font-size: 0.875rem;
-      }
-      
-      .filter-select {
-        border-radius: var(--radius-base);
-        max-width: 300px;
-      }
-    }
-
-    .results-summary {
-      margin-bottom: var(--spacing-md);
-      
-      .summary-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--color-bg-container);
-        border-radius: var(--radius-base);
-        border: 1px solid var(--color-border);
-        
-        .results-count {
-          font-weight: 500;
-          color: var(--color-text-base);
-        }
-        
-        .status-summary {
-          display: flex;
-          gap: var(--spacing-md);
-          
-          .status-item {
-            font-size: 0.875rem;
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border-radius: var(--radius-base);
-            
-            &.quote {
-              background: rgba(245, 158, 11, 0.1);
-              color: var(--color-warning);
-            }
-            
-            &.issued {
-              background: rgba(37, 99, 235, 0.1);
-              color: var(--color-primary);
-            }
-            
-            &.paid {
-              background: rgba(22, 163, 74, 0.1);
-              color: var(--color-success);
-            }
-          }
-        }
-      }
-    }
-
-    .table-card {
-      background: var(--color-bg-container);
-      border-radius: var(--radius-base);
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-      margin-bottom: var(--spacing-lg);
-      
-      .card-content {
-        padding: 0;
-      }
-    }
-
-    .table-container {
-      overflow-x: auto;
-      
-      .invoices-table {
-        width: 100%;
-        border-collapse: collapse;
-        
-        thead {
-          background: var(--color-bg-base);
-          
-          th {
-            padding: var(--spacing-md);
-            text-align: left;
-            font-weight: 600;
-            color: var(--color-text-base);
-            border-bottom: 1px solid var(--color-border);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-        }
-        
-        tbody {
-          .invoice-row {
-            transition: all var(--transition-base);
-            border-bottom: 1px solid var(--color-border);
-            
-            &:hover {
-              background: rgba(37, 99, 235, 0.05);
-            }
-            
-            &:last-child {
-              border-bottom: none;
-            }
-            
-            td {
-              padding: var(--spacing-md);
-              vertical-align: top;
-              
-              .invoice-info {
-                .invoice-link {
-                  color: var(--color-primary);
-                  text-decoration: none;
-                  font-weight: 600;
-                  font-size: 1rem;
-                  
-                  &:hover {
-                    text-decoration: underline;
-                  }
-                }
-                
-                .invoice-meta {
-                  font-size: 0.875rem;
-                  color: var(--color-text-base);
-                  opacity: 0.7;
-                  margin-top: var(--spacing-xs);
-                }
-              }
-              
-              .client-info {
-                .client-name {
-                  color: var(--color-text-base);
-                  font-weight: 500;
-                }
-                
-                .client-email {
-                  font-size: 0.875rem;
-                  color: var(--color-text-base);
-                  opacity: 0.7;
-                  margin-top: var(--spacing-xs);
-                }
-              }
-              
-              .amount-info {
-                .amount {
-                  font-weight: 600;
-                  color: var(--color-success);
-                  font-size: 1rem;
-                }
-                
-                .currency {
-                  font-size: 0.75rem;
-                  color: var(--color-text-base);
-                  opacity: 0.6;
-                  margin-top: var(--spacing-xs);
-                }
-              }
-              
-              .date-info {
-                .due-date {
-                  color: var(--color-text-base);
-                  font-weight: 500;
-                }
-                
-                .days-until {
-                  font-size: 0.75rem;
-                  margin-top: var(--spacing-xs);
-                  
-                  &.overdue {
-                    color: var(--color-error);
-                    font-weight: 500;
-                  }
-                  
-                  &.due-soon {
-                    color: var(--color-warning);
-                    font-weight: 500;
-                  }
-                  
-                  &.normal {
-                    color: var(--color-text-base);
-                    opacity: 0.6;
-                  }
-                }
-              }
-              
-              .created-info {
-                color: var(--color-text-base);
-                opacity: 0.7;
-              }
-              
-              .action-buttons {
-                display: flex;
-                gap: var(--spacing-xs);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .empty-state {
-      padding: var(--spacing-2xl);
-      text-align: center;
-      
-      .empty-actions {
-        margin-top: var(--spacing-lg);
+        opacity: 0.6;
       }
     }
 
@@ -501,13 +224,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
       margin-top: var(--spacing-lg);
     }
 
-    // Responsive adjustments
-    @media (max-width: 1280px) {
-      .invoices-container {
-        padding: var(--spacing-md);
-      }
-    }
-
+    /* Responsive adjustments */
     @media (max-width: 1024px) {
       .page-header .header-content {
         flex-direction: column;
@@ -538,34 +255,6 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
       .page-header .header-content .header-info h1 {
         font-size: 1.75rem;
       }
-      
-      .table-container .invoices-table {
-        font-size: 0.875rem;
-        
-        thead th,
-        tbody td {
-          padding: var(--spacing-sm);
-        }
-      }
-    }
-
-    @media (max-width: 420px) {
-      .invoices-container {
-        padding: var(--spacing-xs);
-      }
-      
-      .page-header .header-content .header-info h1 {
-        font-size: 1.5rem;
-      }
-      
-      .header-actions {
-        flex-direction: column;
-        
-        .action-btn {
-          width: 100%;
-          justify-content: center;
-        }
-      }
     }
   `]
 })
@@ -574,11 +263,148 @@ export class InvoicesListComponent implements OnInit {
   private clientsService = inject(ClientsService);
   private authService = inject(AuthService);
 
-  invoices: Invoice[] = [];
+  // Signals for reactive state
+  invoices = signal<Invoice[]>([]);
   clients: any[] = [];
   selectedClientId = '';
-  loading = false;
+  loading = signal(false);
   errorMessage = '';
+
+  // AG-Grid properties
+  isDarkMode: boolean = false;
+  gridClass: string = 'ag-theme-alpine';
+  gridApi: any = null;
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    {
+      field: 'invoiceNumber',
+      headerName: 'Invoice',
+      flex: 1,
+      minWidth: 150,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        const invoice = params.data;
+        let html = `<a href="/invoices/${invoice.id}" class="invoice-link">${invoice.invoiceNumber}</a>`;
+        if (invoice.notes) {
+          html += `<div class="invoice-meta">${invoice.notes}</div>`;
+        }
+        return html;
+      }
+    },
+    {
+      field: 'client',
+      headerName: 'Client',
+      flex: 2,
+      minWidth: 200,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const client = params.value;
+        if (!client) {
+          return '<span class="unknown-client">Unknown Client</span>';
+        }
+        let html = `<div class="client-name">${client.name}</div>`;
+        if (client.email) {
+          html += `<div class="client-email">${client.email}</div>`;
+        }
+        return html;
+      }
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const status = params.value;
+        const statusClass = `status-${status.toLowerCase()}`;
+        return `<span class="status-badge ${statusClass}">${status}</span>`;
+      }
+    },
+    {
+      field: 'grandTotal',
+      headerName: 'Amount',
+      width: 120,
+      cellRenderer: (params: any) => {
+        return this.formatCurrency(params.value);
+      }
+    },
+    {
+      field: 'dueDate',
+      headerName: 'Due Date',
+      width: 150,
+      cellRenderer: (params: any) => {
+        const dueDate = params.value;
+        if (!dueDate) return '-';
+        
+        const due = new Date(dueDate);
+        const formattedDate = due.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: '2-digit', 
+          year: 'numeric' 
+        });
+        const daysClass = this.getDaysUntilClass(dueDate);
+        const daysText = this.getDaysUntil(dueDate);
+        
+        return `
+          <div class="due-date">${formattedDate}</div>
+          <div class="days-until ${daysClass}">${daysText}</div>
+        `;
+      }
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created',
+      width: 120,
+      valueFormatter: (params: any) => {
+        return params.value ? new Date(params.value).toLocaleDateString() : '-';
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      pinned: 'right',
+      filter: false,
+      cellRenderer: (params: any) => {
+        const invoice = params.data;
+        let buttons = '';
+        
+        buttons += `<button class="btn btn-sm btn-outline" onclick="window.viewInvoice('${invoice.id}')" title="View Details">
+          <span nz-icon nzType="eye"></span>
+        </button>`;
+        
+        if (this.canManageInvoices && invoice.status === 'QUOTE') {
+          buttons += `<button class="btn btn-sm btn-danger" onclick="window.issueInvoice('${invoice.id}')" title="Issue Invoice">
+            <span nz-icon nzType="check-circle"></span>
+          </button>`;
+        }
+        
+        if (this.canManageInvoices && invoice.status === 'ISSUED') {
+          buttons += `<button class="btn btn-sm btn-success" onclick="window.markAsPaid('${invoice.id}')" title="Mark as Paid">
+            <span nz-icon nzType="dollar"></span>
+          </button>`;
+        }
+        
+        return `<div class="action-buttons">${buttons}</div>`;
+      }
+    }
+  ];
+
+  // AG-Grid options
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+      flex: 1,
+      minWidth: 100,
+      floatingFilter: false
+    },
+    rowSelection: 'multiple' as const,
+    animateRows: true,
+    suppressMenuHide: true
+  };
 
   // Permission getters
   get canCreateInvoice(): boolean {
@@ -590,20 +416,46 @@ export class InvoicesListComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Register AG-Grid modules
+    ModuleRegistry.registerModules([AllCommunityModule]);
+    
+    this.updateGridClass();
     this.loadInvoices();
     this.loadClients();
+    
+    // Set up global window functions for AG-Grid cell renderers
+    (window as any).viewInvoice = (id: string) => this.viewInvoice(id);
+    (window as any).issueInvoice = (id: string) => this.issueInvoice(id);
+    (window as any).markAsPaid = (id: string) => this.markAsPaid(id);
   }
 
   loadInvoices() {
-    this.loading = true;
+    this.loading.set(true);
     this.invoicesService.getAll(this.selectedClientId || undefined).subscribe({
       next: (invoices) => {
-        this.invoices = invoices;
-        this.loading = false;
+        this.invoices.set(invoices);
+        this.loading.set(false);
+        
+        // Update grid if it's ready
+        if (this.gridApi) {
+          if (typeof this.gridApi.setGridOption === 'function') {
+            this.gridApi.setGridOption('rowData', this.invoices());
+            this.gridApi.setGridOption('columnDefs', this.columnDefs);
+            // Force grid refresh
+            setTimeout(() => {
+              this.gridApi.refreshCells();
+            }, 100);
+          }
+        }
       },
       error: (error) => {
         console.error('Error loading invoices:', error);
-        this.loading = false;
+        this.loading.set(false);
+        
+        // Update grid with empty data
+        if (this.gridApi && typeof this.gridApi.setGridOption === 'function') {
+          this.gridApi.setGridOption('rowData', []);
+        }
       }
     });
   }
@@ -623,32 +475,72 @@ export class InvoicesListComponent implements OnInit {
     this.loadInvoices();
   }
 
+  // AG-Grid event handlers
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
+    
+    // If invoices are already loaded, set them in the grid
+    if (this.invoices().length > 0) {
+      if (typeof event.api.setGridOption === 'function') {
+        event.api.setGridOption('rowData', this.invoices());
+        event.api.setGridOption('columnDefs', this.columnDefs);
+        // Force grid refresh
+        setTimeout(() => {
+          this.gridApi.refreshCells();
+        }, 100);
+      }
+    }
+  }
+
+  onCellClicked(event: CellClickedEvent) {
+    // Handle cell clicks if needed
+  }
+
+  updateGridClass() {
+    // Check if dark mode is enabled
+    this.isDarkMode = document.documentElement.classList.contains('dark') || 
+                     document.body.classList.contains('dark');
+    this.gridClass = this.isDarkMode ? 'ag-theme-alpine-dark' : 'ag-theme-alpine';
+  }
+
+  viewInvoice(id: string): void {
+    // Navigate to invoice detail page
+    window.location.href = `/invoices/${id}`;
+  }
+
   issueInvoice(invoiceId: string) {
-    this.loading = true;
+    this.loading.set(true);
     this.invoicesService.issue(invoiceId).subscribe({
       next: () => {
         this.loadInvoices(); // Reload to get updated status
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Error issuing invoice:', error);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
 
   markAsPaid(invoiceId: string) {
-    this.loading = true;
+    this.loading.set(true);
     this.invoicesService.markAsPaid(invoiceId).subscribe({
       next: () => {
         this.loadInvoices(); // Reload to get updated status
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Error marking invoice as paid:', error);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
   }
 
   getStatusColor(status: string): string {
@@ -667,7 +559,7 @@ export class InvoicesListComponent implements OnInit {
   }
 
   getStatusCount(status: string): number {
-    return this.invoices.filter(invoice => invoice.status === status).length;
+    return this.invoices().filter(invoice => invoice.status === status).length;
   }
 
   getDaysUntil(dueDate: string): string {

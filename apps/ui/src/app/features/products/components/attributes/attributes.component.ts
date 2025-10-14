@@ -1,67 +1,54 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AttributesService, Attribute, CreateAttributeDto, AttributeOption } from '../../services/attributes.service';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, GridReadyEvent, CellClickedEvent, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
+// Register AG-Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-attributes',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AgGridAngular, NzIconModule],
   template: `
     <div class="attributes-container">
-      <div class="header">
-        <h2>Product Attributes</h2>
-        <button 
-          class="btn btn-primary" 
-          (click)="openCreateModal()"
-        >
-          Add Attribute
-        </button>
-      </div>
-
-      <div class="attributes-grid">
-        <div 
-          *ngFor="let attribute of attributes" 
-          class="attribute-card"
-        >
-          <div class="attribute-header">
-            <h3>{{ attribute.name }}</h3>
-            <div class="attribute-actions">
-              <button 
-                class="btn btn-sm btn-secondary"
-                (click)="openEditModal(attribute)"
-              >
-                Edit
-              </button>
-              <button 
-                class="btn btn-sm btn-danger"
-                (click)="deleteAttribute(attribute.id)"
-              >
-                Delete
-              </button>
-            </div>
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <div class="header-info">
+            <h1>Product Attributes</h1>
+            <p>Define custom attributes for your products</p>
           </div>
-          
-          <div class="attribute-details">
-            <p><strong>Type:</strong> 
-              <span class="type-tag" [class]="'type-' + attribute.type.toLowerCase()">
-                {{ attribute.type }}
-              </span>
-            </p>
-            <p><strong>Options:</strong> {{ attribute.options?.length || 0 }}</p>
-            <div *ngIf="attribute.options && attribute.options.length > 0" class="options-list">
-              <span 
-                *ngFor="let option of attribute.options" 
-                class="option-tag"
-              >
-                {{ option.option }}
-              </span>
-            </div>
+          <div class="header-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="openCreateModal()"
+            >
+              <span nz-icon nzType="plus"></span>
+              Add Attribute
+            </button>
           </div>
         </div>
       </div>
 
-      <div *ngIf="attributes.length === 0" class="no-attributes">
+      <!-- AG-Grid -->
+      <div class="enterprise-grid">
+        <ag-grid-angular
+          [class]="gridClass"
+          [rowData]="attributes()"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClicked($event)"
+          style="width: 100%; height: 100%;"
+        ></ag-grid-angular>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="attributes().length === 0" class="empty-state">
         <p>No attributes found. <a href="#" (click)="openCreateModal(); $event.preventDefault()">Create your first attribute</a></p>
       </div>
 
@@ -182,128 +169,74 @@ import { AttributesService, Attribute, CreateAttributeDto, AttributeOption } fro
   `,
   styles: [`
     .attributes-container {
-      padding: var(--spacing-lg);
-      background: var(--color-bg-base);
-      min-height: 100vh;
-    }
-
-    .header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-xl);
+      flex-direction: column;
+      height: 100vh;
+      background: var(--color-bg-base);
+      padding: var(--spacing-lg);
     }
 
-    .header h2 {
-      margin: 0;
-      color: var(--color-text-base);
-      font-size: 24px;
-      font-weight: 600;
+    .page-header {
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
+      
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--spacing-lg);
+        
+        .header-info {
+          flex: 1;
+          
+          h1 {
+            margin: 0 0 var(--spacing-sm) 0;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text-base);
+            line-height: 1.2;
+          }
+          
+          p {
+            margin: 0;
+            color: var(--color-text-base);
+            opacity: 0.7;
+            font-size: 1rem;
+            line-height: 1.5;
+          }
+        }
+        
+        .header-actions {
+          display: flex;
+          gap: var(--spacing-sm);
+          flex-shrink: 0;
+        }
+      }
     }
 
-    .attributes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: var(--spacing-lg);
-    }
-
-    .attribute-card {
-      border: 1px solid var(--color-border);
+    .enterprise-grid {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid #e5e7eb;
       border-radius: var(--radius-base);
-      padding: var(--spacing-lg);
+      overflow: hidden;
       background: var(--color-bg-container);
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .attribute-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-md);
-    }
-
-    .attribute-header h3 {
-      margin: 0;
-      color: var(--color-text-base);
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .attribute-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
-    .attribute-details p {
-      margin: var(--spacing-sm) 0;
-      color: var(--color-text-base);
-    }
-
-    .attribute-details strong {
-      color: var(--color-text-base);
-    }
-
-    .type-tag {
-      padding: 2px var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .type-text { 
-      background: rgba(59, 130, 246, 0.1); 
-      color: var(--color-primary); 
-    }
-    .type-number { 
-      background: rgba(34, 197, 94, 0.1); 
-      color: var(--color-success); 
-    }
-    .type-decimal { 
-      background: rgba(245, 158, 11, 0.1); 
-      color: var(--color-warning); 
-    }
-    .type-boolean { 
-      background: rgba(147, 51, 234, 0.1); 
-      color: #9333EA; 
-    }
-    .type-date { 
-      background: rgba(248, 113, 113, 0.1); 
-      color: var(--color-error); 
-    }
-    .type-enum { 
-      background: rgba(6, 182, 212, 0.1); 
-      color: #06B6D4; 
-    }
-
-    .options-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--spacing-sm);
-      margin-top: var(--spacing-sm);
-    }
-
-    .option-tag {
-      background: var(--color-bg-base);
-      color: var(--color-text-secondary);
-      padding: 4px var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      border: 1px solid var(--color-border);
-    }
-
-    .no-attributes {
+    .empty-state {
       text-align: center;
-      padding: var(--spacing-2xl);
-      color: var(--color-text-secondary);
-    }
-
-    .no-attributes a {
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    .no-attributes a:hover {
-      text-decoration: underline;
+      padding: var(--spacing-xl);
+      color: var(--color-text-base);
+      
+      a {
+        color: var(--color-primary);
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .option-row {
@@ -406,7 +339,91 @@ export class AttributesComponent implements OnInit {
   private fb = inject(FormBuilder);
   private attributesService = inject(AttributesService);
 
-  attributes: Attribute[] = [];
+  // Signals for reactive state
+  attributes = signal<Attribute[]>([]);
+  loading = signal(false);
+
+  // AG-Grid properties
+  isDarkMode: boolean = false;
+  gridClass: string = 'ag-theme-alpine';
+  gridApi: any = null;
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 2,
+      minWidth: 200,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        const attribute = params.data;
+        return `
+          <div class="attribute-info">
+            <div class="attribute-name">
+              <strong>${attribute.name}</strong>
+            </div>
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
+      width: 120,
+      cellRenderer: (params: any) => {
+        const type = params.value;
+        const typeClass = `type-${type.toLowerCase()}`;
+        return `<span class="type-tag ${typeClass}">${type}</span>`;
+      }
+    },
+    {
+      field: 'options',
+      headerName: 'Options',
+      flex: 2,
+      minWidth: 200,
+      cellRenderer: (params: any) => {
+        const options = params.value || [];
+        if (options.length === 0) return '-';
+        return options.map((opt: any) => `<span class="option-tag">${opt.option}</span>`).join(' ');
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      pinned: 'right',
+      sortable: false,
+      filter: false,
+      cellRenderer: (params: any) => {
+        const attribute = params.data;
+        return `
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-primary" onclick="window.editAttribute('${attribute.id}')" title="Edit Attribute">
+              <span nz-icon nzType="edit"></span>
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="window.deleteAttribute('${attribute.id}')" title="Delete Attribute">
+              <span nz-icon nzType="delete"></span>
+              Delete
+            </button>
+          </div>
+        `;
+      }
+    }
+  ];
+
+  // AG-Grid options
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    suppressRowClickSelection: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+  };
 
   showModal = false;
   isEditMode = false;
@@ -424,20 +441,55 @@ export class AttributesComponent implements OnInit {
 
   ngOnInit() {
     this.loadAttributes();
+    this.setupGlobalHandlers();
   }
 
   loadAttributes() {
+    this.loading.set(true);
     this.attributesService.getAll().subscribe({
       next: (attributes) => {
-        this.attributes = attributes;
-        console.log('Attributes loaded:', this.attributes);
+        this.attributes.set(attributes);
+        this.loading.set(false);
+        console.log('Attributes loaded:', this.attributes());
       },
       error: (error) => {
         console.error('Error loading attributes:', error);
-        // Fallback to empty array if API fails
-        this.attributes = [];
+        this.attributes.set([]);
+        this.loading.set(false);
       }
     });
+  }
+
+  setupGlobalHandlers() {
+    (window as any).editAttribute = (id: string) => {
+      const attribute = this.attributes().find(a => a.id === id);
+      if (attribute) {
+        this.openEditModal(attribute);
+      }
+    };
+
+    (window as any).deleteAttribute = (id: string) => {
+      this.deleteAttribute(id);
+    };
+  }
+
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
+    
+    // If attributes are already loaded, set them in the grid
+    if (this.attributes().length > 0) {
+      if (typeof event.api.setGridOption === 'function') {
+        event.api.setGridOption('rowData', this.attributes());
+        // Force grid refresh
+        setTimeout(() => {
+          this.gridApi.refreshCells();
+        }, 100);
+      }
+    }
+  }
+
+  onCellClicked(event: CellClickedEvent) {
+    // Handle cell clicks if needed
   }
 
   openCreateModal() {
@@ -505,9 +557,11 @@ export class AttributesComponent implements OnInit {
         // Update existing attribute
         this.attributesService.update(this.editingAttribute.id, attributeData).subscribe({
           next: (updatedAttribute) => {
-            const index = this.attributes.findIndex(a => a.id === this.editingAttribute.id);
+            const currentAttributes = this.attributes();
+            const index = currentAttributes.findIndex(a => a.id === this.editingAttribute.id);
             if (index !== -1) {
-              this.attributes[index] = updatedAttribute;
+              currentAttributes[index] = updatedAttribute;
+              this.attributes.set([...currentAttributes]);
             }
             this.closeModal();
           },
@@ -520,7 +574,8 @@ export class AttributesComponent implements OnInit {
         // Create new attribute
         this.attributesService.create(attributeData).subscribe({
           next: (newAttribute) => {
-            this.attributes.push(newAttribute);
+            const currentAttributes = this.attributes();
+            this.attributes.set([...currentAttributes, newAttribute]);
             this.closeModal();
           },
           error: (error) => {
@@ -536,7 +591,8 @@ export class AttributesComponent implements OnInit {
     if (confirm('Are you sure you want to delete this attribute?')) {
       this.attributesService.delete(id).subscribe({
         next: () => {
-          this.attributes = this.attributes.filter(a => a.id !== id);
+          const currentAttributes = this.attributes();
+          this.attributes.set(currentAttributes.filter(a => a.id !== id));
           console.log('Attribute deleted successfully');
         },
         error: (error) => {

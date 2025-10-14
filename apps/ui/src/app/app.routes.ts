@@ -187,7 +187,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/not-found/not-found.component').then(m => m.NotFoundComponent)
+        loadComponent: () => import('./features/suppliers/components/suppliers-list/suppliers-list.component').then(m => m.SuppliersListComponent)
       },
       {
         path: 'new',

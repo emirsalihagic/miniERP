@@ -1,108 +1,171 @@
-.orders-management-container {
+.orders-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg-base);
   padding: var(--spacing-lg);
-  background-color: var(--color-bg-base);
-  min-height: calc(100vh - 64px);
+}
 
-  .filters-section {
-    background-color: var(--color-bg-container);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-base);
-    margin-bottom: var(--spacing-md);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
-
-    .filter-row {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-
-      .filter-item {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-
-        label {
-          font-weight: 500;
-          color: var(--color-text-base);
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-
-  .table-section {
-    background-color: var(--color-bg-container);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-base);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
-
-    nz-table {
-      .ant-table-thead > tr > th {
-        background-color: var(--color-bg-container);
+.page-header {
+  flex-shrink: 0;
+  margin-bottom: var(--spacing-lg);
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    
+    .header-info {
+      flex: 1;
+      
+      h1 {
+        margin: 0 0 var(--spacing-sm) 0;
+        font-size: 2rem;
         font-weight: 600;
         color: var(--color-text-base);
-        border-bottom: 1px solid var(--color-border);
+        line-height: 1.2;
       }
-
-      .ant-table-tbody > tr > td {
-        font-size: 14px;
-        vertical-align: middle;
-        background: var(--color-bg-container);
+      
+      p {
+        margin: 0;
         color: var(--color-text-base);
-        border-bottom: 1px solid var(--color-border);
+        opacity: 0.7;
+        font-size: 1rem;
+        line-height: 1.5;
       }
-
-      .ant-table-tbody > tr:hover > td {
-        background: rgba(59, 130, 246, 0.05);
-      }
-
-      .action-buttons {
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-shrink: 0;
+      
+      .filters {
         display: flex;
-        gap: var(--spacing-sm);
+        align-items: center;
+        gap: var(--spacing-md);
         flex-wrap: wrap;
-
-        button {
-          display: inline-flex;
+        
+        .filter-item {
+          display: flex;
           align-items: center;
-          gap: 4px;
+          gap: var(--spacing-sm);
+          
+          label {
+            font-weight: 500;
+            color: var(--color-text-base);
+            white-space: nowrap;
+          }
         }
-      }
-
-      .no-invoice {
-        color: var(--color-text-secondary);
-        font-style: italic;
       }
     }
   }
+}
 
-  .empty-state {
-    background-color: var(--color-bg-container);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-base);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
-    text-align: center;
-    color: var(--color-text-base);
+.enterprise-grid {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-base);
+  overflow: hidden;
+  background: var(--color-bg-container);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Status badge styling */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  
+  &.status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+  }
+  
+  &.status-invoice-created {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+  }
+  
+  &.status-invoice-issued {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+  }
+  
+  &.status-shipped {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+  }
+  
+  &.status-delivered {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+  }
+  
+  &.status-completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+  }
+  
+  &.status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+  }
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* Links */
+.order-link, .invoice-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.no-invoice {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .page-header .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+    
+    .header-actions {
+      justify-content: flex-start;
+    }
   }
 }
 
 @media (max-width: 768px) {
-  .orders-management-container {
-    padding: 16px;
-
-    .filters-section .filter-row {
-      flex-direction: column;
-      align-items: stretch;
-
-      .filter-item {
-        justify-content: space-between;
-      }
-    }
-
-    .table-section {
-      overflow-x: auto;
+  .orders-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .page-header .header-content .header-info h1 {
+    font-size: 1.75rem;
+  }
+  
+  .page-header .header-actions .filters {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .filter-item {
+      justify-content: space-between;
     }
   }
 }

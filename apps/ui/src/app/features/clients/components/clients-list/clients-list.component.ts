@@ -2,7 +2,9 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { RouterModule } from '@angular/router';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, GridReadyEvent, CellClickedEvent, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -15,7 +17,6 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 
 import { ClientsService } from '../../services/clients.service';
@@ -34,7 +35,8 @@ import {
   imports: [
     CommonModule,
     FormsModule,
-    NzTableModule,
+    RouterModule,
+    AgGridAngular,
     NzButtonModule,
     NzInputModule,
     NzSelectModule,
@@ -47,7 +49,6 @@ import {
     NzModalModule,
     NzMessageModule,
     NzSpinModule,
-    NzPaginationModule,
     NzEmptyModule
   ],
   template: `
@@ -68,259 +69,32 @@ import {
         </div>
       </div>
 
-      <!-- Filters Card -->
-      <div class="filters-card">
-        <div class="card-header">
-          <h3>
-            <span nz-icon nzType="filter"></span>
-            Filters & Search
-          </h3>
-        </div>
-        <div class="card-content">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <label class="filter-label">Search</label>
-              <input 
-                nz-input 
-                placeholder="Search by name, email, client code..." 
-                [(ngModel)]="searchQuery"
-                (ngModelChange)="onSearchChange()"
-                nzSize="large"
-                class="filter-input"
-              />
-            </div>
-            
-            <div class="filter-group">
-              <label class="filter-label">Status</label>
-              <nz-select 
-                [(ngModel)]="statusFilter" 
-                (ngModelChange)="onFilterChange()"
-                nzPlaceHolder="All Statuses"
-                nzSize="large"
-                nzAllowClear
-                class="filter-select"
-              >
-                <nz-option nzValue="ACTIVE" nzLabel="Active"></nz-option>
-                <nz-option nzValue="INACTIVE" nzLabel="Inactive"></nz-option>
-                <nz-option nzValue="PROSPECT" nzLabel="Prospect"></nz-option>
-              </nz-select>
-            </div>
-            
-            <div class="filter-group">
-              <label class="filter-label">City</label>
-              <input 
-                nz-input 
-                placeholder="Filter by city" 
-                [(ngModel)]="cityFilter"
-                (ngModelChange)="onFilterChange()"
-                nzSize="large"
-                class="filter-input"
-              />
-            </div>
-            
-            <div class="filter-group">
-              <label class="filter-label">Tags</label>
-              <input 
-                nz-input 
-                placeholder="Filter by tags" 
-                [(ngModel)]="tagsFilter"
-                (ngModelChange)="onFilterChange()"
-                nzSize="large"
-                class="filter-input"
-              />
-            </div>
-            
-            <div class="filter-group">
-              <label class="filter-label">Sort by</label>
-              <div class="sort-controls">
-                <nz-select 
-                  [(ngModel)]="sortField" 
-                  (ngModelChange)="onSortChange()"
-                  nzSize="large"
-                  class="filter-select"
-                >
-                  <nz-option nzValue="name" nzLabel="Name"></nz-option>
-                  <nz-option nzValue="email" nzLabel="Email"></nz-option>
-                  <nz-option nzValue="status" nzLabel="Status"></nz-option>
-                  <nz-option nzValue="createdAt" nzLabel="Created Date"></nz-option>
-                </nz-select>
-                <button 
-                  type="button"
-                  class="btn btn-outline"
-                  (click)="toggleSortOrder()"
-                  class="sort-order-btn"
-                  [attr.aria-label]="'Sort ' + (sortOrder === 'asc' ? 'descending' : 'ascending')"
-                >
-                  <span nz-icon [nzType]="sortOrder === 'asc' ? 'arrow-up' : 'arrow-down'"></span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Results Summary -->
-      <div class="results-summary" *ngIf="totalClients() > 0">
-        <div class="summary-info">
-          <span class="results-count">{{ totalClients() }} client{{ totalClients() !== 1 ? 's' : '' }} found</span>
-          <span class="page-info" *ngIf="totalClients() > pageSize()">
-            Showing {{ (currentPage() - 1) * pageSize() + 1 }} - {{ Math.min(currentPage() * pageSize(), totalClients()) }} of {{ totalClients() }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Table Card -->
-      <div class="table-card">
-        <div class="card-content">
-          <nz-spin [nzSpinning]="loading()">
-            <div class="table-container">
-              <table class="clients-table">
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th>Type</th>
-                    <th>Contact</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                    <th>Tags</th>
-                    <th>Assigned To</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let client of clients()" class="client-row">
-                    <td>
-                      <div class="client-info">
-                        <div class="client-name">
-                          <strong>{{ client.name }}</strong>
-                          <div class="client-code" *ngIf="client.clientCode">
-                            {{ client.clientCode }}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <nz-tag [nzColor]="client.type === 'COMPANY' ? 'blue' : 'green'" class="type-tag">
-                        {{ client.type }}
-                      </nz-tag>
-                    </td>
-                    <td>
-                      <div class="contact-info">
-                        <div class="email">{{ client.email }}</div>
-                        <div class="phone" *ngIf="client.phone">{{ client.phone }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <nz-tag [nzColor]="getStatusColor(client.status)" class="status-tag">
-                        {{ client.status }}
-                      </nz-tag>
-                    </td>
-                    <td>
-                      <div class="location-info">
-                        <div class="city">{{ client.billingCity || '-' }}</div>
-                        <div class="country" *ngIf="client.billingCountry">{{ client.billingCountry }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="tags-container" *ngIf="client.tags && client.tags.length > 0">
-                        <nz-tag 
-                          *ngFor="let tag of client.tags.slice(0, 2)" 
-                          nzColor="purple"
-                          nzSize="small"
-                          class="tag"
-                        >
-                          {{ tag }}
-                        </nz-tag>
-                        <nz-tag 
-                          *ngIf="client.tags.length > 2" 
-                          nzColor="default"
-                          nzSize="small"
-                          class="tag"
-                        >
-                          +{{ client.tags.length - 2 }}
-                        </nz-tag>
-                      </div>
-                      <span *ngIf="!client.tags || client.tags.length === 0" class="no-tags">-</span>
-                    </td>
-                    <td>
-                      <div class="assigned-info">
-                        <span *ngIf="client.assignedTo" class="assigned-user">
-                          {{ client.assignedTo.firstName }} {{ client.assignedTo.lastName }}
-                        </span>
-                        <span *ngIf="!client.assignedTo" class="not-assigned">-</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-buttons">
-                        <button 
-                          type="button"
-                          class="btn btn-sm btn-outline"
-                          nz-tooltip="View Details"
-                          (click)="viewClient(client.id)"
-                        >
-                          <span nz-icon nzType="eye"></span>
-                        </button>
-                        <button 
-                          type="button"
-                          class="btn btn-sm btn-outline"
-                          nz-tooltip="Edit Client"
-                          (click)="editClient(client.id)"
-                        >
-                          <span nz-icon nzType="edit"></span>
-                        </button>
-                        <button 
-                          type="button"
-                          class="btn btn-sm btn-danger"
-                          nz-tooltip="Delete Client"
-                          (click)="deleteClient(client)"
-                        >
-                          <span nz-icon nzType="delete"></span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="empty-state" *ngIf="!loading() && clients().length === 0">
-              <nz-empty nzNotFoundContent="No clients found">
-                <div class="empty-actions">
-                  <button type="button" class="btn btn-primary" (click)="createClient()">
-                    <span nz-icon nzType="plus"></span>
-                    Create Your First Client
-                  </button>
-                </div>
-              </nz-empty>
-            </div>
-          </nz-spin>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination-section" *ngIf="totalClients() > pageSize()">
-        <nz-pagination
-          [nzPageIndex]="currentPage()"
-          [nzTotal]="totalClients()"
-          [nzPageSize]="pageSize()"
-          [nzShowSizeChanger]="true"
-          [nzPageSizeOptions]="[10, 20, 50, 100]"
-          (nzPageIndexChange)="onPageChange($event)"
-          (nzPageSizeChange)="onPageSizeChange($event)"
-          nzShowQuickJumper
-        ></nz-pagination>
+      <!-- AG-Grid -->
+      <div class="enterprise-grid">
+        <ag-grid-angular
+          [class]="gridClass"
+          [rowData]="clients()"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClicked($event)"
+          style="width: 100%; height: 100%;"
+        ></ag-grid-angular>
       </div>
     </div>
   `,
   styles: [`
     .clients-container {
-      padding: var(--spacing-lg);
-      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       background: var(--color-bg-base);
+      padding: var(--spacing-lg);
     }
 
     .page-header {
-      margin-bottom: var(--spacing-xl);
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
       
       .header-content {
         display: flex;
@@ -356,262 +130,65 @@ import {
       }
     }
 
-    .filters-card {
-      background: var(--color-bg-container);
+    .enterprise-grid {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid #e5e7eb;
       border-radius: var(--radius-base);
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-      margin-bottom: var(--spacing-lg);
-      
-      .card-header {
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--color-border);
-        background: var(--color-bg-base);
-        
-        h3 {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-sm);
-          margin: 0;
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: var(--color-text-base);
-          
-          span {
-            color: var(--color-primary);
-          }
-        }
-      }
-      
-      .card-content {
-        padding: var(--spacing-lg);
-      }
-    }
-
-    .filters-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-md);
-      
-      .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-        
-        .filter-label {
-          font-weight: 500;
-          color: var(--color-text-base);
-          font-size: 0.875rem;
-        }
-        
-        .filter-input,
-        .filter-select {
-          border-radius: var(--radius-base);
-        }
-        
-        .sort-controls {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-xs);
-          
-          .sort-order-btn {
-            color: var(--color-text-base);
-            transition: all var(--transition-base);
-            
-            &:hover {
-              color: var(--color-primary);
-              background: rgba(37, 99, 235, 0.1);
-            }
-          }
-        }
-      }
-    }
-
-    .results-summary {
-      margin-bottom: var(--spacing-md);
-      
-      .summary-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--color-bg-container);
-        border-radius: var(--radius-base);
-        border: 1px solid var(--color-border);
-        
-        .results-count {
-          font-weight: 500;
-          color: var(--color-text-base);
-        }
-        
-        .page-info {
-          font-size: 0.875rem;
-          color: var(--color-text-base);
-          opacity: 0.7;
-        }
-      }
-    }
-
-    .table-card {
+      overflow: hidden;
       background: var(--color-bg-container);
-      border-radius: var(--radius-base);
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--color-border);
-      margin-bottom: var(--spacing-lg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status badge styling */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
       
-      .card-content {
-        padding: 0;
+      &.status-active {
+        background: rgba(22, 163, 74, 0.1);
+        color: var(--color-success);
+      }
+      
+      &.status-inactive {
+        background: rgba(107, 114, 128, 0.1);
+        color: var(--color-text-secondary);
+      }
+      
+      &.status-prospect {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--color-warning);
       }
     }
 
-    .table-container {
-      overflow-x: auto;
+    /* Type badge styling */
+    .type-badge {
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
       
-      .clients-table {
-        width: 100%;
-        border-collapse: collapse;
-        
-        thead {
-          background: var(--color-bg-base);
-          
-          th {
-            padding: var(--spacing-md);
-            text-align: left;
-            font-weight: 600;
-            color: var(--color-text-base);
-            border-bottom: 1px solid var(--color-border);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-        }
-        
-        tbody {
-          .client-row {
-            transition: all var(--transition-base);
-            border-bottom: 1px solid var(--color-border);
-            
-            &:hover {
-              background: rgba(37, 99, 235, 0.05);
-            }
-            
-            &:last-child {
-              border-bottom: none;
-            }
-            
-            td {
-              padding: var(--spacing-md);
-              vertical-align: top;
-              
-              .client-info {
-                .client-name {
-                  strong {
-                    color: var(--color-text-base);
-                    font-weight: 600;
-                  }
-                  
-                  .client-code {
-                    font-size: 0.75rem;
-                    color: var(--color-text-base);
-                    opacity: 0.6;
-                    margin-top: var(--spacing-xs);
-                  }
-                }
-              }
-              
-              .contact-info {
-                .email {
-                  color: var(--color-text-base);
-                  font-weight: 500;
-                }
-                
-                .phone {
-                  font-size: 0.875rem;
-                  color: var(--color-text-base);
-                  opacity: 0.7;
-                  margin-top: var(--spacing-xs);
-                }
-              }
-              
-              .location-info {
-                .city {
-                  color: var(--color-text-base);
-                  font-weight: 500;
-                }
-                
-                .country {
-                  font-size: 0.875rem;
-                  color: var(--color-text-base);
-                  opacity: 0.7;
-                  margin-top: var(--spacing-xs);
-                }
-              }
-              
-              .tags-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: var(--spacing-xs);
-                
-                .tag {
-                  border-radius: var(--radius-base);
-                }
-              }
-              
-              .no-tags {
-                color: var(--color-text-base);
-                opacity: 0.5;
-                font-style: italic;
-              }
-              
-              .assigned-info {
-                .assigned-user {
-                  color: var(--color-text-base);
-                  font-weight: 500;
-                }
-                
-                .not-assigned {
-                  color: var(--color-text-base);
-                  opacity: 0.5;
-                  font-style: italic;
-                }
-              }
-              
-              .action-buttons {
-                display: flex;
-                gap: var(--spacing-xs);
-              }
-            }
-          }
-        }
+      &.type-company {
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--color-primary);
+      }
+      
+      &.type-individual {
+        background: rgba(22, 163, 74, 0.1);
+        color: var(--color-success);
       }
     }
 
-    .empty-state {
-      padding: var(--spacing-2xl);
-      text-align: center;
-      
-      .empty-actions {
-        margin-top: var(--spacing-lg);
-      }
-    }
-
-    .pagination-section {
+    /* Action buttons */
+    .action-buttons {
       display: flex;
-      justify-content: center;
-      margin-top: var(--spacing-lg);
+      gap: var(--spacing-xs);
     }
 
-    // Responsive adjustments
-    @media (max-width: 1280px) {
-      .clients-container {
-        padding: var(--spacing-md);
-      }
-      
-      .filters-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      }
-    }
-
+    /* Responsive adjustments */
     @media (max-width: 1024px) {
       .page-header .header-content {
         flex-direction: column;
@@ -622,10 +199,6 @@ import {
           justify-content: flex-start;
         }
       }
-      
-      .filters-grid {
-        grid-template-columns: 1fr;
-      }
     }
 
     @media (max-width: 768px) {
@@ -635,35 +208,6 @@ import {
       
       .page-header .header-content .header-info h1 {
         font-size: 1.75rem;
-      }
-      
-      .table-container .clients-table {
-        font-size: 0.875rem;
-        
-        thead th,
-        tbody td {
-          padding: var(--spacing-sm);
-        }
-      }
-      
-      .results-summary .summary-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-xs);
-      }
-    }
-
-    @media (max-width: 420px) {
-      .clients-container {
-        padding: var(--spacing-xs);
-      }
-      
-      .page-header .header-content .header-info h1 {
-        font-size: 1.5rem;
-      }
-      
-      .header-actions {
-        flex-direction: column;
       }
     }
   `]
@@ -687,20 +231,190 @@ export class ClientsListComponent implements OnInit {
   // Math property for template
   Math = Math;
 
+  // AG-Grid properties
+  isDarkMode: boolean = false;
+  gridClass: string = 'ag-theme-alpine';
+  gridApi: any = null;
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Client Name',
+      flex: 2,
+      minWidth: 200,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        const client = params.data;
+        return `
+          <div class="client-info">
+            <div class="client-name">
+              <strong>${client.name}</strong>
+              ${client.clientCode ? `<div class="client-code">${client.clientCode}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
+      width: 120,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const type = params.value;
+        const typeClass = `type-${type.toLowerCase()}`;
+        return `<span class="type-badge ${typeClass}">${type}</span>`;
+      }
+    },
+    {
+      field: 'email',
+      headerName: 'Contact',
+      flex: 2,
+      minWidth: 200,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const client = params.data;
+        return `
+          <div class="contact-info">
+            <div class="email">${client.email}</div>
+            ${client.phone ? `<div class="phone">${client.phone}</div>` : ''}
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const status = params.value;
+        const statusClass = `status-${status.toLowerCase()}`;
+        return `<span class="status-badge ${statusClass}">${status}</span>`;
+      }
+    },
+    {
+      field: 'billingCity',
+      headerName: 'Location',
+      width: 150,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const client = params.data;
+        return `
+          <div class="location-info">
+            <div class="city">${client.billingCity || '-'}</div>
+            ${client.billingCountry ? `<div class="country">${client.billingCountry}</div>` : ''}
+          </div>
+        `;
+      }
+    },
+    {
+      field: 'tags',
+      headerName: 'Tags',
+      width: 150,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const tags = params.value || [];
+        if (tags.length === 0) {
+          return '<span class="no-tags">-</span>';
+        }
+        const visibleTags = tags.slice(0, 2);
+        const remainingCount = tags.length - 2;
+        let html = visibleTags.map((tag: string) => `<span class="tag">${tag}</span>`).join('');
+        if (remainingCount > 0) {
+          html += `<span class="tag">+${remainingCount}</span>`;
+        }
+        return `<div class="tags-container">${html}</div>`;
+      }
+    },
+    {
+      field: 'assignedTo',
+      headerName: 'Assigned To',
+      width: 150,
+      filter: 'agTextColumnFilter',
+      cellRenderer: (params: any) => {
+        const assignedTo = params.value;
+        if (!assignedTo) {
+          return '<span class="not-assigned">-</span>';
+        }
+        return `<span class="assigned-user">${assignedTo.firstName} ${assignedTo.lastName}</span>`;
+      }
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created',
+      width: 120,
+      valueFormatter: (params: any) => {
+        return params.value ? new Date(params.value).toLocaleDateString() : '-';
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      pinned: 'right',
+      filter: false,
+      cellRenderer: (params: any) => {
+        const client = params.data;
+        return `
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-outline" onclick="window.viewClient('${client.id}')" title="View Details">
+              <span nz-icon nzType="eye"></span>
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="window.editClient('${client.id}')" title="Edit Client">
+              <span nz-icon nzType="edit"></span>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="window.deleteClient('${client.id}')" title="Delete Client">
+              <span nz-icon nzType="delete"></span>
+            </button>
+          </div>
+        `;
+      }
+    }
+  ];
+
+  // AG-Grid options
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      sortable: true,
+      filter: true,
+      resizable: true,
+      flex: 1,
+      minWidth: 100,
+      floatingFilter: false
+    },
+    rowSelection: 'multiple' as const,
+    animateRows: true,
+    suppressMenuHide: true
+  };
+
   private clientsService = inject(ClientsService);
   private router = inject(Router);
   private message = inject(NzMessageService);
 
   ngOnInit() {
+    // Register AG-Grid modules
+    ModuleRegistry.registerModules([AllCommunityModule]);
+    
+    this.updateGridClass();
     this.loadClients();
+    
+    // Set up global window functions for AG-Grid cell renderers
+    (window as any).viewClient = (id: string) => this.viewClient(id);
+    (window as any).editClient = (id: string) => this.editClient(id);
+    (window as any).deleteClient = (id: string) => {
+      const client = this.clients().find(c => c.id === id);
+      if (client) this.deleteClient(client);
+    };
   }
 
   loadClients() {
     this.loading.set(true);
     
     const params: ClientQueryParams = {
-      page: this.currentPage(),
-      limit: this.pageSize(),
+      page: 1, // AG-Grid handles pagination internally
+      limit: 1000, // Load all clients for AG-Grid
       sort: this.sortField,
       order: this.sortOrder,
       q: this.searchQuery || undefined,
@@ -714,11 +428,28 @@ export class ClientsListComponent implements OnInit {
         this.clients.set(response.items);
         this.totalClients.set(response.total);
         this.loading.set(false);
+        
+        // Update grid if it's ready
+        if (this.gridApi) {
+          if (typeof this.gridApi.setGridOption === 'function') {
+            this.gridApi.setGridOption('rowData', this.clients());
+            this.gridApi.setGridOption('columnDefs', this.columnDefs);
+            // Force grid refresh
+            setTimeout(() => {
+              this.gridApi.refreshCells();
+            }, 100);
+          }
+        }
       },
       error: (error: any) => {
         console.error('Error loading clients:', error);
         this.message.error('Failed to load clients');
         this.loading.set(false);
+        
+        // Update grid with empty data
+        if (this.gridApi && typeof this.gridApi.setGridOption === 'function') {
+          this.gridApi.setGridOption('rowData', []);
+        }
       }
     });
   }
@@ -781,5 +512,33 @@ export class ClientsListComponent implements OnInit {
       default:
         return 'default';
     }
+  }
+
+  // AG-Grid event handlers
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
+    
+    // If clients are already loaded, set them in the grid
+    if (this.clients().length > 0) {
+      if (typeof event.api.setGridOption === 'function') {
+        event.api.setGridOption('rowData', this.clients());
+        event.api.setGridOption('columnDefs', this.columnDefs);
+        // Force grid refresh
+        setTimeout(() => {
+          this.gridApi.refreshCells();
+        }, 100);
+      }
+    }
+  }
+
+  onCellClicked(event: CellClickedEvent) {
+    // Handle cell clicks if needed
+  }
+
+  updateGridClass() {
+    // Check if dark mode is enabled
+    this.isDarkMode = document.documentElement.classList.contains('dark') || 
+                     document.body.classList.contains('dark');
+    this.gridClass = this.isDarkMode ? 'ag-theme-alpine-dark' : 'ag-theme-alpine';
   }
 }
