@@ -1,7 +1,7 @@
 <div class="user-form-container">
   <div class="page-header">
     <h1>{{ getTitle() }}</h1>
-    <button nz-button (click)="onCancel()">
+    <button type="button" class="btn btn-secondary" (click)="onCancel()">
       <span nz-icon nzType="arrow-left"></span>
       Back to Users
     </button>
@@ -148,15 +148,14 @@
       <nz-form-item>
         <nz-form-control [nzOffset]="6" [nzSpan]="18">
           <button 
-            nz-button 
-            nzType="primary" 
             type="submit"
-            [nzLoading]="loading"
-            [disabled]="form.invalid"
+            class="btn btn-primary"
+            [disabled]="form.invalid || loading"
           >
+            <span *ngIf="loading" class="spinner"></span>
             {{ isEditMode ? 'Update User' : 'Create User' }}
           </button>
-          <button nz-button nzType="default" type="button" (click)="onCancel()" style="margin-left: 8px;">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()" class="cancel-btn">
             Cancel
           </button>
         </nz-form-control>

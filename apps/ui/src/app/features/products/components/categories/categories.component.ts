@@ -74,7 +74,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
       </div>
 
       <div *ngIf="categories.length === 0" class="no-categories">
-        <p>No categories found. <a href="#" (click)="openCreateModal()">Create your first category</a></p>
+        <p>No categories found. <a href="#" (click)="openCreateModal(); $event.preventDefault()">Create your first category</a></p>
       </div>
 
       <!-- Create/Edit Modal -->
@@ -182,26 +182,36 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
   `,
   styles: [`
     .categories-container {
-      padding: 20px;
+      padding: var(--spacing-lg);
+      background: var(--color-bg-base);
+      min-height: 100vh;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .header h2 {
+      margin: 0;
+      color: var(--color-text-base);
+      font-size: 24px;
+      font-weight: 600;
     }
 
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: var(--spacing-sm);
     }
 
     .table-container {
-      background: white;
-      border-radius: 8px;
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
       overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--color-border);
     }
 
     .categories-table {
@@ -210,35 +220,47 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
     }
 
     .categories-table th {
-      background: #f8f9fa;
-      padding: 15px;
+      background: var(--color-bg-base);
+      padding: var(--spacing-md);
       text-align: left;
       font-weight: 600;
-      border-bottom: 2px solid #dee2e6;
+      border-bottom: 2px solid var(--color-border);
+      color: var(--color-text-base);
     }
 
     .categories-table td {
-      padding: 15px;
-      border-bottom: 1px solid #dee2e6;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .categories-table tr:hover {
-      background: #f8f9fa;
+      background: rgba(59, 130, 246, 0.05);
     }
 
     .child-category {
-      background: #f8f9fa;
+      background: rgba(59, 130, 246, 0.05);
     }
 
     .action-buttons {
       display: flex;
-      gap: 8px;
+      gap: var(--spacing-sm);
     }
 
     .no-categories {
       text-align: center;
-      padding: 40px;
-      color: #6c757d;
+      padding: var(--spacing-2xl);
+      color: var(--color-text-secondary);
+    }
+
+    .no-categories a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .no-categories a:hover {
+      text-decoration: underline;
     }
 
     .modal-overlay {
@@ -255,103 +277,75 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
     }
 
     .modal-content {
-      background: white;
-      border-radius: 8px;
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
       width: 90%;
       max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-lg);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
-      border-bottom: 1px solid #ddd;
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--color-border);
     }
 
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
+    .modal-header h3 {
+      margin: 0;
+      color: var(--color-text-base);
     }
+
 
     .modal-body {
-      padding: 20px;
+      padding: var(--spacing-lg);
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: var(--spacing-lg);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: var(--spacing-xs);
       font-weight: 500;
+      color: var(--color-text-base);
     }
 
     .form-control {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
       font-size: 14px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
     }
 
     .error-message {
-      color: #dc3545;
+      color: var(--color-error);
       font-size: 12px;
-      margin-top: 5px;
+      margin-top: var(--spacing-xs);
     }
 
     .modal-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
-      padding: 20px;
-      border-top: 1px solid #ddd;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
     }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-sm {
-      padding: 4px 8px;
-      font-size: 12px;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
   `]
 })
 export class CategoriesComponent implements OnInit {

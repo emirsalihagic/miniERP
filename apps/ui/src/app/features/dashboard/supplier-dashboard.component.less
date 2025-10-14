@@ -1,17 +1,17 @@
 .supplier-dashboard {
-  padding: 24px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   min-height: 100vh;
   color: white;
 }
 
 .welcome-section {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: var(--spacing-xl);
   
   h1 {
     color: white;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-sm);
     font-size: 2.5rem;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
@@ -24,39 +24,47 @@
 }
 
 .stats-section {
-  margin-bottom: 32px;
+  margin-bottom: var(--spacing-xl);
   
   nz-card {
-    background: rgba(255,255,255,0.95);
+    background: var(--color-bg-container);
     backdrop-filter: blur(10px);
-    border: none;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    color: var(--color-text-base);
   }
 }
 
 .supplier-actions {
   nz-card {
-    background: rgba(255,255,255,0.95);
+    background: var(--color-bg-container);
     backdrop-filter: blur(10px);
-    border: none;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    color: var(--color-text-base);
   }
 }
 
 .action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+    margin: 0 auto;
+  }
   
   button {
-    width: 100%;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border-radius: 8px;
-    font-weight: 500;
+    justify-self: stretch;
+    min-height: 48px;
   }
 }
 
@@ -65,42 +73,42 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    margin: 8px 0;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border-left: 3px solid #f5576c;
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    background: var(--color-bg-base);
+    border-radius: var(--radius-base);
+    border-left: 3px solid var(--color-primary);
     
     .order-id {
       font-weight: 600;
-      color: #f5576c;
+      color: var(--color-primary);
     }
     
     .order-status {
-      padding: 4px 8px;
+      padding: 4px var(--spacing-sm);
       border-radius: 12px;
       font-size: 0.8rem;
       font-weight: 500;
       
       &.urgent {
-        background: #f8d7da;
-        color: #721c24;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--color-error);
       }
       
       &.normal {
-        background: #d1ecf1;
-        color: #0c5460;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--color-primary);
       }
       
       &.completed {
-        background: #d4edda;
-        color: #155724;
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--color-success);
       }
     }
     
     .order-amount {
       font-weight: 600;
-      color: #28a745;
+      color: var(--color-success);
     }
   }
 }
@@ -110,14 +118,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    margin: 8px 0;
-    background: #f8f9fa;
-    border-radius: 6px;
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    background: var(--color-bg-base);
+    border-radius: var(--radius-base);
     
     .metric-label {
       font-weight: 500;
-      color: #666;
+      color: var(--color-text-secondary);
     }
     
     .metric-value {
@@ -125,19 +133,19 @@
       font-size: 1.1rem;
       
       &.excellent {
-        color: #28a745;
+        color: var(--color-success);
       }
       
       &.good {
-        color: #17a2b8;
+        color: var(--color-primary);
       }
       
       &.warning {
-        color: #ffc107;
+        color: var(--color-warning);
       }
       
       &.danger {
-        color: #dc3545;
+        color: var(--color-error);
       }
     }
   }

@@ -326,11 +326,11 @@ import { NavigationService } from '../../../../core/services/navigation.service'
             <!-- Form Actions -->
             <div class="form-actions">
               <nz-space nzSize="middle">
-                <button nz-button nzType="primary" nzSize="large" [disabled]="!clientForm.valid" type="submit">
+                <button class="btn btn-primary" [disabled]="!clientForm.valid" type="submit">
                   <span nz-icon nzType="save"></span>
                   {{ isEditMode() ? 'Update Client' : 'Create Client' }}
                 </button>
-                <button nz-button nzSize="large" type="button" (click)="onCancel()">
+                <button class="btn btn-secondary" type="button" (click)="onCancel()">
                   <span nz-icon nzType="close"></span>
                   Cancel
                 </button>
@@ -343,19 +343,22 @@ import { NavigationService } from '../../../../core/services/navigation.service'
   `,
   styles: [`
     .client-form-container {
-      padding: 24px;
+      padding: var(--spacing-lg);
       min-height: 100vh;
-      background-color: #f5f5f5;
+      background-color: var(--color-bg-base);
     }
 
     .form-card {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
+      box-shadow: var(--shadow-card);
+      border-radius: var(--radius-base);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-container);
     }
 
     .section-card {
-      margin-bottom: 16px;
-      background-color: #fafafa;
+      margin-bottom: var(--spacing-md);
+      background-color: var(--color-bg-container);
+      border: 1px solid var(--color-border);
     }
 
     .section-card:last-child {
@@ -363,30 +366,31 @@ import { NavigationService } from '../../../../core/services/navigation.service'
     }
 
     .form-actions {
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid #f0f0f0;
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
       text-align: center;
     }
 
     .tags-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: var(--spacing-sm);
       align-items: center;
     }
 
     .tag-input {
       width: 200px;
-      margin-left: 8px;
+      margin-left: var(--spacing-sm);
     }
 
     nz-form-item {
-      margin-bottom: 16px;
+      margin-bottom: var(--spacing-md);
     }
 
     nz-form-label {
       font-weight: 500;
+      color: var(--color-text-base);
     }
   `]
 })

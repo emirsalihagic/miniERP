@@ -85,24 +85,21 @@
           
           <div class="submit-actions">
             <button 
-              nz-button 
-              nzType="default" 
+              type="button"
+              class="btn btn-secondary back-btn"
               routerLink="/shop/cart"
-              class="back-btn"
             >
               <span nz-icon nzType="arrow-left"></span>
               Back to Cart
             </button>
             
             <button 
-              nz-button 
-              nzType="primary" 
-              nzSize="large"
+              type="button"
+              class="btn btn-lg btn-primary submit-btn"
               (click)="submitOrder()"
-              [nzLoading]="submitting"
-              [disabled]="!canSubmitOrder()"
-              class="submit-btn"
+              [disabled]="!canSubmitOrder() || submitting"
             >
+              <span *ngIf="submitting" class="spinner"></span>
               <span nz-icon nzType="check"></span>
               Submit Order
             </button>
@@ -119,7 +116,7 @@
         nzNotFoundFooter="Add items to your cart before checkout"
       >
         <ng-container nzExtra>
-          <button nz-button nzType="primary" routerLink="/shop">
+          <button type="button" class="btn btn-primary" routerLink="/shop">
             <span nz-icon nzType="shopping"></span>
             Browse Products
           </button>

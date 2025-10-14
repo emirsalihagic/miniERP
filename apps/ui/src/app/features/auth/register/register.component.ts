@@ -144,13 +144,11 @@ import { AuthService } from '../../../core/services/auth.service';
           <nz-form-item>
             <nz-form-control>
               <button
-                nz-button
-                nzType="primary"
-                nzBlock
-                [nzLoading]="isLoading"
-                [disabled]="!registerForm.valid"
                 type="submit"
+                class="btn btn-primary"
+                [disabled]="!registerForm.valid || isLoading"
               >
+                <span *ngIf="isLoading" class="spinner"></span>
                 Create Account
               </button>
             </nz-form-control>

@@ -1,53 +1,57 @@
 .shop-catalog {
-  padding: 24px;
-  background-color: #f0f2f5;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-base);
   min-height: calc(100vh - 64px);
 
   .catalog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
 
     h1 {
       font-size: 28px;
       font-weight: 700;
       margin: 0;
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .cart-info {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: var(--spacing-md);
     }
   }
 
   .filters-section {
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
   }
 
   .products-section {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-lg);
 
     .product-card {
       height: 100%;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
-      transition: all 0.3s ease;
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-card);
+      transition: all var(--transition-base);
       display: flex;
       flex-direction: column;
+      background: var(--color-bg-container);
+      border: 1px solid var(--color-border);
 
       &:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: var(--shadow-lg);
         transform: translateY(-2px);
       }
 
@@ -72,8 +76,8 @@
         .product-name {
           font-size: 16px;
           font-weight: 600;
-          margin-bottom: 8px;
-          color: #333;
+          margin-bottom: var(--spacing-sm);
+          color: var(--color-text-base);
           line-height: 1.4;
           height: 44px;
           overflow: hidden;
@@ -84,12 +88,12 @@
 
         .product-sku {
           font-size: 12px;
-          color: #666;
-          margin-bottom: 12px;
+          color: var(--color-text-secondary);
+          margin-bottom: var(--spacing-sm);
           font-family: 'Courier New', monospace;
-          background-color: #f5f5f5;
+          background-color: rgba(59, 130, 246, 0.05);
           padding: 2px 6px;
-          border-radius: 3px;
+          border-radius: var(--radius-sm);
           display: inline-block;
         }
 
@@ -110,14 +114,14 @@
 
             .supplier-label,
             .unit-label {
-              color: #666;
+              color: var(--color-text-secondary);
               font-weight: 500;
               min-width: 60px;
             }
 
             .supplier-name,
             .unit-name {
-              color: #333;
+              color: var(--color-text-base);
               flex: 1;
             }
           }
@@ -135,13 +139,13 @@
             gap: 4px;
 
             .attr-name {
-              color: #666;
+              color: var(--color-text-secondary);
               font-weight: 500;
               min-width: 80px;
             }
 
             .attr-value {
-              color: #333;
+              color: var(--color-text-base);
               flex: 1;
             }
           }
@@ -149,12 +153,12 @@
       }
 
       .product-footer {
-        border-top: 1px solid #f0f0f0;
-        padding-top: 16px;
+        border-top: 1px solid var(--color-border);
+        padding-top: var(--spacing-md);
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--spacing-md);
 
         .product-price {
           flex: 1;
@@ -162,7 +166,7 @@
           
           .price-label {
             font-size: 12px;
-            color: #666;
+            color: var(--color-text-secondary);
             margin-right: 4px;
             display: block;
             margin-bottom: 4px;
@@ -171,13 +175,13 @@
           .price-value {
             font-size: 18px;
             font-weight: 700;
-            color: #1890ff;
+            color: var(--color-primary);
             display: block;
             
             .vat-label {
               font-size: 12px;
               font-weight: 400;
-              color: #999;
+              color: var(--color-text-secondary);
               margin-left: 4px;
             }
           }
@@ -186,7 +190,7 @@
             display: flex;
             align-items: center;
             font-size: 14px;
-            color: #999;
+            color: var(--color-text-secondary);
           }
         }
 
@@ -214,19 +218,22 @@
   }
 
   .empty-state {
-    background-color: #fff;
-    padding: 48px 24px;
-    border-radius: 8px;
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    border-radius: var(--radius-base);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-base);
   }
 
   .pagination-section {
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 8px;
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-base);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
   }
 }
 

@@ -272,12 +272,6 @@ import { UnitsService, Unit, CreateUnitDto } from '../../services/units.service'
       border-bottom: 1px solid #ddd;
     }
 
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-    }
 
     .modal-body {
       padding: 20px;
@@ -321,38 +315,6 @@ import { UnitsService, Unit, CreateUnitDto } from '../../services/units.service'
       border-top: 1px solid #ddd;
     }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-sm {
-      padding: 4px 8px;
-      font-size: 12px;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
   `]
 })
 export class UnitsListComponent implements OnInit {

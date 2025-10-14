@@ -1,29 +1,30 @@
 .orders-management-container {
-  padding: 24px;
-  background-color: #f0f2f5;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-base);
   min-height: calc(100vh - 64px);
 
   .filters-section {
-    background-color: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
 
     .filter-row {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: var(--spacing-md);
       flex-wrap: wrap;
 
       .filter-item {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--spacing-sm);
 
         label {
           font-weight: 500;
-          color: #333;
+          color: var(--color-text-base);
           white-space: nowrap;
         }
       }
@@ -31,26 +32,35 @@
   }
 
   .table-section {
-    background-color: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
 
     nz-table {
       .ant-table-thead > tr > th {
-        background-color: #fafafa;
+        background-color: var(--color-bg-container);
         font-weight: 600;
-        color: #333;
+        color: var(--color-text-base);
+        border-bottom: 1px solid var(--color-border);
       }
 
       .ant-table-tbody > tr > td {
         font-size: 14px;
         vertical-align: middle;
+        background: var(--color-bg-container);
+        color: var(--color-text-base);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background: rgba(59, 130, 246, 0.05);
       }
 
       .action-buttons {
         display: flex;
-        gap: 8px;
+        gap: var(--spacing-sm);
         flex-wrap: wrap;
 
         button {
@@ -61,18 +71,20 @@
       }
 
       .no-invoice {
-        color: #999;
+        color: var(--color-text-secondary);
         font-style: italic;
       }
     }
   }
 
   .empty-state {
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
     text-align: center;
+    color: var(--color-text-base);
   }
 }
 

@@ -55,9 +55,6 @@ import { PermissionService, MenuPermission } from '../../core/services/permissio
         </div>
 
         <div class="actions">
-          <button nz-button nzType="primary" (click)="refreshPermissions()">
-            Refresh Permissions
-          </button>
         </div>
       </nz-card>
     </div>
@@ -157,9 +154,6 @@ export class PermissionTestComponent implements OnInit {
     }
   }
 
-  refreshPermissions(): void {
-    this.loadUserAndPermissions();
-  }
 
   getRoleColor(role: string | undefined): string {
     switch (role) {

@@ -243,7 +243,8 @@ import { ThemeService } from '../../core/services/theme.service';
               <!-- Actions -->
               <div class="setting-section">
                 <div class="actions">
-                  <button nz-button (click)="resetToDefaults()" [nzLoading]="resetting">
+                  <button type="button" class="btn btn-danger" (click)="resetToDefaults()" [disabled]="resetting">
+                    <span *ngIf="resetting" class="spinner"></span>
                     <span nz-icon nzType="reload"></span>
                     Reset to Defaults
                   </button>
@@ -375,6 +376,38 @@ import { ThemeService } from '../../core/services/theme.service';
       
       .actions {
         flex-direction: column;
+      }
+    }
+
+    // Dark theme overrides
+    :host-context(.dark) {
+      .settings-container {
+        background: var(--color-bg-base);
+      }
+      
+      .settings-card {
+        background: var(--color-bg-container);
+        border-color: var(--color-border);
+      }
+      
+      .section-title {
+        color: var(--color-text-base);
+        
+        span[nz-icon] {
+          color: var(--color-primary);
+        }
+      }
+      
+      .setting-item {
+        border-color: var(--color-border);
+      }
+      
+      .setting-label {
+        color: var(--color-text-base);
+      }
+      
+      .setting-description {
+        color: var(--color-text-secondary);
       }
     }
   `]

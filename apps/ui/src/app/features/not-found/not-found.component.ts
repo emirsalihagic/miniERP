@@ -23,10 +23,10 @@ import { NavigationService } from '../../core/services/navigation.service';
         [nzExtra]="extraTemplate"
       >
         <ng-template #extraTemplate>
-          <button nz-button nzType="primary" (click)="goHome()">
+          <button type="button" class="btn btn-primary" (click)="goHome()">
             Back Home
           </button>
-          <button nz-button nzType="default" (click)="goBack()" style="margin-left: 8px;">
+          <button type="button" class="btn btn-secondary" (click)="goBack()" style="margin-left: 8px;">
             Go Back
           </button>
         </ng-template>

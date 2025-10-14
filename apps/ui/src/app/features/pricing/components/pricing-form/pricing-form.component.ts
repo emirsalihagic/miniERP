@@ -203,47 +203,50 @@ import { NavigationService } from '../../../../core/services/navigation.service'
   `,
   styles: [`
     .pricing-form-container {
-      padding: 2rem;
+      padding: var(--spacing-lg);
       max-width: 800px;
       margin: 0 auto;
+      background-color: var(--color-bg-base);
+      min-height: calc(100vh - 64px);
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-lg);
     }
 
     .header h1 {
       margin: 0;
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .pricing-form {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 2rem;
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-card);
+      padding: var(--spacing-lg);
+      border: 1px solid var(--color-border);
     }
 
     .form-section {
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-lg);
     }
 
     .form-section h2 {
-      margin: 0 0 1.5rem 0;
-      color: #555;
+      margin: 0 0 var(--spacing-md) 0;
+      color: var(--color-text-base);
       font-size: 1.25rem;
-      border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: var(--spacing-sm);
     }
 
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
     }
 
     .form-group {
@@ -252,89 +255,55 @@ import { NavigationService } from '../../../../core/services/navigation.service'
     }
 
     .form-group label {
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--spacing-sm);
       font-weight: 500;
-      color: #555;
+      color: var(--color-text-base);
     }
 
     .form-input,
     .form-select {
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
       font-size: 1rem;
-      transition: border-color 0.2s;
+      transition: border-color var(--transition-base);
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .form-input:focus,
     .form-select:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
     }
 
     .form-input.error,
     .form-select.error {
-      border-color: #dc3545;
+      border-color: var(--color-error);
     }
 
     .form-help {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
 
     .error-message {
-      color: #dc3545;
+      color: var(--color-error);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
 
     .form-actions {
       display: flex;
-      gap: 1rem;
+      gap: var(--spacing-md);
       justify-content: flex-end;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
+      padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border);
     }
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
 
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #0056b3;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #007bff;
-      border: 1px solid #007bff;
-    }
-
-    .btn-outline:hover {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .spinner {
       width: 1rem;
@@ -351,12 +320,12 @@ import { NavigationService } from '../../../../core/services/navigation.service'
     }
 
     .error-banner {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-top: 1rem;
-      border: 1px solid #f5c6cb;
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--color-error);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-sm);
+      margin-top: var(--spacing-md);
+      border: 1px solid var(--color-error);
     }
 
     @media (max-width: 768px) {

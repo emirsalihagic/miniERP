@@ -1,48 +1,81 @@
 .user-form-container {
-  padding: 24px;
-  background: #f5f5f5;
+  padding: var(--spacing-lg);
+  background: var(--color-bg-base);
   min-height: 100vh;
 
   .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding: 16px 24px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-bg-container);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
 
     h1 {
       margin: 0;
-      color: #262626;
+      color: var(--color-text-base);
       font-size: 24px;
       font-weight: 600;
     }
   }
 
   nz-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    background: var(--color-bg-container);
+    border: 1px solid var(--color-border);
 
     nz-form {
       .ant-form-item {
-        margin-bottom: 24px;
+        margin-bottom: var(--spacing-lg);
       }
 
       .ant-form-item-label {
         font-weight: 500;
+        color: var(--color-text-base);
       }
 
       .ant-input,
       .ant-select-selector {
-        border-radius: 6px;
+        border-radius: var(--radius-base);
+        background: var(--color-bg-container);
+        border-color: var(--color-border);
+        color: var(--color-text-base);
+        
+        &:focus {
+          border-color: var(--color-primary);
+        }
       }
 
       .ant-btn {
-        border-radius: 6px;
+        border-radius: var(--radius-base);
         height: 40px;
         font-weight: 500;
+      }
+
+      .cancel-btn {
+        margin-left: var(--spacing-sm);
+      }
+
+      .ant-checkbox-wrapper {
+        color: var(--color-text-base);
+      }
+
+      .ant-checkbox {
+        .ant-checkbox-inner {
+          background: var(--color-bg-container);
+          border-color: var(--color-border);
+        }
+
+        &.ant-checkbox-checked {
+          .ant-checkbox-inner {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+          }
+        }
       }
     }
   }

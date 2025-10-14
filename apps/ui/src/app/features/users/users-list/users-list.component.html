@@ -1,7 +1,7 @@
 <div class="users-list-container">
   <div class="page-header">
     <h1>Users Management</h1>
-    <button nz-button nzType="primary" (click)="createUser()">
+    <button type="button" class="btn btn-primary" (click)="createUser()">
       <span nz-icon nzType="plus"></span>
       Create User
     </button>
@@ -52,11 +52,11 @@
           <td>{{ user.createdAt | date:'short' }}</td>
           <td>
             <nz-space>
-              <button *nzSpaceItem nz-button nzType="link" nzSize="small" (click)="editUser(user)">
+              <button *nzSpaceItem type="button" class="btn btn-sm btn-outline" (click)="editUser(user)">
                 <span nz-icon nzType="edit"></span>
                 Edit
               </button>
-              <button *nzSpaceItem nz-button nzType="link" nzSize="small" nzDanger (click)="deleteUser(user)">
+              <button *nzSpaceItem type="button" class="btn btn-sm btn-danger" (click)="deleteUser(user)">
                 <span nz-icon nzType="delete"></span>
                 Delete
               </button>

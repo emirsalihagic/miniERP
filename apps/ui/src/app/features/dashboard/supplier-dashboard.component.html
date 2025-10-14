@@ -61,17 +61,29 @@
     <div nz-col nzXs="24" nzSm="12" nzMd="8">
       <nz-card nzTitle="Quick Actions" nzSize="small">
         <div class="action-buttons">
-          <button nz-button nzType="primary" nzSize="large" routerLink="/products/new">
+          <button class="btn btn-lg btn-primary" routerLink="/products/new">
             <span nz-icon nzType="plus"></span>
             Add Product
           </button>
-          <button nz-button nzSize="large" routerLink="/products">
+          <button class="btn btn-lg btn-primary" routerLink="/products">
             <span nz-icon nzType="shopping"></span>
             Manage Products
           </button>
-          <button nz-button nzSize="large" routerLink="/suppliers">
+          <button class="btn btn-lg btn-primary" routerLink="/suppliers">
             <span nz-icon nzType="shop"></span>
             View Profile
+          </button>
+          <button class="btn btn-lg btn-secondary" routerLink="/orders">
+            <span nz-icon nzType="file-done"></span>
+            Order Management
+          </button>
+          <button class="btn btn-lg btn-secondary" routerLink="/pricing">
+            <span nz-icon nzType="dollar-circle"></span>
+            Pricing Management
+          </button>
+          <button class="btn btn-lg btn-secondary" routerLink="/invoices">
+            <span nz-icon nzType="file-text"></span>
+            Invoice Center
           </button>
         </div>
       </nz-card>

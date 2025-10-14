@@ -68,17 +68,29 @@
       </div>
       <div class="card-content">
         <div class="action-buttons">
-          <button nz-button nzType="primary" nzSize="large" routerLink="/orders/new" class="action-btn">
-            <span nz-icon nzType="shopping-cart"></span>
-            Create Order
+          <button type="button" class="btn btn-lg btn-primary" routerLink="/orders/new">
+            <span nz-icon nzType="plus"></span>
+            Create New Order
           </button>
-          <button nz-button nzSize="large" routerLink="/orders" class="action-btn">
+          <button type="button" class="btn btn-lg btn-primary" routerLink="/orders">
             <span nz-icon nzType="file-text"></span>
-            View Orders
+            Order Management
           </button>
-          <button nz-button nzSize="large" routerLink="/cart" class="action-btn">
+          <button type="button" class="btn btn-lg btn-primary" routerLink="/invoices">
+            <span nz-icon nzType="file-done"></span>
+            Invoice Center
+          </button>
+          <button type="button" class="btn btn-lg btn-secondary" routerLink="/cart">
             <span nz-icon nzType="shopping-cart"></span>
-            Cart
+            Shopping Cart
+          </button>
+          <button type="button" class="btn btn-lg btn-secondary" routerLink="/shop">
+            <span nz-icon nzType="shop"></span>
+            Product Catalog
+          </button>
+          <button type="button" class="btn btn-lg btn-secondary" routerLink="/profile">
+            <span nz-icon nzType="user"></span>
+            Account Settings
           </button>
         </div>
       </div>

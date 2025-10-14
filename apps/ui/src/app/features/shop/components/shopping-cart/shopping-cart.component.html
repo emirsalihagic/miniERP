@@ -3,21 +3,19 @@
     <h1>Shopping Cart</h1>
     <div class="cart-actions">
       <button 
-        nz-button 
-        nzType="default" 
-        nzDanger
+        type="button"
+        class="btn btn-danger"
         (click)="clearCart()"
-        [nzLoading]="updating"
-        [disabled]="!cart || cart.items.length === 0"
+        [disabled]="!cart || cart.items.length === 0 || updating"
       >
+        <span *ngIf="updating" class="spinner"></span>
         <span nz-icon nzType="delete"></span>
         Clear Cart
       </button>
       <button 
-        nz-button 
-        nzType="default"
+        type="button"
+        class="btn btn-secondary continue-shopping-btn"
         routerLink="/shop"
-        class="continue-shopping-btn"
       >
         <span nz-icon nzType="shopping"></span>
         Continue Shopping
@@ -108,13 +106,12 @@
               </td>
               <td>
                 <button 
-                  nz-button 
-                  nzType="text" 
-                  nzDanger
-                  nzSize="small"
+                  type="button"
+                  class="btn btn-sm btn-danger"
                   (click)="removeItem(item)"
-                  [nzLoading]="updating"
+                  [disabled]="updating"
                 >
+                  <span *ngIf="updating" class="spinner"></span>
                   <span nz-icon nzType="delete"></span>
                 </button>
               </td>
@@ -157,12 +154,10 @@
           
           <div class="checkout-actions">
             <button 
-              nz-button 
-              nzType="primary" 
-              nzSize="large"
+              type="button"
+              class="btn btn-lg btn-primary checkout-btn"
               routerLink="/shop/checkout"
               [disabled]="!canProceedToCheckout()"
-              class="checkout-btn"
             >
               <span nz-icon nzType="credit-card"></span>
               Proceed to Checkout
@@ -180,7 +175,7 @@
         nzNotFoundFooter="Start shopping to add items to your cart"
       >
         <ng-container nzExtra>
-          <button nz-button nzType="primary" routerLink="/shop">
+          <button type="button" class="btn btn-primary" routerLink="/shop">
             <span nz-icon nzType="shopping"></span>
             Browse Products
           </button>

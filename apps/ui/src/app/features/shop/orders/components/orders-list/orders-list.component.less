@@ -1,45 +1,46 @@
 .orders-list {
-  padding: 24px;
-  background-color: #f0f2f5;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-base);
   min-height: calc(100vh - 64px);
 
   .orders-header {
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
 
     h1 {
       font-size: 28px;
       font-weight: 700;
-      margin: 0 0 8px 0;
-      color: #333;
+      margin: 0 0 var(--spacing-sm) 0;
+      color: var(--color-text-base);
     }
 
     p {
       font-size: 16px;
-      color: #666;
+      color: var(--color-text-secondary);
       margin: 0;
     }
   }
 
   .filters-section {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-lg);
 
     .filter-controls {
       display: flex;
-      gap: 24px;
+      gap: var(--spacing-lg);
       align-items: center;
 
       .filter-item {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--spacing-sm);
 
         label {
           font-weight: 500;
-          color: #333;
+          color: var(--color-text-base);
           white-space: nowrap;
         }
       }
@@ -47,30 +48,30 @@
   }
 
   .orders-content {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-lg);
 
     .order-number {
       .number {
         font-weight: 600;
-        color: #1890ff;
+        color: var(--color-primary);
         font-family: monospace;
       }
     }
 
     .order-date {
       font-size: 14px;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .order-total {
       font-weight: 600;
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .invoice-info {
       .invoice-number {
         font-size: 12px;
-        color: #1890ff;
+        color: var(--color-primary);
         font-family: monospace;
         margin-bottom: 4px;
       }
@@ -78,27 +79,29 @@
 
     .no-invoice {
       font-size: 12px;
-      color: #999;
+      color: var(--color-text-secondary);
       font-style: italic;
     }
 
     .order-actions {
       display: flex;
-      gap: 8px;
+      gap: var(--spacing-sm);
     }
 
     .empty-orders {
-      padding: 48px 24px;
+      padding: var(--spacing-2xl) var(--spacing-lg);
       text-align: center;
+      color: var(--color-text-base);
     }
   }
 
   .pagination-section {
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 8px;
+    background-color: var(--color-bg-container);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-base);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
   }
 }
 

@@ -31,23 +31,11 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
           <div class="header-actions">
             <button 
               *ngIf="canCreateInvoice" 
-              nz-button 
-              nzType="primary" 
-              nzSize="large"
+              class="btn btn-primary"
               routerLink="/invoices/new"
-              class="action-btn"
             >
               <span nz-icon nzType="plus"></span>
               Create Invoice
-            </button>
-            <button 
-              nz-button 
-              nzSize="large" 
-              (click)="loadInvoices()"
-              class="action-btn"
-            >
-              <span nz-icon nzType="reload"></span>
-              Refresh
             </button>
           </div>
         </div>
@@ -161,38 +149,25 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
                     <td>
                       <div class="action-buttons">
                         <button 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
+                          class="btn btn-sm btn-secondary"
                           nz-tooltip="View Details"
                           [routerLink]="['/invoices', invoice.id]"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="eye"></span>
                         </button>
                         <button 
                           *ngIf="canManageInvoices && invoice.status === 'QUOTE'" 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
+                          class="btn btn-sm btn-danger"
                           nz-tooltip="Issue Invoice"
-                          nzDanger
                           (click)="issueInvoice(invoice.id)"
-                          [nzLoading]="loading"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="check-circle"></span>
                         </button>
                         <button 
                           *ngIf="canManageInvoices && invoice.status === 'ISSUED'" 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
+                          class="btn btn-sm btn-success"
                           nz-tooltip="Mark as Paid"
-                          nzDanger
                           (click)="markAsPaid(invoice.id)"
-                          [nzLoading]="loading"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="dollar"></span>
                         </button>
@@ -208,8 +183,7 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
                 <div class="empty-actions">
                   <button 
                     *ngIf="canCreateInvoice" 
-                    nz-button 
-                    nzType="primary" 
+                    class="btn btn-primary"
                     routerLink="/invoices/new"
                   >
                     <span nz-icon nzType="plus"></span>
@@ -274,19 +248,6 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
           display: flex;
           gap: var(--spacing-sm);
           flex-shrink: 0;
-          
-          .action-btn {
-            height: 48px;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            border-radius: var(--radius-base);
-            transition: all var(--transition-base);
-            
-            &:hover {
-              transform: translateY(-1px);
-            }
-          }
         }
       }
     }
@@ -520,21 +481,6 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
               .action-buttons {
                 display: flex;
                 gap: var(--spacing-xs);
-                
-                .action-btn {
-                  color: var(--color-text-base);
-                  transition: all var(--transition-base);
-                  
-                  &:hover {
-                    color: var(--color-primary);
-                    background: rgba(37, 99, 235, 0.1);
-                  }
-                  
-                  &.ant-btn-dangerous:hover {
-                    color: var(--color-error);
-                    background: rgba(220, 38, 38, 0.1);
-                  }
-                }
               }
             }
           }

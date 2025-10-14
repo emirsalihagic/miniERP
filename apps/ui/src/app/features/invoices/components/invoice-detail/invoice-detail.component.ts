@@ -579,66 +579,6 @@ import { UserRole } from '../../../../shared/interfaces/user.interface';
       padding-top: 1rem;
     }
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #0056b3;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #007bff;
-      border: 1px solid #007bff;
-    }
-
-    .btn-outline:hover {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-success {
-      background: #28a745;
-      color: white;
-    }
-
-    .btn-success:hover:not(:disabled) {
-      background: #1e7e34;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background: #c82333;
-    }
-
-    .btn-sm {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .loading {
       text-align: center;

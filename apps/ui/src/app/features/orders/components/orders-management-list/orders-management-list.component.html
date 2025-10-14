@@ -25,14 +25,14 @@
         </div>
         
         <div class="filter-item">
-          <button nz-button nzType="primary" (click)="onSearch()">
+          <button type="button" class="btn btn-primary" (click)="onSearch()">
             <span nz-icon nzType="search"></span>
             Search
           </button>
         </div>
         
         <div class="filter-item">
-          <button nz-button (click)="clearFilters()">
+          <button type="button" class="btn btn-secondary" (click)="clearFilters()">
             <span nz-icon nzType="clear"></span>
             Clear Filters
           </button>
@@ -89,9 +89,8 @@
             <td>
               <div class="action-buttons">
                 <button
-                  nz-button
-                  nzType="primary"
-                  nzSize="small"
+                  type="button"
+                  class="btn btn-sm btn-primary"
                   *ngIf="canShipOrder(order)"
                   (click)="shipOrder(order)">
                   <span nz-icon nzType="car"></span>
@@ -99,9 +98,8 @@
                 </button>
                 
                 <button
-                  nz-button
-                  nzType="default"
-                  nzSize="small"
+                  type="button"
+                  class="btn btn-sm btn-success"
                   *ngIf="canMarkDelivered(order)"
                   (click)="markDelivered(order)">
                   <span nz-icon nzType="check"></span>
@@ -109,8 +107,8 @@
                 </button>
                 
                 <button
-                  nz-button
-                  nzSize="small"
+                  type="button"
+                  class="btn btn-sm btn-outline"
                   [routerLink]="['/orders', order.id]">
                   <span nz-icon nzType="eye"></span>
                   View

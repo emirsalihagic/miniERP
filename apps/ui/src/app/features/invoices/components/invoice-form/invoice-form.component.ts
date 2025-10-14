@@ -183,43 +183,6 @@ import { NavigationService } from '../../../../core/services/navigation.service'
       border-top: 1px solid #eee;
     }
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #0056b3;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #007bff;
-      border: 1px solid #007bff;
-    }
-
-    .btn-outline:hover {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .spinner {
       width: 1rem;

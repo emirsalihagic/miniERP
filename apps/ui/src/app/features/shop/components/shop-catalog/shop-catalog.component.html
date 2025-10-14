@@ -4,7 +4,7 @@
     <h1>Shop Products</h1>
     <div class="cart-info">
       <nz-badge [nzCount]="cartItemCount" [nzShowZero]="false">
-        <button nz-button nzType="primary" routerLink="/shop/cart">
+        <button type="button" class="btn btn-primary" routerLink="/shop/cart">
           <span nz-icon nzType="shopping-cart"></span>
           Cart
         </button>
@@ -136,11 +136,9 @@
                   ></nz-input-number>
                 </div>
                 <button 
-                  nz-button 
-                  nzType="primary" 
-                  nzSize="small"
+                  type="button"
+                  class="btn btn-sm btn-primary add-to-cart-btn"
                   (click)="addToCart(groupedProduct)"
-                  class="add-to-cart-btn"
                   [disabled]="!productQuantities[groupedProduct.selectedVariant.id] || productQuantities[groupedProduct.selectedVariant.id] <= 0 || isPriceLoading(groupedProduct.selectedVariant.id)"
                 >
                   <span nz-icon nzType="plus"></span>

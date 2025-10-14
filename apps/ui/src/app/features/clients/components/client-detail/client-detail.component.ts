@@ -62,11 +62,11 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
               </div>
               <div class="client-actions">
                 <nz-space nzSize="middle">
-                  <button nz-button nzType="primary" (click)="editClient()">
+                  <button type="button" class="btn btn-primary" (click)="editClient()">
                     <span nz-icon nzType="edit"></span>
                     Edit Client
                   </button>
-                  <button nz-button (click)="goBack()">
+                  <button type="button" class="btn btn-secondary" (click)="goBack()">
                     <span nz-icon nzType="arrow-left"></span>
                     Back to List
                   </button>
@@ -306,9 +306,9 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
   `,
   styles: [`
     .client-detail-container {
-      padding: 24px;
+      padding: var(--spacing-lg);
       min-height: 100vh;
-      background-color: #f5f5f5;
+      background-color: var(--color-bg-base);
     }
 
     .client-detail {
@@ -317,8 +317,9 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
     }
 
     .header-card {
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: var(--spacing-md);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--color-border);
     }
 
     .client-header {
@@ -328,70 +329,75 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
     }
 
     .client-name {
-      margin: 0 0 8px 0;
+      margin: 0 0 var(--spacing-sm) 0;
       font-size: 28px;
       font-weight: 600;
-      color: #262626;
+      color: var(--color-text-base);
     }
 
     .client-meta {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--spacing-sm);
     }
 
     .client-code {
-      color: #8c8c8c;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
     .summary-row {
-      margin-bottom: 16px;
+      margin-bottom: var(--spacing-md);
     }
 
     .summary-card {
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--color-border);
     }
 
     .summary-item {
-      padding: 16px 0;
+      padding: var(--spacing-md) 0;
     }
 
     .summary-value {
       font-size: 24px;
       font-weight: 600;
-      color: #1890ff;
+      color: var(--color-primary);
       margin-bottom: 4px;
     }
 
     .summary-label {
       font-size: 14px;
-      color: #8c8c8c;
+      color: var(--color-text-secondary);
     }
 
     .details-card {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--color-border);
     }
 
     .tab-content {
-      padding: 16px 0;
+      padding: var(--spacing-md) 0;
     }
 
     .text-muted {
-      color: #8c8c8c;
+      color: var(--color-text-secondary);
     }
 
     .notes-content {
       min-height: 60px;
-      padding: 8px;
-      background-color: #fafafa;
-      border-radius: 4px;
+      padding: var(--spacing-sm);
+      background-color: rgba(59, 130, 246, 0.05);
+      border-radius: var(--radius-sm);
       white-space: pre-wrap;
+      color: var(--color-text-base);
     }
 
     nz-card {
-      margin-bottom: 16px;
+      margin-bottom: var(--spacing-md);
+      background: var(--color-bg-container);
+      border: 1px solid var(--color-border);
     }
 
     nz-card:last-child {
@@ -400,14 +406,14 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
 
     /* Field list styling */
     .field-list {
-      padding: 16px 0;
+      padding: var(--spacing-md) 0;
     }
 
     .field-item {
       display: flex;
-      margin-bottom: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: var(--spacing-sm);
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .field-item:last-child {
@@ -417,20 +423,20 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/currency.pipe';
 
     .field-label {
       font-weight: 600;
-      color: #262626;
+      color: var(--color-text-base);
       min-width: 140px;
-      margin-right: 16px;
+      margin-right: var(--spacing-md);
       flex-shrink: 0;
     }
 
     .field-value {
-      color: #595959;
+      color: var(--color-text-secondary);
       flex: 1;
       word-break: break-word;
     }
 
     .field-value a {
-      color: #1890ff;
+      color: var(--color-primary);
       text-decoration: none;
     }
 

@@ -16,15 +16,15 @@
       <!-- SSO Section -->
       <div class="sso-section">
         <div class="sso-buttons">
-          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('okta')">
+          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('okta')">
             <span nz-icon nzType="safety-certificate" class="sso-icon"></span>
             Okta
           </button>
-          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('azure')">
+          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('azure')">
             <span nz-icon nzType="cloud" class="sso-icon"></span>
             Azure AD
           </button>
-          <button nz-button nzType="default" nzSize="large" class="sso-button" (click)="onSSOLogin('google')">
+          <button type="button" class="btn btn-lg btn-outline sso-button" (click)="onSSOLogin('google')">
             <span nz-icon nzType="google" class="sso-icon"></span>
             Google
           </button>
@@ -106,10 +106,10 @@
 
         <!-- Submit Button -->
         <button 
-          nz-button 
-          nzType="primary" 
-          nzSize="large" 
-          nzBlock
+          type="submit"
+          class="btn btn-lg btn-primary login-primary"
+          [disabled]="loginForm.invalid || isLoading"
+        >
           [nzLoading]="isLoading"
           [disabled]="!loginForm.valid"
           type="submit"

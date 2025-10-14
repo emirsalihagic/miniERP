@@ -62,7 +62,7 @@ import { AttributesService, Attribute, CreateAttributeDto, AttributeOption } fro
       </div>
 
       <div *ngIf="attributes.length === 0" class="no-attributes">
-        <p>No attributes found. <a href="#" (click)="openCreateModal()">Create your first attribute</a></p>
+        <p>No attributes found. <a href="#" (click)="openCreateModal(); $event.preventDefault()">Create your first attribute</a></p>
       </div>
 
       <!-- Create/Edit Modal -->
@@ -182,85 +182,134 @@ import { AttributesService, Attribute, CreateAttributeDto, AttributeOption } fro
   `,
   styles: [`
     .attributes-container {
-      padding: 20px;
+      padding: var(--spacing-lg);
+      background: var(--color-bg-base);
+      min-height: 100vh;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .header h2 {
+      margin: 0;
+      color: var(--color-text-base);
+      font-size: 24px;
+      font-weight: 600;
     }
 
     .attributes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
+      gap: var(--spacing-lg);
     }
 
     .attribute-card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      padding: var(--spacing-lg);
+      background: var(--color-bg-container);
+      box-shadow: var(--shadow-card);
     }
 
     .attribute-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .attribute-header h3 {
+      margin: 0;
+      color: var(--color-text-base);
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .attribute-actions {
       display: flex;
-      gap: 8px;
+      gap: var(--spacing-sm);
     }
 
     .attribute-details p {
-      margin: 8px 0;
+      margin: var(--spacing-sm) 0;
+      color: var(--color-text-base);
+    }
+
+    .attribute-details strong {
+      color: var(--color-text-base);
     }
 
     .type-tag {
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 2px var(--spacing-sm);
+      border-radius: var(--radius-sm);
       font-size: 12px;
       font-weight: bold;
     }
 
-    .type-text { background: #e3f2fd; color: #1976d2; }
-    .type-number { background: #e8f5e8; color: #388e3c; }
-    .type-decimal { background: #fff3e0; color: #f57c00; }
-    .type-boolean { background: #f3e5f5; color: #7b1fa2; }
-    .type-date { background: #fce4ec; color: #c2185b; }
-    .type-enum { background: #e0f2f1; color: #00695c; }
+    .type-text { 
+      background: rgba(59, 130, 246, 0.1); 
+      color: var(--color-primary); 
+    }
+    .type-number { 
+      background: rgba(34, 197, 94, 0.1); 
+      color: var(--color-success); 
+    }
+    .type-decimal { 
+      background: rgba(245, 158, 11, 0.1); 
+      color: var(--color-warning); 
+    }
+    .type-boolean { 
+      background: rgba(147, 51, 234, 0.1); 
+      color: #9333EA; 
+    }
+    .type-date { 
+      background: rgba(248, 113, 113, 0.1); 
+      color: var(--color-error); 
+    }
+    .type-enum { 
+      background: rgba(6, 182, 212, 0.1); 
+      color: #06B6D4; 
+    }
 
     .options-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
     }
 
     .option-tag {
-      background: #e9ecef;
-      color: #495057;
-      padding: 4px 8px;
-      border-radius: 4px;
+      background: var(--color-bg-base);
+      color: var(--color-text-secondary);
+      padding: 4px var(--spacing-sm);
+      border-radius: var(--radius-sm);
       font-size: 12px;
+      border: 1px solid var(--color-border);
     }
 
     .no-attributes {
       text-align: center;
-      padding: 40px;
-      color: #6c757d;
+      padding: var(--spacing-2xl);
+      color: var(--color-text-secondary);
+    }
+
+    .no-attributes a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .no-attributes a:hover {
+      text-decoration: underline;
     }
 
     .option-row {
       display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
       align-items: center;
     }
 
@@ -282,103 +331,75 @@ import { AttributesService, Attribute, CreateAttributeDto, AttributeOption } fro
     }
 
     .modal-content {
-      background: white;
-      border-radius: 8px;
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
       width: 90%;
       max-width: 600px;
       max-height: 90vh;
       overflow-y: auto;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-lg);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
-      border-bottom: 1px solid #ddd;
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--color-border);
     }
 
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
+    .modal-header h3 {
+      margin: 0;
+      color: var(--color-text-base);
     }
+
 
     .modal-body {
-      padding: 20px;
+      padding: var(--spacing-lg);
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: var(--spacing-lg);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: var(--spacing-xs);
       font-weight: 500;
+      color: var(--color-text-base);
     }
 
     .form-control {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
       font-size: 14px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
     }
 
     .error-message {
-      color: #dc3545;
+      color: var(--color-error);
       font-size: 12px;
-      margin-top: 5px;
+      margin-top: var(--spacing-xs);
     }
 
     .modal-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
-      padding: 20px;
-      border-top: 1px solid #ddd;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
     }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-sm {
-      padding: 4px 8px;
-      font-size: 12px;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
   `]
 })
 export class AttributesComponent implements OnInit {

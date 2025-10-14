@@ -1,9 +1,9 @@
 <div class="order-management-detail-container" *ngIf="order">
   <div class="header-section">
-      <button nz-button nzType="default" (click)="goBack()">
+      <button class="btn btn-secondary" (click)="goBack()">
       <span nz-icon nzType="arrow-left"></span>
       Back to Orders
-    </button>
+      </button>
     <h1>Order Management: {{ order.orderNumber }}</h1>
   </div>
 
@@ -168,18 +168,15 @@
           </div>
         </div>
         <div class="invoice-actions">
-          <button nz-button nzType="primary" [routerLink]="['/invoices', order.invoice.id]">
+          <button class="btn btn-primary" [routerLink]="['/invoices', order.invoice.id]">
             <span nz-icon nzType="file-text"></span>
             View Invoice
           </button>
           
           <button 
-            nz-button 
-            nzType="primary" 
-            nzDanger
+            class="btn btn-success"
             *ngIf="canMarkAsPaid()"
-            (click)="markInvoiceAsPaid()"
-            [nzLoading]="updatingStatus">
+            (click)="markInvoiceAsPaid()">
             <span nz-icon nzType="check-circle"></span>
             Mark as Paid
           </button>
@@ -193,29 +190,23 @@
     <nz-card nzTitle="Order Actions">
       <div class="action-buttons">
         <button 
-          nz-button 
-          nzType="primary" 
+          class="btn btn-primary"
           *ngIf="canUpdateStatus()"
-          (click)="showStatusModal()"
-          [nzLoading]="updatingStatus">
+          (click)="showStatusModal()">
           <span nz-icon nzType="edit"></span>
           Update Status
         </button>
         
         <button 
-          nz-button 
-          nzType="primary" 
-          nzDanger
+          class="btn btn-success"
           *ngIf="canCompleteOrder()"
-          (click)="completeOrder()"
-          [nzLoading]="updatingStatus">
+          (click)="completeOrder()">
           <span nz-icon nzType="check-circle"></span>
           Complete Order
         </button>
         
         <button 
-          nz-button 
-          nzType="default"
+          class="btn btn-secondary"
           [routerLink]="['/orders']">
           <span nz-icon nzType="arrow-left"></span>
           Back to Orders

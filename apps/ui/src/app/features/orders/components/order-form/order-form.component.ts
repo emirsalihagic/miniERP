@@ -43,15 +43,15 @@ import { OrdersService } from '../../../shop/services/orders.service';
           </div>
           
           <div class="form-actions">
-            <button nz-button nzType="default" (click)="goBack()">
+            <button type="button" class="btn btn-secondary" (click)="goBack()">
               Cancel
             </button>
             <button 
-              nz-button 
-              nzType="primary" 
+              type="button"
+              class="btn btn-primary" 
               (click)="createOrder()"
-              [nzLoading]="loading"
               [disabled]="loading">
+              <span *ngIf="loading" class="spinner"></span>
               Create Order
             </button>
           </div>
@@ -71,25 +71,25 @@ import { OrdersService } from '../../../shop/services/orders.service';
     }
     
     .info-text {
-      background: #f6f8fa;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 24px;
-      color: #656d76;
+      background: var(--color-bg-container);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      color: var(--color-text-secondary);
       font-size: 14px;
       line-height: 1.5;
     }
     
     .form-group {
-      margin-bottom: 24px;
+      margin-bottom: var(--spacing-lg);
     }
     
     .form-group label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: var(--spacing-sm);
       font-weight: 500;
-      color: #24292f;
+      color: var(--color-text-base);
     }
     
     .notes-textarea {
@@ -99,10 +99,10 @@ import { OrdersService } from '../../../shop/services/orders.service';
     
     .form-actions {
       display: flex;
-      gap: 12px;
+      gap: var(--spacing-sm);
       justify-content: flex-end;
-      padding-top: 16px;
-      border-top: 1px solid #d0d7de;
+      padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border);
     }
   `]
 })

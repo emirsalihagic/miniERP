@@ -60,13 +60,9 @@ import {
             <p>Manage your client relationships and track their information</p>
           </div>
           <div class="header-actions">
-            <button nz-button nzType="primary" nzSize="large" (click)="createClient()" class="action-btn">
+            <button class="btn btn-primary" (click)="createClient()">
               <span nz-icon nzType="plus"></span>
               Create Client
-            </button>
-            <button nz-button nzSize="large" (click)="refreshClients()" class="action-btn">
-              <span nz-icon nzType="reload"></span>
-              Refresh
             </button>
           </div>
         </div>
@@ -149,9 +145,8 @@ import {
                   <nz-option nzValue="createdAt" nzLabel="Created Date"></nz-option>
                 </nz-select>
                 <button 
-                  nz-button 
-                  nzType="text" 
-                  nzSize="large" 
+                  type="button"
+                  class="btn btn-outline"
                   (click)="toggleSortOrder()"
                   class="sort-order-btn"
                   [attr.aria-label]="'Sort ' + (sortOrder === 'asc' ? 'descending' : 'ascending')"
@@ -258,33 +253,26 @@ import {
                     <td>
                       <div class="action-buttons">
                         <button 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
+                          type="button"
+                          class="btn btn-sm btn-outline"
                           nz-tooltip="View Details"
                           (click)="viewClient(client.id)"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="eye"></span>
                         </button>
                         <button 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
+                          type="button"
+                          class="btn btn-sm btn-outline"
                           nz-tooltip="Edit Client"
                           (click)="editClient(client.id)"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="edit"></span>
                         </button>
                         <button 
-                          nz-button 
-                          nzType="text" 
-                          nzSize="small"
-                          nzDanger
+                          type="button"
+                          class="btn btn-sm btn-danger"
                           nz-tooltip="Delete Client"
                           (click)="deleteClient(client)"
-                          class="action-btn"
                         >
                           <span nz-icon nzType="delete"></span>
                         </button>
@@ -298,7 +286,7 @@ import {
             <div class="empty-state" *ngIf="!loading() && clients().length === 0">
               <nz-empty nzNotFoundContent="No clients found">
                 <div class="empty-actions">
-                  <button nz-button nzType="primary" (click)="createClient()">
+                  <button type="button" class="btn btn-primary" (click)="createClient()">
                     <span nz-icon nzType="plus"></span>
                     Create Your First Client
                   </button>
@@ -364,19 +352,6 @@ import {
           display: flex;
           gap: var(--spacing-sm);
           flex-shrink: 0;
-          
-          .action-btn {
-            height: 48px;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            border-radius: var(--radius-base);
-            transition: all var(--transition-base);
-            
-            &:hover {
-              transform: translateY(-1px);
-            }
-          }
         }
       }
     }
@@ -604,21 +579,6 @@ import {
               .action-buttons {
                 display: flex;
                 gap: var(--spacing-xs);
-                
-                .action-btn {
-                  color: var(--color-text-base);
-                  transition: all var(--transition-base);
-                  
-                  &:hover {
-                    color: var(--color-primary);
-                    background: rgba(37, 99, 235, 0.1);
-                  }
-                  
-                  &.ant-btn-dangerous:hover {
-                    color: var(--color-error);
-                    background: rgba(220, 38, 38, 0.1);
-                  }
-                }
               }
             }
           }
@@ -704,11 +664,6 @@ import {
       
       .header-actions {
         flex-direction: column;
-        
-        .action-btn {
-          width: 100%;
-          justify-content: center;
-        }
       }
     }
   `]
@@ -798,9 +753,6 @@ export class ClientsListComponent implements OnInit {
     this.loadClients();
   }
 
-  refreshClients() {
-    this.loadClients();
-  }
 
   createClient() {
     this.router.navigate(['/clients/new']);

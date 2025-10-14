@@ -181,63 +181,69 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
   `,
   styles: [`
     .pricing-list-container {
-      padding: 2rem;
+      padding: var(--spacing-lg);
       max-width: 1400px;
       margin: 0 auto;
+      background-color: var(--color-bg-base);
+      min-height: calc(100vh - 64px);
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-lg);
     }
 
     .header h1 {
       margin: 0;
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .header-actions {
       display: flex;
-      gap: 1rem;
+      gap: var(--spacing-md);
     }
 
     .filters {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 8px;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-md);
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-card);
     }
 
     .filter-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
     .filter-group label {
       font-weight: 500;
-      color: #555;
+      color: var(--color-text-base);
       font-size: 0.875rem;
     }
 
     .form-input,
     .form-select {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: var(--spacing-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
       font-size: 0.875rem;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .form-input:focus,
     .form-select:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
     }
 
     .loading-state {
@@ -245,18 +251,18 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem;
-      color: #666;
+      padding: var(--spacing-2xl);
+      color: var(--color-text-secondary);
     }
 
     .spinner {
       width: 2rem;
       height: 2rem;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #007bff;
+      border: 3px solid var(--color-border);
+      border-top: 3px solid var(--color-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
+      margin-bottom: var(--spacing-md);
     }
 
     @keyframes spin {
@@ -265,19 +271,20 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     }
 
     .error-banner {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-      border: 1px solid #f5c6cb;
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--color-error);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-md);
+      border: 1px solid var(--color-error);
     }
 
     .pricing-table-container {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: var(--color-bg-container);
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
+      border: 1px solid var(--color-border);
     }
 
     .pricing-table {
@@ -286,22 +293,24 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     }
 
     .pricing-table th {
-      background: #f8f9fa;
-      padding: 1rem;
+      background: var(--color-bg-base);
+      padding: var(--spacing-md);
       text-align: left;
       font-weight: 600;
-      color: #555;
-      border-bottom: 2px solid #dee2e6;
+      color: var(--color-text-base);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .pricing-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #dee2e6;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
       vertical-align: top;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
     }
 
     .pricing-row:hover {
-      background: #f8f9fa;
+      background: rgba(59, 130, 246, 0.05);
     }
 
     .product-info {
@@ -311,63 +320,63 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 
     .product-name {
       font-weight: 500;
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .sku {
       font-family: monospace;
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 0.875rem;
     }
 
     .price {
       font-weight: 600;
-      color: #28a745;
+      color: var(--color-success);
     }
 
     .currency {
       font-weight: 500;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .tax-rate {
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .discount {
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .discount.has-discount {
-      color: #dc3545;
+      color: var(--color-error);
       font-weight: 500;
     }
 
     .scope {
       padding: 0.25rem 0.5rem;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-size: 0.75rem;
       font-weight: 500;
       text-transform: uppercase;
     }
 
     .scope.base {
-      background: #e9ecef;
-      color: #495057;
+      background: rgba(136, 136, 136, 0.1);
+      color: var(--color-text-secondary);
     }
 
     .scope.client {
-      background: #d4edda;
-      color: #155724;
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--color-success);
     }
 
     .scope.supplier {
-      background: #d1ecf1;
-      color: #0c5460;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--color-primary);
     }
 
     .entity-name {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 0.875rem;
     }
 
@@ -378,100 +387,49 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     }
 
     .from {
-      color: #333;
+      color: var(--color-text-base);
     }
 
     .to {
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .actions {
       display: flex;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
-    .btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #0056b3;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #007bff;
-      border: 1px solid #007bff;
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background: #c82333;
-    }
-
-    .btn-sm {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .empty-state {
       text-align: center;
-      padding: 3rem;
-      color: #666;
+      padding: var(--spacing-2xl);
+      color: var(--color-text-secondary);
     }
 
     .empty-icon {
       font-size: 3rem;
-      margin-bottom: 1rem;
+      margin-bottom: var(--spacing-md);
     }
 
     .empty-state h3 {
-      margin: 0 0 0.5rem 0;
-      color: #333;
+      margin: 0 0 var(--spacing-sm) 0;
+      color: var(--color-text-base);
     }
 
     .empty-state p {
-      margin: 0 0 2rem 0;
+      margin: 0 0 var(--spacing-lg) 0;
     }
 
     .pagination {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 1rem;
-      margin-top: 2rem;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
     }
 
     .page-info {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 0.875rem;
     }
 

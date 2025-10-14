@@ -187,8 +187,8 @@
             
             <div class="invoice-actions">
               <button 
-                nz-button 
-                nzType="primary"
+                type="button"
+                class="btn btn-primary"
                 routerLink="/invoices/{{ order.invoice.id }}"
               >
                 <span nz-icon nzType="file-text"></span>
@@ -204,8 +204,8 @@
         <nz-card nzTitle="Actions">
           <div class="action-buttons">
             <button 
-              nz-button 
-              nzType="default"
+              type="button"
+              class="btn btn-secondary"
               routerLink="/shop/orders"
             >
               <span nz-icon nzType="arrow-left"></span>
@@ -213,8 +213,8 @@
             </button>
             
             <button 
-              nz-button 
-              nzType="default"
+              type="button"
+              class="btn btn-outline"
               routerLink="/shop"
             >
               <span nz-icon nzType="shopping"></span>
@@ -222,8 +222,8 @@
             </button>
             
             <button 
-              nz-button 
-              nzType="primary"
+              type="button"
+              class="btn btn-danger"
               nzDanger
               *ngIf="canCancelOrder()"
               (click)="cancelOrder()"
