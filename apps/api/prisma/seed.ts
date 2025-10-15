@@ -1105,16 +1105,16 @@ async function main() {
     }),
 
     prisma.product.upsert({
-      where: { sku: 'TEST-DRAFT' },
-      update: { status: 'DRAFT' },
+      where: { sku: 'TEST-REGISTRATION' },
+      update: { status: 'REGISTRATION' },
       create: {
-        sku: 'TEST-DRAFT',
-        name: 'Draft Product',
-        description: 'This product is still in draft status for testing',
+        sku: 'TEST-REGISTRATION',
+        name: 'Registration Product',
+        description: 'This product is in registration status for testing',
         category: 'Office Supplies',
         unitId: units.find(u => u.code === 'pc')?.id,
         supplierId: suppliers[2].id,
-        status: 'DRAFT',
+        status: 'REGISTRATION',
         storageType: 'AMBIENT',
       },
     }),
