@@ -20,9 +20,12 @@ export class ProductsController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'groupId', required: false, type: String })
-  @ApiQuery({ name: 'status', required: false, enum: ProductStatus })
+  @ApiQuery({ name: 'status', required: false, type: [String], description: 'Filter by status(es). Can be a single value or array of values.' })
   @ApiQuery({ name: 'brand', required: false, type: String })
   @ApiQuery({ name: 'sku', required: false, type: String })
+  @ApiQuery({ name: 'category', required: false, type: [String], description: 'Filter by category(ies). Can be a single value or array of values.' })
+  @ApiQuery({ name: 'unit', required: false, type: [String], description: 'Filter by unit(s). Can be a single value or array of values.' })
+  @ApiQuery({ name: 'storageType', required: false, type: [String], description: 'Filter by storage type(s). Can be a single value or array of values.' })
   @ApiQuery({ name: 'attr.color', required: false, type: String, description: 'Filter by attribute (example: attr.color=blue)' })
   @ApiQuery({ name: 'attr.storage', required: false, type: String, description: 'Filter by attribute (example: attr.storage=256)' })
   @ApiResponse({ status: 200, description: 'List of products' })
@@ -30,9 +33,12 @@ export class ProductsController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('groupId') groupId?: string,
-    @Query('status') status?: ProductStatus,
+    @Query('status') status?: string | string[],
     @Query('brand') brand?: string,
     @Query('sku') sku?: string,
+    @Query('category') category?: string | string[],
+    @Query('unit') unit?: string | string[],
+    @Query('storageType') storageType?: string | string[],
     @Query() query?: any,
   ) {
     // Parse attribute filters from query parameters
@@ -44,13 +50,46 @@ export class ProductsController {
       }
     });
 
+    // Handle array parameters - manually parse multiple query params with same name
+    const parseArrayParam = (paramName: string): string[] | undefined => {
+      const values = query[paramName];
+      if (!values) return undefined;
+      if (Array.isArray(values)) return values;
+      if (typeof values === 'string') {
+        // Check if it's a JSON array string
+        try {
+          const parsed = JSON.parse(values);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch {
+          // Not JSON, continue with other parsing
+        }
+        
+        // Check if it's comma-separated values
+        if (values.includes(',')) {
+          return values.split(',').map(v => v.trim()).filter(v => v.length > 0);
+        }
+        return [values];
+      }
+      return [values];
+    };
+
+    const parsedStatus = parseArrayParam('status');
+    const parsedCategory = parseArrayParam('category');
+    const parsedUnit = parseArrayParam('unit');
+    const parsedStorageType = parseArrayParam('storageType');
+
     const filters: ProductFilters = {
       page,
       limit,
       groupId,
-      status,
+      status: parsedStatus && parsedStatus.length === 1 ? parsedStatus[0] as ProductStatus : parsedStatus as ProductStatus[],
       brand,
       sku,
+      // category: parsedCategory && parsedCategory.length === 1 ? parsedCategory[0] : parsedCategory, // Temporarily disabled
+      unit: parsedUnit && parsedUnit.length === 1 ? parsedUnit[0] : parsedUnit,
+      storageType: parsedStorageType && parsedStorageType.length === 1 ? parsedStorageType[0] : parsedStorageType,
       attributes: Object.keys(attributes).length > 0 ? attributes : undefined,
     };
 
@@ -96,10 +135,9 @@ export class ProductsController {
   }
 
   @Get('shop')
-  @Roles(UserRole.CLIENT_USER, UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Get shop products (active and sellable only)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 500 })
   @ApiQuery({ name: 'groupId', required: false, type: String })
   @ApiQuery({ name: 'brand', required: false, type: String })
   @ApiQuery({ name: 'sku', required: false, type: String })
@@ -112,6 +150,10 @@ export class ProductsController {
     @Query('sku') sku?: string,
     @Query() query?: any,
   ) {
+    console.log('=== SHOP PRODUCTS DEBUG ===');
+    console.log('Raw query params:', { page, limit, groupId, brand, sku, query });
+    console.log('Limit type:', typeof limit, 'Value:', limit);
+    
     // Parse attribute filters from query parameters
     const attributes: Record<string, any> = {};
     Object.keys(query).forEach(key => {

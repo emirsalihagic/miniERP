@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AgGridModule } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, CellClickedEvent, GridOptions, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, CellClickedEvent, GridOptions, ModuleRegistry, AllCommunityModule, IServerSideDatasource, IServerSideGetRowsParams } from 'ag-grid-community';
+import { AllEnterpriseModule } from 'ag-grid-enterprise';
+import { MenuItemDef } from 'ag-grid-community';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ProductsService, Product } from '../../services/products.service';
 import { EnterpriseGridConfig } from '../../../../shared/interfaces/enterprise-grid.interface';
 
 // Register AG-Grid modules
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
 @Component({
   selector: 'app-products-list',
@@ -43,107 +45,17 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         </div>
       </div>
 
-      <!-- Quick Filters -->
-      <div class="quick-filters">
-        <div class="filter-group">
-          <label>Status:</label>
-          <div class="filter-chips">
-            <button 
-              class="filter-chip" 
-              [class.active]="statusFilter === 'ALL'" 
-              (click)="setStatusFilter('ALL')">
-              All
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="statusFilter === 'ACTIVE'" 
-              (click)="setStatusFilter('ACTIVE')">
-              Active
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="statusFilter === 'INACTIVE'" 
-              (click)="setStatusFilter('INACTIVE')">
-              Inactive
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="statusFilter === 'REGISTRATION'" 
-              (click)="setStatusFilter('REGISTRATION')">
-              Registration
-            </button>
-          </div>
-        </div>
-        
-        <div class="filter-group">
-          <label>Storage:</label>
-          <div class="filter-chips">
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'ALL'" 
-              (click)="setStorageFilter('ALL')">
-              All
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'AMBIENT'" 
-              (click)="setStorageFilter('AMBIENT')">
-              Ambient
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'CHILLED'" 
-              (click)="setStorageFilter('CHILLED')">
-              Chilled
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'FROZEN'" 
-              (click)="setStorageFilter('FROZEN')">
-              Frozen
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'HAZMAT'" 
-              (click)="setStorageFilter('HAZMAT')">
-              Hazmat
-            </button>
-            <button 
-              class="filter-chip" 
-              [class.active]="storageFilter === 'DRY'" 
-              (click)="setStorageFilter('DRY')">
-              Dry
-            </button>
-          </div>
-        </div>
-        
-        <div class="filter-actions">
-          <button class="clear-filters-btn" (click)="clearAllFilters()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-            Clear All
-          </button>
-        </div>
-      </div>
-
-      <!-- AG-Grid -->
-      <div class="enterprise-grid">
-        <ag-grid-angular
-          [class]="gridClass"
-          [rowData]="products"
-          [columnDefs]="columnDefs"
-          [gridOptions]="gridOptions"
-          (gridReady)="onGridReady($event)"
-          (cellClicked)="onCellClicked($event)"
-          style="width: 100%; height: 100%;"
-        ></ag-grid-angular>
-      </div>
-
-      <!-- Empty State -->
-      <div *ngIf="products.length === 0" class="empty-state">
-        <p>No products found. <a routerLink="/products/new">Create your first product</a></p>
-      </div>
+               <!-- AG-Grid -->
+               <div class="enterprise-grid">
+                 <ag-grid-angular
+                   [class]="gridClass"
+                   [columnDefs]="columnDefs"
+                   [gridOptions]="gridOptions"
+                   (gridReady)="onGridReady($event)"
+                   (cellClicked)="onCellClicked($event)"
+                   style="width: 100%; height: 100%;"
+                 ></ag-grid-angular>
+               </div>
     </div>
   `,
   styles: [`
@@ -505,90 +417,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       }
     }
 
-    /* Quick Filters */
-    .quick-filters {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-      padding: var(--spacing-md) 0;
-      margin-bottom: var(--spacing-md);
-      border-bottom: 1px solid var(--color-border);
-      flex-wrap: wrap;
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      
-      label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--color-text-secondary);
-        white-space: nowrap;
-      }
-    }
-
-    .filter-chips {
-      display: flex;
-      gap: var(--spacing-xs);
-      flex-wrap: wrap;
-    }
-
-    .filter-chip {
-      padding: 6px 12px;
-      border: 1px solid var(--color-border);
-      border-radius: 16px;
-      background: var(--color-bg-container);
-      color: var(--color-text-base);
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      
-      &:hover {
-        border-color: var(--color-primary);
-        background: var(--color-primary-bg);
-        color: var(--color-primary);
-      }
-      
-      &.active {
-        background: var(--color-primary);
-        color: white;
-        border-color: var(--color-primary);
-        
-        &:hover {
-          background: var(--color-primary-hover);
-          border-color: var(--color-primary-hover);
-        }
-      }
-    }
-
-    .filter-actions {
-      margin-left: auto;
-    }
-
-    .clear-filters-btn {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-xs);
-      padding: 6px 12px;
-      border: 1px solid var(--color-border);
-      border-radius: 16px;
-      background: var(--color-bg-container);
-      color: var(--color-text-secondary);
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      
-      &:hover {
-        border-color: var(--color-error);
-        background: var(--color-error-bg);
-        color: var(--color-error);
-      }
-    }
   `]
 })
 export class ProductsListComponent implements OnInit {
@@ -599,10 +427,13 @@ export class ProductsListComponent implements OnInit {
   isDarkMode: boolean = false;
   gridClass: string = 'ag-theme-alpine';
   gridApi: any = null;
+  gridColumnApi: any = null;
 
-  // Filter state
-  statusFilter: string | 'ALL' = 'ALL';
-  storageFilter: string | 'ALL' = 'ALL';
+  // Pagination state
+  currentPage: number = 1;
+  pageSize: number = 20;
+  totalRecords: number = 0;
+  isLoading: boolean = false;
 
   // AG-Grid Configuration
   columnDefs: ColDef[] = [
@@ -752,6 +583,62 @@ export class ProductsListComponent implements OnInit {
       } else {
         return { backgroundColor: '#f8f9fa' };
       }
+    },
+    // Use server-side row model with infinite scrolling for better performance
+    rowModelType: 'serverSide',
+    infiniteInitialRowCount: 20,
+    cacheBlockSize: 20,
+    maxBlocksInCache: 5,
+    suppressPaginationPanel: true,
+    theme: 'legacy',
+    // Enterprise features
+    getContextMenuItems: (params: any): MenuItemDef[] => {
+      const product = params.node?.data;
+      if (!product) return [];
+      
+      return [
+        {
+          name: 'Edit Product',
+          action: () => {
+            this.router.navigate(['/products/edit', product.id]);
+          },
+          icon: '<span class="ag-icon ag-icon-edit"></span>'
+        },
+        {
+          name: 'Delete Product',
+          action: () => {
+            this.deleteProduct(product.id);
+          },
+          icon: '<span class="ag-icon ag-icon-trash"></span>'
+        },
+        { name: 'separator' },
+        { name: 'copy' },
+        { name: 'copyWithHeaders' },
+        { name: 'separator' },
+        { name: 'export' }
+      ];
+    },
+    enableRangeSelection: true,
+    enableCharts: true,
+    sideBar: {
+      toolPanels: [
+        {
+          id: 'columns',
+          labelDefault: 'Columns',
+          labelKey: 'columns',
+          iconKey: 'columns',
+          toolPanel: 'agColumnsToolPanel',
+        },
+        {
+          id: 'filters',
+          labelDefault: 'Filters',
+          labelKey: 'filters',
+          iconKey: 'filter',
+          toolPanel: 'agFiltersToolPanel',
+        }
+      ],
+      defaultToolPanel: 'columns',
+      hiddenByDefault: true
     }
   };
 
@@ -786,16 +673,14 @@ export class ProductsListComponent implements OnInit {
   onGridReady(event: GridReadyEvent) {
     this.gridApi = event.api;
     
-    // If products are already loaded, set them in the grid
-    if (this.products.length > 0) {
-      if (typeof event.api.setGridOption === 'function') {
-        event.api.setGridOption('rowData', this.products);
-        // Force grid refresh
-        setTimeout(() => {
-          this.gridApi.refreshCells();
-        }, 100);
+    // Set up server-side datasource for infinite scrolling
+    const datasource: IServerSideDatasource = {
+      getRows: (params: IServerSideGetRowsParams) => {
+        this.loadProductsForServerSide(params);
       }
-    }
+    };
+    
+    this.gridApi.setGridOption('serverSideDatasource', datasource);
   }
 
   onCellClicked(event: CellClickedEvent) {
@@ -810,37 +695,55 @@ export class ProductsListComponent implements OnInit {
   }
 
   loadProducts() {
-    this.productsService.getAll({}).subscribe({
+    // For server-side pagination, we don't need to load all products upfront
+    // The grid will handle loading data through the datasource
+    this.setupGlobalHandlers();
+    this.updateGridClass();
+  }
+
+  loadProductsForServerSide(params: IServerSideGetRowsParams) {
+    this.isLoading = true;
+    
+    // Calculate pagination parameters
+    const startRow = params.request.startRow || 0;
+    const endRow = params.request.endRow || 20;
+    const pageSize = endRow - startRow;
+    const page = Math.floor(startRow / pageSize) + 1;
+    
+    // Build filters
+    const filters: any = {
+      page: page,
+      limit: pageSize
+    };
+    
+    console.log('Loading products for server-side:', { startRow, endRow, page, pageSize, filters });
+    
+    this.productsService.getAll(filters).subscribe({
       next: (response) => {
-        this.products = response.data;
+        this.isLoading = false;
+        const totalRecords = response.meta?.total || 0;
+        const products = response.data;
         
-        // Update grid if it's ready
-        if (this.gridApi) {
-          // Column definitions are now static with text filters
-          
-          // Use the correct method to update the grid
-          if (typeof this.gridApi.setGridOption === 'function') {
-            this.gridApi.setGridOption('rowData', this.products);
-            this.gridApi.setGridOption('columnDefs', this.columnDefs);
-            // Force grid refresh
-            setTimeout(() => {
-              this.gridApi.refreshCells();
-            }, 100);
-          }
-        }
+        console.log('Products loaded for server-side:', products.length, 'Total:', totalRecords);
+        
+        // Call success callback with the data
+        params.success({
+          rowData: products,
+          rowCount: totalRecords
+        });
       },
       error: (error) => {
-        console.error('Error loading products:', error);
-        // Fallback to empty array if API fails
-        this.products = [];
+        this.isLoading = false;
+        console.error('Error loading products for server-side:', error);
         
-        // Update grid with empty data
-        if (this.gridApi && typeof this.gridApi.setGridOption === 'function') {
-          this.gridApi.setGridOption('rowData', []);
-        }
+        // Call fail callback
+        params.fail();
       }
     });
   }
+
+
+
 
   showAttributes(product: Product) {
     // In a real app, you might open a modal or navigate to a detail page
@@ -864,54 +767,4 @@ export class ProductsListComponent implements OnInit {
     }
   }
 
-  // Quick filter methods
-  setStatusFilter(status: string | 'ALL') {
-    this.statusFilter = status;
-    this.applyClientSideFilters();
-  }
-
-  setStorageFilter(storage: string | 'ALL') {
-    this.storageFilter = storage;
-    this.applyClientSideFilters();
-  }
-
-  applyClientSideFilters() {
-    if (this.gridApi) {
-      // Clear existing filters first
-      this.gridApi.setFilterModel(null);
-      
-      const filters: any = {};
-      
-      // Apply status filter if not 'ALL'
-      if (this.statusFilter !== 'ALL') {
-        filters.status = {
-          type: 'equals',
-          filter: this.statusFilter
-        };
-      }
-      
-      // Apply storage filter if not 'ALL'
-      if (this.storageFilter !== 'ALL') {
-        filters.storageType = {
-          type: 'equals',
-          filter: this.storageFilter
-        };
-      }
-      
-      // Apply filters if any exist
-      if (Object.keys(filters).length > 0) {
-        this.gridApi.setFilterModel(filters);
-      }
-    }
-  }
-
-  clearAllFilters() {
-    this.statusFilter = 'ALL';
-    this.storageFilter = 'ALL';
-    
-    // Clear client-side filters
-    if (this.gridApi) {
-      this.gridApi.setFilterModel(null);
-    }
-  }
 }
