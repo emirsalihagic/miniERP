@@ -1448,7 +1448,7 @@ async function main() {
       billingCountry: 'United Kingdom',
       status: ClientStatus.ACTIVE,
       paymentTerms: PaymentTerms.D45,
-      preferredCurrency: Currency.GBP,
+      preferredCurrency: Currency.USD,
       tags: ['manufacturing', 'bulk'],
       clientCode: 'CLT-GLOBAL-002',
       creditLimit: 250000,
@@ -1482,7 +1482,7 @@ async function main() {
       billingCountry: 'Sweden',
       status: ClientStatus.ACTIVE,
       paymentTerms: PaymentTerms.D15,
-      preferredCurrency: Currency.GBP,
+      preferredCurrency: Currency.USD,
       tags: ['trading', 'scandinavia'],
       clientCode: 'CLT-NORDIC-004',
       creditLimit: 150000,
@@ -1892,6 +1892,37 @@ async function main() {
   }
   
   console.log(`[SUCCESS] Created ${individualUsers.length} individual users`);
+
+  // Create user preferences for all users
+  console.log('[INFO] Creating user preferences for all users...');
+  
+  const allUsers = [adminUser, clientUser, ...companyUsers, ...individualUsers];
+  let preferencesCreated = 0;
+  
+  for (const user of allUsers) {
+    try {
+      await prisma.userPreferences.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: {
+          userId: user.id,
+          theme: 'LIGHT',
+          dateFormat: 'DD_MM_YYYY',
+          timeFormat: 'HOUR_24',
+          currency: 'USD',
+          autoSaveForms: true,
+          emailNotifications: false,
+          language: 'EN',
+          timezone: 'Europe/Sarajevo',
+        },
+      });
+      preferencesCreated++;
+    } catch (error) {
+      console.log(`[WARNING] Could not create preferences for user ${user.email}: ${error.message}`);
+    }
+  }
+  
+  console.log(`[SUCCESS] Created user preferences for ${preferencesCreated} users`);
 
   // Create client-specific pricing override
   await prisma.pricing.create({
