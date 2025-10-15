@@ -730,6 +730,8 @@ export class InvoicesListComponent implements OnInit {
       headerClass: 'custom-header'
     },
     rowSelection: 'multiple' as const,
+    // Custom no rows overlay
+    overlayNoRowsTemplate: 'No matching criteria',
     animateRows: true,
     suppressMenuHide: true,
     rowHeight: 60,

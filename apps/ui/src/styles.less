@@ -2984,3 +2984,135 @@ app-products-list {
     height: 8px;
   }
 }
+
+/* AG-Grid Filter Indicators */
+::ng-deep .ag-header-cell {
+  .ag-header-cell-menu-button {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+  }
+  
+  &:hover .ag-header-cell-menu-button {
+    background-color: #f3f4f6 !important;
+    border-radius: 4px !important;
+  }
+  
+  // Filtered state indicators
+  &.ag-header-cell-filtered {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-left: 3px solid #3b82f6 !important;
+    
+    .ag-header-cell-menu-button {
+      background-color: #3b82f6 !important;
+      color: white !important;
+      border-radius: 4px !important;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+    }
+    
+    .ag-header-cell-label {
+      font-weight: 600 !important;
+      color: #1e40af !important;
+    }
+    
+    .ag-filter-icon {
+      color: #3b82f6 !important;
+    }
+  }
+  
+  .ag-filter-icon {
+    display: inline-block !important;
+    margin-left: 4px !important;
+    color: #6b7280 !important;
+    transition: color 0.2s ease !important;
+  }
+}
+
+// Alternative approach - target the header cell directly
+::ng-deep .ag-header-cell-filtered,
+::ng-deep .filtered-column {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-left: 3px solid #3b82f6 !important;
+  
+  .ag-header-cell-menu-button {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  .ag-header-cell-label {
+    font-weight: 600 !important;
+    color: #1e40af !important;
+  }
+  
+  .ag-filter-icon {
+    color: #3b82f6 !important;
+  }
+}
+
+// Additional backup styling for filtered columns
+::ng-deep .ag-header-cell.filtered-column {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background-color: #3b82f6;
+    z-index: 1;
+  }
+}
+
+// Global no rows overlay styling for all AG-Grid tables
+::ng-deep .ag-overlay-no-rows-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 100%;
+  
+  .ag-overlay-no-rows-center {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+    text-align: center;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Custom no rows overlay styling
+::ng-deep .no-rows-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 100%;
+  
+  .no-rows-message {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+    text-align: center;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}

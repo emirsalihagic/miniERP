@@ -484,6 +484,8 @@ export class ClientsListComponent implements OnInit {
     rowSelection: 'multiple' as const,
     animateRows: true,
     suppressMenuHide: true,
+    // Custom no rows overlay
+    overlayNoRowsTemplate: 'No matching criteria',
     rowHeight: 56,
     headerHeight: 48,
     suppressRowHoverHighlight: false,

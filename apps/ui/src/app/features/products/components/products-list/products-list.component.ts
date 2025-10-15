@@ -45,6 +45,54 @@ ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
         </div>
       </div>
 
+      <!-- Quick Filters -->
+      <div class="quick-filters">
+        <div class="filter-group">
+          <label>Status:</label>
+          <div class="filter-chips">
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'ALL'" 
+              (click)="setStatusFilter('ALL')">
+              All
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'ACTIVE'" 
+              (click)="setStatusFilter('ACTIVE')">
+              Active
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'INACTIVE'" 
+              (click)="setStatusFilter('INACTIVE')">
+              Inactive
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'DISCONTINUED'" 
+              (click)="setStatusFilter('DISCONTINUED')">
+              Discontinued
+            </button>
+            <button 
+              class="filter-chip" 
+              [class.active]="statusFilter === 'DRAFT'" 
+              (click)="setStatusFilter('DRAFT')">
+              Draft
+            </button>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="clear-filters-btn" (click)="clearAllFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
                <!-- AG-Grid -->
                <div class="enterprise-grid">
                  <ag-grid-angular
@@ -126,6 +174,94 @@ ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
       margin-bottom: var(--spacing-xs);
       font-weight: 500;
       color: var(--color-text-base);
+    }
+
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .quick-filters .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      flex-direction: row;
+      min-width: auto;
+      
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+        margin-bottom: 0;
+      }
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-base);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      
+      &.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        
+        &:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
+        }
+      }
+    }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+
+    .clear-filters-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      background: var(--color-bg-container);
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: var(--color-error);
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
     }
 
     .table-container {
@@ -435,34 +571,35 @@ export class ProductsListComponent implements OnInit {
   totalRecords: number = 0;
   isLoading: boolean = false;
 
+  // Quick filter state
+  statusFilter: string | 'ALL' = 'ALL';
+
   // AG-Grid Configuration
   columnDefs: ColDef[] = [
     {
       field: 'name',
-      headerName: 'Product Name',
+      headerName: 'Name',
       flex: 2,
       minWidth: 200,
-      pinned: 'left'
+      pinned: 'left',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
+      }
     },
     {
       field: 'sku',
       headerName: 'SKU',
-      width: 120
-    },
-    {
-      field: 'description',
-      headerName: 'Description',
-      flex: 2,
-      minWidth: 200,
-      cellRenderer: (params: any) => {
-        const desc = params.value;
-        return desc ? (desc.length > 50 ? desc.substring(0, 50) + '...' : desc) : '-';
+      width: 120,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
       }
     },
     {
       field: 'category',
       headerName: 'Category',
-      width: 120,
+      width: 150,
       filter: 'agTextColumnFilter',
       filterParams: {
         filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
@@ -471,7 +608,7 @@ export class ProductsListComponent implements OnInit {
     {
       field: 'status',
       headerName: 'Status',
-      width: 100,
+      width: 120,
       filter: 'agTextColumnFilter',
       filterParams: {
         filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
@@ -480,18 +617,6 @@ export class ProductsListComponent implements OnInit {
         const status = params.value;
         const statusClass = `status-${status.toLowerCase()}`;
         return `<span class="status-badge ${statusClass}">${status}</span>`;
-      }
-    },
-    {
-      field: 'supplier',
-      headerName: 'Supplier',
-      width: 150,
-      filter: 'agTextColumnFilter',
-      filterParams: {
-        filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
-      },
-      valueGetter: (params: any) => {
-        return params.data.supplier?.name || '-';
       }
     },
     {
@@ -509,18 +634,10 @@ export class ProductsListComponent implements OnInit {
     {
       field: 'storageType',
       headerName: 'Storage',
-      width: 100,
+      width: 120,
       filter: 'agTextColumnFilter',
       filterParams: {
         filterOptions: ['contains', 'equals', 'startsWith', 'endsWith']
-      }
-    },
-    {
-      field: 'createdAt',
-      headerName: 'Created',
-      width: 120,
-      valueFormatter: (params: any) => {
-        return params.value ? new Date(params.value).toLocaleDateString() : '-';
       }
     },
     {
@@ -568,9 +685,13 @@ export class ProductsListComponent implements OnInit {
       },
       headerClass: 'custom-header'
     },
+    // Enable filter indicators
+    suppressMenuHide: false,
+    suppressColumnVirtualisation: false,
     rowSelection: 'multiple' as const,
+    // Custom no rows overlay
+    overlayNoRowsTemplate: 'No matching criteria',
     animateRows: true,
-    suppressMenuHide: true,
     rowHeight: 56,
     headerHeight: 48,
     suppressRowHoverHighlight: false,
@@ -681,10 +802,66 @@ export class ProductsListComponent implements OnInit {
     };
     
     this.gridApi.setGridOption('serverSideDatasource', datasource);
+    
+    // Set up global handlers for action buttons
+    this.setupGlobalHandlers();
+    
+    // Update grid class for styling
+    this.updateGridClass();
+    
+    // Listen for filter changes to update visual indicators
+    this.gridApi.addEventListener('filterChanged', () => {
+      this.updateFilterIndicators();
+    });
   }
 
   onCellClicked(event: CellClickedEvent) {
     // Handle cell clicks if needed
+  }
+
+  private getProductValue(product: any, columnKey: string): any {
+    switch (columnKey) {
+      case 'status':
+        return product.status;
+      case 'category':
+        return product.category;
+      case 'unit':
+        return product.unit?.name;
+      case 'storageType':
+        return product.storageType;
+      case 'sku':
+        return product.sku;
+      case 'name':
+        return product.name;
+      default:
+        return product[columnKey];
+    }
+  }
+
+  updateFilterIndicators() {
+    // Force update of filter indicators by adding/removing classes
+    setTimeout(() => {
+      const filterModel = this.gridApi?.getFilterModel();
+      if (!filterModel) return;
+      
+      // Get all column headers
+      const headerElements = document.querySelectorAll('.ag-header-cell');
+      
+      headerElements.forEach((headerElement: Element) => {
+        const columnId = headerElement.getAttribute('col-id');
+        if (!columnId) return;
+        
+        const isFiltered = filterModel[columnId] !== undefined;
+        
+        if (isFiltered) {
+          headerElement.classList.add('ag-header-cell-filtered');
+          headerElement.classList.add('filtered-column');
+        } else {
+          headerElement.classList.remove('ag-header-cell-filtered');
+          headerElement.classList.remove('filtered-column');
+        }
+      });
+    }, 100);
   }
 
   updateGridClass() {
@@ -710,26 +887,52 @@ export class ProductsListComponent implements OnInit {
     const pageSize = endRow - startRow;
     const page = Math.floor(startRow / pageSize) + 1;
     
-    // Build filters
+    // Build filters from AG-Grid filter model
+    const filterModel = params.request.filterModel || {};
     const filters: any = {
       page: page,
-      limit: pageSize
+      limit: pageSize,
+      sort: 'name',
+      order: 'asc'
     };
+
+    // Map AG-Grid filter model to API parameters
+    Object.keys(filterModel).forEach(columnKey => {
+      const filter = (filterModel as any)[columnKey];
+      
+      if (filter && filter.filterType === 'set') {
+        // Set filter - multiple values selected
+        if (filter.values && filter.values.length > 0) {
+          // Send as JSON string for proper array handling
+          filters[columnKey] = JSON.stringify(filter.values);
+        }
+      } else if (filter && filter.filterType === 'text') {
+        // Text filter
+        if (filter.filter) {
+          filters[columnKey] = filter.filter;
+        }
+      }
+    });
     
-    console.log('Loading products for server-side:', { startRow, endRow, page, pageSize, filters });
+    console.log('Loading products for server-side:', { startRow, endRow, page, pageSize, filters, filterModel });
     
     this.productsService.getAll(filters).subscribe({
       next: (response) => {
         this.isLoading = false;
         const totalRecords = response.meta?.total || 0;
-        const products = response.data;
+        let products = response.data;
+        
+        // Client-side filtering is now handled by the backend
         
         console.log('Products loaded for server-side:', products.length, 'Total:', totalRecords);
+        
+        // Check if we have any filters applied
+        const hasFilters = Object.keys(filterModel).length > 0;
         
         // Call success callback with the data
         params.success({
           rowData: products,
-          rowCount: totalRecords
+          rowCount: hasFilters && products.length === 0 ? -1 : totalRecords // Use -1 to trigger no rows overlay
         });
       },
       error: (error) => {
@@ -764,6 +967,43 @@ export class ProductsListComponent implements OnInit {
           console.error('Error deleting product:', error);
         }
       });
+    }
+  }
+
+  // Quick filter methods
+  setStatusFilter(status: string | 'ALL') {
+    this.statusFilter = status;
+    this.applyClientSideFilters();
+  }
+
+  applyClientSideFilters() {
+    if (this.gridApi) {
+      // Clear existing filters first
+      this.gridApi.setFilterModel(null);
+      
+      const filters: any = {};
+      
+      // Apply status filter if not 'ALL'
+      if (this.statusFilter !== 'ALL') {
+        filters.status = {
+          type: 'equals',
+          filter: this.statusFilter
+        };
+      }
+      
+      // Apply filters if any exist
+      if (Object.keys(filters).length > 0) {
+        this.gridApi.setFilterModel(filters);
+      }
+    }
+  }
+
+  clearAllFilters() {
+    this.statusFilter = 'ALL';
+    
+    // Clear client-side filters
+    if (this.gridApi) {
+      this.gridApi.setFilterModel(null);
     }
   }
 

@@ -429,6 +429,8 @@ export class CategoriesComponent implements OnInit {
     suppressRowClickSelection: true,
     rowSelection: 'multiple',
     animateRows: true,
+    // Custom no rows overlay
+    overlayNoRowsTemplate: 'No matching criteria',
     rowHeight: 56,
     headerHeight: 48,
     suppressRowHoverHighlight: false,
