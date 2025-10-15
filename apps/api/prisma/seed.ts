@@ -1090,16 +1090,16 @@ async function main() {
 
     // Add test products with different statuses for filtering
     prisma.product.upsert({
-      where: { sku: 'TEST-DISCONTINUED' },
-      update: { status: 'DISCONTINUED' },
+      where: { sku: 'TEST-INACTIVE' },
+      update: { status: 'INACTIVE' },
       create: {
-        sku: 'TEST-DISCONTINUED',
-        name: 'Discontinued Product',
-        description: 'This product has been discontinued for testing',
+        sku: 'TEST-INACTIVE',
+        name: 'Inactive Product',
+        description: 'This product is inactive for testing',
         category: 'Electronics',
         unitId: units.find(u => u.code === 'pc')?.id,
         supplierId: suppliers[1].id,
-        status: 'DISCONTINUED',
+        status: 'INACTIVE',
         storageType: 'AMBIENT',
       },
     }),
